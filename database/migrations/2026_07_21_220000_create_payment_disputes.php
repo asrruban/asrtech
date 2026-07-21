@@ -52,7 +52,7 @@ return new class extends Migration
             $table->string('action');
             $table->timestamp('acted_at');
             $table->timestamps();
-            $table->unique(['payment_dispute_id', 'license_id']);
+            $table->unique(['payment_dispute_id', 'license_id'], 'pd_license_unique');
         });
     }
 
