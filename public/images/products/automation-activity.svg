@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title">
+  <title id="title">ASRTech automation activity log</title>
+  <rect width="1200" height="750" fill="#f1f5f9"/>
+  <rect x="58" y="52" width="1084" height="646" rx="28" fill="#fff"/>
+  <text x="108" y="126" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#0f172a">Activity log</text>
+  <rect x="108" y="164" width="984" height="70" rx="14" fill="#f8fafc" stroke="#e2e8f0"/>
+  <circle cx="148" cy="199" r="13" fill="#38bdf8"/><rect x="178" y="189" width="240" height="18" rx="9" fill="#cbd5e1"/><rect x="900" y="182" width="150" height="34" rx="17" fill="#dcfce7"/>
+  <g font-family="Arial,sans-serif"><text x="108" y="286" font-size="15" font-weight="700" fill="#64748b">WORKFLOW</text><text x="530" y="286" font-size="15" font-weight="700" fill="#64748b">STARTED</text><text x="792" y="286" font-size="15" font-weight="700" fill="#64748b">DURATION</text><text x="982" y="286" font-size="15" font-weight="700" fill="#64748b">STATUS</text></g>
+  <g stroke="#e2e8f0"><path d="M108 310h984"/><path d="M108 390h984"/><path d="M108 470h984"/><path d="M108 550h984"/></g>
+  <g font-family="Arial,sans-serif" font-size="16" fill="#334155"><text x="108" y="357">Service provisioning</text><text x="108" y="437">Payment confirmation</text><text x="108" y="517">Renewal notification</text><text x="108" y="597">Account synchronization</text></g>
+  <g fill="#10b981"><circle cx="1018" cy="350" r="9"/><circle cx="1018" cy="430" r="9"/><circle cx="1018" cy="510" r="9"/><circle cx="1018" cy="590" r="9"/></g>
+</svg>

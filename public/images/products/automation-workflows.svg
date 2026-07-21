@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-labelledby="title">
+  <title id="title">ASRTech workflow builder</title>
+  <rect width="1200" height="750" fill="#e0f2fe"/>
+  <rect x="58" y="52" width="1084" height="646" rx="28" fill="#fff"/>
+  <text x="110" y="132" font-family="Arial,sans-serif" font-size="34" font-weight="700" fill="#0f172a">Workflow builder</text>
+  <text x="110" y="170" font-family="Arial,sans-serif" font-size="17" fill="#64748b">Connect triggers, conditions, and actions</text>
+  <g stroke="#38bdf8" stroke-width="8" fill="none"><path d="M310 375h155"/><path d="M735 375h155"/></g>
+  <g><rect x="110" y="280" width="200" height="190" rx="20" fill="#eff6ff" stroke="#60a5fa" stroke-width="3"/><rect x="465" y="280" width="270" height="190" rx="20" fill="#f5f3ff" stroke="#a78bfa" stroke-width="3"/><rect x="890" y="280" width="200" height="190" rx="20" fill="#ecfdf5" stroke="#34d399" stroke-width="3"/></g>
+  <g font-family="Arial,sans-serif" text-anchor="middle" fill="#0f172a"><text x="210" y="350" font-size="18" font-weight="700">Trigger</text><text x="210" y="388" font-size="15">Invoice overdue</text><text x="600" y="350" font-size="18" font-weight="700">Condition</text><text x="600" y="388" font-size="15">Balance exceeds threshold</text><text x="990" y="350" font-size="18" font-weight="700">Action</text><text x="990" y="388" font-size="15">Notify account owner</text></g>
+</svg>
