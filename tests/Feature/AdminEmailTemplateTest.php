@@ -14,6 +14,12 @@ class AdminEmailTemplateTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withoutVite();
+    }
+
     public function test_default_system_templates_are_seeded(): void
     {
         $this->actingAs($this->admin(), 'admin');
@@ -22,7 +28,7 @@ class AdminEmailTemplateTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/Configuration/Settings/EmailTemplates/Index')
-                ->has('templates', 8)
+                ->has('templates', 9)
                 ->has('categories'));
 
         $this->assertTrue(
@@ -48,6 +54,9 @@ class AdminEmailTemplateTest extends TestCase
         );
         $this->assertTrue(
             EmailTemplate::query()->where('slug', 'refund-request-decision')->where('is_system', true)->exists(),
+        );
+        $this->assertTrue(
+            EmailTemplate::query()->where('slug', 'product-release-published')->where('is_system', true)->exists(),
         );
     }
 

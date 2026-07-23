@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonInterface|null $available_until
  * @property int|null $download_limit
  * @property bool $status
+ * @property CarbonInterface|null $notification_queued_at
+ * @property CarbonInterface|null $notified_at
  * @property int $downloads_count
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
@@ -44,6 +46,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'available_until',
     'download_limit',
     'status',
+    'notification_queued_at',
+    'notified_at',
 ])]
 class ProductRelease extends Model
 {
@@ -55,6 +59,8 @@ class ProductRelease extends Model
             'released_at' => 'datetime',
             'available_until' => 'datetime',
             'status' => 'boolean',
+            'notification_queued_at' => 'datetime',
+            'notified_at' => 'datetime',
         ];
     }
 

@@ -6,6 +6,8 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 /**
  * Admin-configurable upload storage: the `uploads` disk is rebuilt at boot
@@ -52,6 +54,19 @@ class StorageService
     public function storeUpload(UploadedFile $file, string $purpose): string
     {
         $path = (string) $this->disk()->putFile($this->pathFor($purpose), $file, 'public');
+
+        return $this->url($path);
+    }
+
+    /** Store generated content under the configured public upload disk. */
+    public function storeContents(string $contents, string $purpose, string $extension): string
+    {
+        $filename = Str::uuid().'.'.ltrim($extension, '.');
+        $path = trim($this->pathFor($purpose), '/').'/'.$filename;
+
+        if (! $this->disk()->put($path, $contents, 'public')) {
+            throw new RuntimeException('Unable to store the generated image.');
+        }
 
         return $this->url($path);
     }

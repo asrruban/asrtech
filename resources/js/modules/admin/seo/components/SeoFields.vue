@@ -1,5 +1,9 @@
 <script setup lang="ts">
+import { LoaderCircle, Sparkles } from '@lucide/vue';
+import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
+import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -9,25 +13,96 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-const props = defineProps(['seo', 'errors']);
+const props = defineProps(['seo', 'errors', 'aiContext']);
 const emit = defineEmits(['update:seo']);
+const generating = ref(false);
+const aiError = ref('');
 const update = (key, value) => {
     emit('update:seo', { ...props.seo, [key]: String(value) });
 };
 const eventValue = (event: Event): string =>
     (event.target as HTMLInputElement).value;
+const generateSeo = async () => {
+    if (!props.aiContext?.name?.trim()) {
+        aiError.value = 'Enter a name before generating SEO.';
+
+        return;
+    }
+
+    generating.value = true;
+    aiError.value = '';
+
+    try {
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content') ?? '';
+        const response = await fetch('/admin/seo/generate', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+            },
+            body: JSON.stringify(props.aiContext),
+        });
+        const payload: any = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(
+                payload.errors?.ai?.[0] ||
+                    payload.message ||
+                    'SEO generation failed.',
+            );
+        }
+
+        emit('update:seo', {
+            ...props.seo,
+            ...payload.seo,
+            schema_json: payload.seo.schema_json
+                ? JSON.stringify(payload.seo.schema_json, null, 2)
+                : props.seo.schema_json,
+        });
+        toast.success('SEO fields generated. Review them before saving.');
+    } catch (error) {
+        aiError.value =
+            error instanceof Error
+                ? error.message
+                : 'SEO generation failed. Please try again.';
+    } finally {
+        generating.value = false;
+    }
+};
 </script>
 
 <template>
     <Card>
-        <CardHeader>
-            <CardTitle>Search engine optimization</CardTitle>
-            <CardDescription>
-                Control search snippets, canonical URLs, social cards, and
-                structured data.
-            </CardDescription>
+        <CardHeader class="gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <CardTitle>Search engine optimization</CardTitle>
+                <CardDescription class="mt-1">
+                    Control search snippets, canonical URLs, social cards, and
+                    structured data.
+                </CardDescription>
+            </div>
+            <Button
+                v-if="aiContext"
+                type="button"
+                variant="outline"
+                :disabled="generating"
+                @click="generateSeo"
+            >
+                <LoaderCircle v-if="generating" class="size-4 animate-spin" />
+                <Sparkles v-else class="size-4" />
+                {{ generating ? 'Generating…' : 'Generate SEO with ChatGPT' }}
+            </Button>
         </CardHeader>
         <CardContent class="grid gap-5 md:grid-cols-2">
+            <InputError
+                v-if="aiError"
+                class="md:col-span-2"
+                :message="aiError"
+            />
             <div class="space-y-2 md:col-span-2">
                 <Label>Meta title</Label>
                 <Input

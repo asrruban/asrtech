@@ -35,14 +35,6 @@ const addAddon = () =>
         currency: props.currency,
         purchase_url: '',
     });
-const addReview = () =>
-    props.form.reviews.push({
-        name: '',
-        title: '',
-        rating: 5,
-        content: '',
-        reviewed_at: '',
-    });
 </script>
 
 <template>
@@ -323,68 +315,6 @@ const addReview = () =>
             </div>
             <Button type="button" variant="outline" @click="addAddon">
                 <Plus class="size-4" /> Add optional service
-            </Button>
-        </CardContent>
-    </Card>
-
-    <Card v-show="activeSection === 'reviews'">
-        <CardHeader>
-            <CardTitle>Customer reviews</CardTitle>
-            <CardDescription>
-                Publish approved testimonials and ratings for this product.
-            </CardDescription>
-        </CardHeader>
-        <CardContent class="space-y-4">
-            <div
-                v-for="(review, index) in form.reviews"
-                :key="index"
-                class="space-y-4 rounded-lg border p-4"
-            >
-                <div class="grid gap-4 md:grid-cols-[1fr_1fr_120px_160px_auto]">
-                    <div class="space-y-2">
-                        <Label>Customer name</Label>
-                        <Input v-model="review.name" required />
-                    </div>
-                    <div class="space-y-2">
-                        <Label>Review title</Label>
-                        <Input v-model="review.title" />
-                    </div>
-                    <div class="space-y-2">
-                        <Label>Rating</Label>
-                        <Input
-                            v-model.number="review.rating"
-                            type="number"
-                            min="1"
-                            max="5"
-                            required
-                        />
-                    </div>
-                    <div class="space-y-2">
-                        <Label>Date</Label>
-                        <Input v-model="review.reviewed_at" type="date" />
-                    </div>
-                    <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        class="self-end text-destructive"
-                        @click="form.reviews.splice(index, 1)"
-                    >
-                        <Trash2 class="size-4" />
-                    </Button>
-                </div>
-                <div class="space-y-2">
-                    <Label>Review</Label>
-                    <textarea
-                        v-model="review.content"
-                        rows="4"
-                        required
-                        class="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
-                    />
-                </div>
-            </div>
-            <Button type="button" variant="outline" @click="addReview">
-                <Plus class="size-4" /> Add review
             </Button>
         </CardContent>
     </Card>

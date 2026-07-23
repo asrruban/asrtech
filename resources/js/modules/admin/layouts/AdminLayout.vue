@@ -8,6 +8,7 @@ import {
     Layers3,
     LayoutDashboard,
     LifeBuoy,
+    MessageSquareText,
     Package,
     PanelsTopLeft,
     ReceiptText,
@@ -53,9 +54,18 @@ const page = usePage();
 const breadcrumbNavigation = [
     { title: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
     { title: 'All Products', href: '/admin/products', icon: Package },
+    {
+        title: 'Product Reviews',
+        href: '/admin/product-reviews',
+        icon: MessageSquareText,
+    },
     { title: 'Product Types', href: '/admin/product-types', icon: Layers3 },
     { title: 'Categories', href: '/admin/categories', icon: Tags },
-    { title: 'Groups', href: '/admin/groups', icon: Layers3 },
+    {
+        title: 'Subcategories',
+        href: '/admin/subcategories',
+        icon: Layers3,
+    },
     { title: 'Users', href: '/admin/users', icon: Users },
     { title: 'Payment Reliability', href: '/admin/payments', icon: Activity },
     { title: 'Invoices', href: '/admin/invoices', icon: ReceiptText },
@@ -121,7 +131,8 @@ const isProductsActive = () =>
         '/admin/products',
         '/admin/product-types',
         '/admin/categories',
-        '/admin/groups',
+        '/admin/subcategories',
+        '/admin/product-reviews',
     ].some(isActive);
 const isSettingsActive = () =>
     isActive('/admin/settings') || isActive('/admin/support/departments');
@@ -131,6 +142,9 @@ const unansweredTickets = computed(
 );
 const pendingRefundRequests = computed(
     () => page.props.adminBadges?.pendingRefundRequests ?? 0,
+);
+const pendingProductReviews = computed(
+    () => page.props.adminBadges?.pendingProductReviews ?? 0,
 );
 
 const currentNavigation = computed(
@@ -229,6 +243,32 @@ const breadcrumbs = computed(() => [
                                             <SidebarMenuSubButton
                                                 as-child
                                                 :is-active="
+                                                    isActive(
+                                                        '/admin/product-reviews',
+                                                    )
+                                                "
+                                            >
+                                                <Link
+                                                    href="/admin/product-reviews"
+                                                >
+                                                    <span>Reviews</span>
+                                                    <span
+                                                        v-if="
+                                                            pendingProductReviews
+                                                        "
+                                                        class="ml-auto rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-800"
+                                                    >
+                                                        {{
+                                                            pendingProductReviews
+                                                        }}
+                                                    </span>
+                                                </Link>
+                                            </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                        <SidebarMenuSubItem>
+                                            <SidebarMenuSubButton
+                                                as-child
+                                                :is-active="
                                                     isActive('/admin/products')
                                                 "
                                             >
@@ -255,11 +295,15 @@ const breadcrumbs = computed(() => [
                                             <SidebarMenuSubButton
                                                 as-child
                                                 :is-active="
-                                                    isActive('/admin/groups')
+                                                    isActive(
+                                                        '/admin/subcategories',
+                                                    )
                                                 "
                                             >
-                                                <Link href="/admin/groups">
-                                                    <span>Groups</span>
+                                                <Link
+                                                    href="/admin/subcategories"
+                                                >
+                                                    <span>Subcategories</span>
                                                 </Link>
                                             </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>

@@ -24,8 +24,12 @@ const navigation = computed(() => [
     { label: 'Products', href: '/products' },
     { label: 'Software Development', href: '/software-development' },
     { label: 'Support', href: '/support' },
-    ...(user.value ? [{ label: 'Client Area', href: '/client-area' }] : []),
 ]);
+const accountNavigation = computed(() =>
+    user.value
+        ? { label: 'Client Area', href: '/client-area' }
+        : { label: 'Sign in', href: '/login' },
+);
 const isActive = (href) =>
     href === '/' ? page.url === '/' : page.url.startsWith(href);
 </script>
@@ -110,14 +114,7 @@ const isActive = (href) =>
                         </span>
                     </Link>
                     <Link
-                        v-if="!user"
-                        href="/login"
-                        class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-                    >
-                        Sign in
-                    </Link>
-                    <Link
-                        v-else
+                        v-if="user"
                         href="/logout"
                         method="post"
                         as="button"
@@ -126,9 +123,10 @@ const isActive = (href) =>
                         Sign out
                     </Link>
                     <Button as-child size="sm">
-                        <a :href="`mailto:${site.supportEmail || ''}`"
-                            >Contact us <ArrowRight class="size-4"
-                        /></a>
+                        <Link :href="accountNavigation.href">
+                            {{ accountNavigation.label }}
+                            <ArrowRight class="size-4" />
+                        </Link>
                     </Button>
                 </nav>
 
@@ -227,15 +225,7 @@ const isActive = (href) =>
                         </span>
                     </Link>
                     <Link
-                        v-if="!user"
-                        href="/login"
-                        class="block rounded-md px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-slate-100 hover:text-primary dark:hover:bg-white/5"
-                        @click="mobileOpen = false"
-                    >
-                        Sign in
-                    </Link>
-                    <Link
-                        v-else
+                        v-if="user"
                         href="/logout"
                         method="post"
                         as="button"
@@ -246,9 +236,13 @@ const isActive = (href) =>
                     </Link>
 
                     <Button as-child class="mt-4 w-full">
-                        <a :href="`mailto:${site.supportEmail || ''}`">
-                            Contact us <ArrowRight class="ml-2 size-4" />
-                        </a>
+                        <Link
+                            :href="accountNavigation.href"
+                            @click="mobileOpen = false"
+                        >
+                            {{ accountNavigation.label }}
+                            <ArrowRight class="ml-2 size-4" />
+                        </Link>
                     </Button>
                 </div>
             </div>

@@ -119,6 +119,12 @@ class Product extends Model
         return $this->hasMany(ProductRelease::class);
     }
 
+    /** @return HasMany<ProductReview, $this> */
+    public function customerReviews(): HasMany
+    {
+        return $this->hasMany(ProductReview::class);
+    }
+
     /** @return HasMany<Subscription, $this> */
     public function subscriptions(): HasMany
     {

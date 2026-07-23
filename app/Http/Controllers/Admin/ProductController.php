@@ -8,19 +8,27 @@ use App\Http\Requests\Admin\SaveProductRequest;
 use App\Models\Category;
 use App\Models\Group;
 use App\Models\Product;
+use App\Models\ProductRelease;
 use App\Models\ProductType;
+use App\Services\ProductReleaseFileService;
+use App\Services\ProductReleaseNotificationService;
 use App\Services\ProductService;
 use App\Services\StorageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class ProductController extends Controller
 {
     public function __construct(
         private readonly ProductService $products,
         private readonly StorageService $storage,
+        private readonly ProductReleaseFileService $releaseFiles,
+        private readonly ProductReleaseNotificationService $releaseNotifications,
     ) {}
 
     public function index(Request $request): Response
@@ -62,12 +70,51 @@ class ProductController extends Controller
             );
         }
 
-        $this->products->execute(
-            new Product,
-            $data,
-            $request->prices(),
-            $request->seoData(),
-        );
+        /** @var array{disk: string, file_path: string}|null $storedReleaseFile */
+        $storedReleaseFile = null;
+        $release = null;
+
+        try {
+            DB::transaction(function () use ($request, $data, &$storedReleaseFile, &$release): void {
+                $product = $this->products->execute(
+                    new Product,
+                    $data,
+                    $request->prices(),
+                    $request->seoData(),
+                );
+
+                $metadata = $request->initialReleaseMetadata();
+                $file = $request->file('initial_release.file');
+
+                if ($metadata === null || ! $file instanceof UploadedFile) {
+                    return;
+                }
+
+                $storedReleaseFile = $this->releaseFiles->store($product, $file);
+                $release = $product->releases()->create([
+                    ...$metadata,
+                    ...$storedReleaseFile,
+                ]);
+                $product->update([
+                    'version' => $metadata['version'],
+                    'release_date' => $metadata['released_at'],
+                ]);
+            });
+        } catch (Throwable $exception) {
+            if ($storedReleaseFile !== null) {
+                $this->releaseFiles->deleteStoredFile($storedReleaseFile);
+            }
+
+            throw $exception;
+        }
+
+        if ($release instanceof ProductRelease) {
+            try {
+                $this->releaseNotifications->schedule($release);
+            } catch (Throwable $exception) {
+                report($exception);
+            }
+        }
 
         return redirect()->route('admin.products.index');
     }

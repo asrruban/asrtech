@@ -284,7 +284,7 @@ const initials = (name) =>
                                 class="flex items-center gap-2 text-slate-600 dark:text-slate-300"
                             >
                                 <Layers3 class="size-4 text-violet-500" />
-                                Groups
+                                Subcategories
                             </span>
                             <span class="font-semibold">{{
                                 stats.groups

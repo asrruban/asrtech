@@ -85,6 +85,7 @@ class ProductReleaseDownloadTest extends TestCase
 
     public function test_client_product_page_lists_only_current_published_releases(): void
     {
+        $this->withoutVite();
         Storage::fake('local');
         [$user, $product, $license] = $this->licensedProduct();
         $current = $this->release($product, ['version' => '2.5.0', 'download_limit' => 2]);

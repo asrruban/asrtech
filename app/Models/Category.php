@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 #[Fillable(['name', 'slug', 'description', 'status'])]
 class Category extends Model
@@ -26,5 +27,11 @@ class Category extends Model
     public function products(): HasMany
     {
         return $this->hasMany(Product::class);
+    }
+
+    /** @return MorphOne<SeoMetadata, $this> */
+    public function seo(): MorphOne
+    {
+        return $this->morphOne(SeoMetadata::class, 'seoable');
     }
 }

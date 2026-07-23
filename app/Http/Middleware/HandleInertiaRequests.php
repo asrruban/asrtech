@@ -6,6 +6,7 @@ use App\Enums\InvoiceStatus;
 use App\Http\Controllers\Client\SocialAuthController;
 use App\Models\Admin;
 use App\Models\Invoice;
+use App\Models\ProductReview;
 use App\Models\RefundRequest;
 use App\Models\Ticket;
 use App\Models\User;
@@ -76,6 +77,7 @@ class HandleInertiaRequests extends Middleware
             'adminBadges' => fn () => $request->user('admin') !== null ? [
                 'unansweredTickets' => Ticket::query()->awaitingReply()->count(),
                 'pendingRefundRequests' => RefundRequest::query()->where('status', 'pending')->count(),
+                'pendingProductReviews' => ProductReview::query()->where('status', 'pending')->count(),
             ] : null,
             // Client-area nav counters (products / tickets / unpaid invoices).
             'clientBadges' => function () use ($request) {

@@ -471,6 +471,21 @@ const formatDate = (value: string) =>
                                         </template>
                                     </p>
                                     <p
+                                        v-if="release.notified_at"
+                                        class="mt-1 text-xs font-medium text-emerald-700"
+                                    >
+                                        Customer update emails queued
+                                        {{ formatDate(release.notified_at) }}
+                                    </p>
+                                    <p
+                                        v-else-if="
+                                            release.notification_queued_at
+                                        "
+                                        class="mt-1 text-xs font-medium text-amber-700"
+                                    >
+                                        Customer notification batch is queued
+                                    </p>
+                                    <p
                                         class="mt-2 max-w-3xl font-mono text-[11px] break-all text-muted-foreground"
                                     >
                                         SHA-256:

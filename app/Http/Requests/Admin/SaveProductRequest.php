@@ -90,12 +90,29 @@ class SaveProductRequest extends FormRequest
             'addons.*.sale_price' => ['nullable', 'numeric', 'min:0', 'max:9999999999.99'],
             'addons.*.currency' => ['required', 'string', 'size:3'],
             'addons.*.purchase_url' => ['nullable', 'url', 'max:2000'],
-            'reviews' => ['nullable', 'array', 'max:50'],
-            'reviews.*.name' => ['required', 'string', 'max:150'],
-            'reviews.*.title' => ['nullable', 'string', 'max:255'],
-            'reviews.*.rating' => ['required', 'integer', 'between:1,5'],
-            'reviews.*.content' => ['required', 'string', 'max:5000'],
-            'reviews.*.reviewed_at' => ['nullable', 'date'],
+
+            'initial_release' => [$product === null ? 'nullable' : 'prohibited', 'array'],
+            'initial_release.version' => [
+                Rule::requiredIf(fn (): bool => $this->hasFile('initial_release.file')),
+                'nullable',
+                'string',
+                'max:100',
+            ],
+            'initial_release.title' => ['nullable', 'string', 'max:255'],
+            'initial_release.release_notes' => ['nullable', 'string', 'max:20000'],
+            'initial_release.released_at' => [
+                Rule::requiredIf(fn (): bool => $this->hasFile('initial_release.file')),
+                'nullable',
+                'date',
+            ],
+            'initial_release.available_until' => [
+                'nullable',
+                'date',
+                'after:initial_release.released_at',
+            ],
+            'initial_release.download_limit' => ['nullable', 'integer', 'min:1', 'max:100000'],
+            'initial_release.status' => ['sometimes', 'boolean'],
+            'initial_release.file' => ['nullable', 'file', 'max:512000'],
 
             'prices' => ['required', 'array', 'min:1'],
             'prices.*.billing_cycle' => ['required', 'distinct', Rule::enum(BillingCycle::class)],
@@ -162,7 +179,6 @@ class SaveProductRequest extends FormRequest
         $data['documentation_robots'] ??= 'index,follow';
         $data['requirements'] = $this->rows('requirements');
         $data['addons'] = $this->rows('addons');
-        $data['reviews'] = $this->rows('reviews');
         $data['feature_groups'] = array_map(
             fn (array $group): array => [
                 ...$group,
@@ -179,6 +195,25 @@ class SaveProductRequest extends FormRequest
         );
 
         return $data;
+    }
+
+    /** @return array<string, mixed>|null */
+    public function initialReleaseMetadata(): ?array
+    {
+        if (! $this->hasFile('initial_release.file')) {
+            return null;
+        }
+
+        $release = $this->validated('initial_release');
+
+        if (! is_array($release)) {
+            return null;
+        }
+
+        unset($release['file']);
+        $release['status'] = (bool) ($release['status'] ?? false);
+
+        return $release;
     }
 
     /** @return list<array<string, mixed>> */

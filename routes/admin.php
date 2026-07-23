@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AiProductContentController;
+use App\Http\Controllers\Admin\AiProductIconController;
+use App\Http\Controllers\Admin\AiSeoController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BrandingController;
 use App\Http\Controllers\Admin\CategoryController;
@@ -17,6 +20,7 @@ use App\Http\Controllers\Admin\PageController;
 use App\Http\Controllers\Admin\PaymentReliabilityController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductReleaseController;
+use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\PromotionCodeController;
 use App\Http\Controllers\Admin\RefundRequestController;
@@ -59,9 +63,22 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('categories', CategoryController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->middleware('admin.permission:catalog.manage');
+        Route::resource('subcategories', GroupController::class)
+            ->parameters(['subcategories' => 'group'])
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('admin.permission:catalog.manage');
         Route::resource('groups', GroupController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->middleware('admin.permission:catalog.manage');
+        Route::post('seo/generate', AiSeoController::class)
+            ->middleware(['admin.permission:catalog.manage', 'throttle:10,1'])
+            ->name('seo.generate');
+        Route::post('products/ai/content', AiProductContentController::class)
+            ->middleware(['admin.permission:catalog.manage', 'throttle:10,1'])
+            ->name('products.ai.content');
+        Route::post('products/ai/icon', AiProductIconController::class)
+            ->middleware(['admin.permission:catalog.manage', 'throttle:5,1'])
+            ->name('products.ai.icon');
         Route::resource('products', ProductController::class)
             ->except(['show'])
             ->middleware('admin.permission:catalog.manage');
@@ -77,6 +94,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::delete('products/{product}/releases/{release}', [ProductReleaseController::class, 'destroy'])
             ->middleware('admin.permission:catalog.manage')
             ->name('products.releases.destroy');
+        Route::get('product-reviews', [ProductReviewController::class, 'index'])
+            ->middleware('admin.permission:catalog.manage')
+            ->name('product-reviews.index');
+        Route::patch('product-reviews/{review}', [ProductReviewController::class, 'update'])
+            ->middleware('admin.permission:catalog.manage')
+            ->name('product-reviews.update');
         Route::resource('product-types', ProductTypeController::class)
             ->only(['index', 'store', 'update', 'destroy'])
             ->middleware('admin.permission:catalog.manage');

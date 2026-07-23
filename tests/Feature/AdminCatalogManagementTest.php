@@ -28,12 +28,12 @@ class AdminCatalogManagementTest extends TestCase
 
         $category = Category::query()->where('name', 'Software')->firstOrFail();
 
-        $this->post('/admin/groups', [
+        $this->post('/admin/subcategories', [
             'category_id' => $category->id,
             'name' => 'Security',
             'description' => 'Security licenses',
             'status' => true,
-        ])->assertRedirect('/admin/groups');
+        ])->assertRedirect('/admin/subcategories');
 
         $group = Group::query()->where('name', 'Security')->firstOrFail();
 
@@ -281,6 +281,7 @@ class AdminCatalogManagementTest extends TestCase
     {
         $this->get('/admin/products')->assertRedirect('/admin/login');
         $this->get('/admin/categories')->assertRedirect('/admin/login');
+        $this->get('/admin/subcategories')->assertRedirect('/admin/login');
         $this->get('/admin/groups')->assertRedirect('/admin/login');
         $this->get('/admin/product-types')->assertRedirect('/admin/login');
     }

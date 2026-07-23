@@ -65,6 +65,10 @@ class EmailTemplateService
             'client_name', 'request_number', 'request_amount', 'request_status',
             'decision_note', 'invoice_number', 'invoice_url',
         ],
+        'product-release-published' => [
+            'client_name', 'product_name', 'version', 'release_title',
+            'release_notes', 'release_date', 'downloads_url',
+        ],
     ];
 
     /**

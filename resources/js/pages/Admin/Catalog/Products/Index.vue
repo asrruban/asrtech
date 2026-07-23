@@ -76,7 +76,7 @@ const paginationLabel = (value) =>
                             <tr>
                                 <th class="px-5 py-3 font-medium">Product</th>
                                 <th class="px-5 py-3 font-medium">
-                                    Category / Group
+                                    Category / Subcategory
                                 </th>
                                 <th class="px-5 py-3 font-medium">Type</th>
                                 <th class="px-5 py-3 text-right font-medium">

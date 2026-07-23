@@ -24,3 +24,7 @@ Schedule::command('subscriptions:send-renewal-reminders')
     ->withoutOverlapping();
 
 Schedule::command('invoices:send-reminders')->dailyAt('09:00');
+
+Schedule::command('products:send-release-notifications')
+    ->everyFiveMinutes()
+    ->withoutOverlapping();

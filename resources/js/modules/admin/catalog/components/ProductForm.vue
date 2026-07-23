@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
-import { Save } from '@lucide/vue';
+import { ImagePlus, LoaderCircle, Save, Sparkles } from '@lucide/vue';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,12 @@ const props = defineProps([
     'product',
 ]);
 const existingSeo = props.product?.seo;
+const localDateTime = () => {
+    const date = new Date();
+    date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+
+    return date.toISOString().slice(0, 16);
+};
 const activeSection = ref('details');
 const sections = [
     { value: 'details', label: 'Product details' },
@@ -34,9 +41,11 @@ const sections = [
     { value: 'pricing', label: 'Pricing and licenses' },
     { value: 'features', label: 'Feature groups' },
     { value: 'requirements', label: 'Requirements' },
+    ...(!props.product
+        ? [{ value: 'release', label: 'Product file and release' }]
+        : []),
     { value: 'changelog', label: 'Changelog' },
     { value: 'addons', label: 'Optional services' },
-    { value: 'reviews', label: 'Customer reviews' },
     { value: 'documentation', label: 'Documentation' },
     { value: 'seo', label: 'Search engine optimization' },
 ];
@@ -89,7 +98,16 @@ const form = useForm({
         notes: (release.notes ?? []).join('\n'),
     })),
     addons: props.product?.addons ?? [],
-    reviews: props.product?.reviews ?? [],
+    initial_release: {
+        version: '',
+        title: '',
+        release_notes: '',
+        released_at: localDateTime(),
+        available_until: '',
+        download_limit: '' as string | number,
+        status: true,
+        file: null as File | null,
+    },
     status: props.product?.status ?? true,
     featured: props.product?.featured ?? false,
     has_free_trial: props.product?.has_free_trial ?? false,
@@ -117,6 +135,12 @@ const form = useForm({
 const filteredGroups = computed(() =>
     props.groups.filter((group) => group.category_id === form.category_id),
 );
+const selectedCategory = computed(() =>
+    props.categories.find((category) => category.id === form.category_id),
+);
+const selectedGroup = computed(() =>
+    props.groups.find((group) => group.id === form.group_id),
+);
 const slugify = (value: string) =>
     value
         .toLowerCase()
@@ -134,6 +158,104 @@ const uploadedImagePreview = ref('');
 const featuredImagePreview = computed(
     () => uploadedImagePreview.value || form.featured_image,
 );
+const generatingContent = ref(false);
+const generatingIcon = ref(false);
+const aiError = ref('');
+const csrfToken = () =>
+    document
+        .querySelector('meta[name="csrf-token"]')
+        ?.getAttribute('content') ?? '';
+const jsonPost = async (url: string, body: Record<string, unknown>) => {
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken(),
+        },
+        body: JSON.stringify(body),
+    });
+    const payload: any = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(
+            payload.errors?.ai?.[0] ||
+                payload.message ||
+                'AI generation failed.',
+        );
+    }
+
+    return payload;
+};
+const generateContent = async () => {
+    if (!form.name.trim()) {
+        aiError.value = 'Enter a product name before generating content.';
+
+        return;
+    }
+
+    generatingContent.value = true;
+    aiError.value = '';
+
+    try {
+        const payload = await jsonPost('/admin/products/ai/content', {
+            name: form.name,
+            product_type: selectedProductType.value?.name ?? form.type,
+            category: selectedCategory.value?.name ?? null,
+            subcategory: selectedGroup.value?.name ?? null,
+            compatibility: form.compatibility || null,
+            php_compatibility: form.php_compatibility || null,
+            existing_details:
+                form.description || form.short_description || null,
+        });
+
+        Object.assign(form, payload.content);
+        toast.success(
+            'Product description and documentation generated. Review before saving.',
+        );
+    } catch (error) {
+        aiError.value =
+            error instanceof Error
+                ? error.message
+                : 'Product content generation failed.';
+    } finally {
+        generatingContent.value = false;
+    }
+};
+const generateIcon = async () => {
+    if (!form.name.trim()) {
+        aiError.value = 'Enter a product name before generating an icon.';
+
+        return;
+    }
+
+    generatingIcon.value = true;
+    aiError.value = '';
+
+    try {
+        const payload = await jsonPost('/admin/products/ai/icon', {
+            name: form.name,
+        });
+
+        if (uploadedImagePreview.value) {
+            URL.revokeObjectURL(uploadedImagePreview.value);
+            uploadedImagePreview.value = '';
+        }
+
+        form.featured_image_upload = null;
+        form.featured_image = payload.url;
+        toast.success(
+            `Featured icon generated using only “${payload.brand}” as product context.`,
+        );
+    } catch (error) {
+        aiError.value =
+            error instanceof Error
+                ? error.message
+                : 'Product icon generation failed.';
+    } finally {
+        generatingIcon.value = false;
+    }
+};
 const selectFeaturedImage = (event: Event) => {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
@@ -144,6 +266,10 @@ const selectFeaturedImage = (event: Event) => {
 
     form.featured_image_upload = file;
     uploadedImagePreview.value = file ? URL.createObjectURL(file) : '';
+};
+const selectInitialReleaseFile = (event: Event) => {
+    form.initial_release.file =
+        (event.target as HTMLInputElement).files?.[0] ?? null;
 };
 
 onBeforeUnmount(() => {
@@ -163,12 +289,22 @@ watch(
     },
 );
 const submit = () => {
-    form.transform((data) => ({
-        ...data,
-        ...(props.product ? { _method: 'put' } : {}),
-        group_id: data.group_id === '' ? null : data.group_id,
-        prices: data.prices.filter((price) => price.enabled),
-    }));
+    form.transform((data) => {
+        const transformed = {
+            ...data,
+            group_id: data.group_id === '' ? null : data.group_id,
+            prices: data.prices.filter((price) => price.enabled),
+        };
+
+        if (!props.product) {
+            return transformed;
+        }
+
+        const { initial_release: _initialRelease, ...editableData } =
+            transformed;
+
+        return { ...editableData, _method: 'put' };
+    });
 
     const options = {
         onError: (errors) => {
@@ -192,8 +328,10 @@ const submit = () => {
                 activeSection.value = 'changelog';
             } else if (fields.some((field) => field.startsWith('addons'))) {
                 activeSection.value = 'addons';
-            } else if (fields.some((field) => field.startsWith('reviews'))) {
-                activeSection.value = 'reviews';
+            } else if (
+                fields.some((field) => field.startsWith('initial_release'))
+            ) {
+                activeSection.value = 'release';
             } else if (
                 fields.some((field) => field.startsWith('documentation_'))
             ) {
@@ -231,14 +369,40 @@ const label = (value) =>
 
             <div class="min-w-0 space-y-6">
                 <Card v-show="activeSection === 'details'">
-                    <CardHeader>
-                        <CardTitle>Product details</CardTitle>
-                        <CardDescription>
-                            Describe the WHMCS module, template, license, or
-                            development service.
-                        </CardDescription>
+                    <CardHeader
+                        class="gap-4 sm:flex-row sm:items-start sm:justify-between"
+                    >
+                        <div>
+                            <CardTitle>Product details</CardTitle>
+                            <CardDescription class="mt-1">
+                                Describe the WHMCS module, template, license, or
+                                development service.
+                            </CardDescription>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            :disabled="generatingContent"
+                            @click="generateContent"
+                        >
+                            <LoaderCircle
+                                v-if="generatingContent"
+                                class="size-4 animate-spin"
+                            />
+                            <Sparkles v-else class="size-4" />
+                            {{
+                                generatingContent
+                                    ? 'Writing…'
+                                    : 'Write description & docs'
+                            }}
+                        </Button>
                     </CardHeader>
                     <CardContent class="grid gap-5 md:grid-cols-2">
+                        <InputError
+                            v-if="aiError"
+                            class="md:col-span-2"
+                            :message="aiError"
+                        />
                         <div class="space-y-2 md:col-span-2">
                             <Label for="product-name">Name</Label>
                             <Input
@@ -284,13 +448,13 @@ const label = (value) =>
                         </div>
 
                         <div class="space-y-2">
-                            <Label for="product-group">Group</Label>
+                            <Label for="product-group">Subcategory</Label>
                             <select
                                 id="product-group"
                                 v-model.number="form.group_id"
                                 class="h-9 w-full rounded-md border bg-transparent px-3 text-sm"
                             >
-                                <option value="">No group</option>
+                                <option value="">No subcategory</option>
                                 <option
                                     v-for="group in filteredGroups"
                                     :key="group.id"
@@ -444,6 +608,29 @@ const label = (value) =>
                                         "
                                     />
                                 </div>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    :disabled="generatingIcon"
+                                    @click="generateIcon"
+                                >
+                                    <LoaderCircle
+                                        v-if="generatingIcon"
+                                        class="size-4 animate-spin"
+                                    />
+                                    <ImagePlus v-else class="size-4" />
+                                    {{
+                                        generatingIcon
+                                            ? 'Generating icon…'
+                                            : 'Generate icon from product name'
+                                    }}
+                                </Button>
+                                <p class="text-xs text-muted-foreground">
+                                    Generic words are removed first. For
+                                    “QuickBooks Payments Gateway module for
+                                    WHMCS,” only “QuickBooks” is sent as the
+                                    product context.
+                                </p>
                             </div>
                             <div
                                 class="flex min-h-36 items-center justify-center overflow-hidden rounded-lg border bg-background"
@@ -514,6 +701,148 @@ const label = (value) =>
                                 Enable 7 days Free Trial
                             </label>
                         </div>
+                    </CardContent>
+                </Card>
+
+                <Card v-if="!product" v-show="activeSection === 'release'">
+                    <CardHeader>
+                        <CardTitle
+                            >Initial product file and changelog</CardTitle
+                        >
+                        <CardDescription>
+                            Optionally upload the first private release package
+                            while creating the product. Customers with an
+                            eligible license can download it from their client
+                            area.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent class="space-y-5">
+                        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+                            <div class="space-y-2">
+                                <Label for="initial-release-version">
+                                    Version
+                                </Label>
+                                <Input
+                                    id="initial-release-version"
+                                    v-model="form.initial_release.version"
+                                    placeholder="1.0.0"
+                                />
+                                <InputError
+                                    :message="
+                                        form.errors['initial_release.version']
+                                    "
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <Label for="initial-release-title">
+                                    Release title
+                                </Label>
+                                <Input
+                                    id="initial-release-title"
+                                    v-model="form.initial_release.title"
+                                    placeholder="Initial release"
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <Label for="initial-release-date">
+                                    Release date
+                                </Label>
+                                <Input
+                                    id="initial-release-date"
+                                    v-model="form.initial_release.released_at"
+                                    type="datetime-local"
+                                />
+                                <InputError
+                                    :message="
+                                        form.errors[
+                                            'initial_release.released_at'
+                                        ]
+                                    "
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <Label for="initial-release-expiry">
+                                    Available until
+                                </Label>
+                                <Input
+                                    id="initial-release-expiry"
+                                    v-model="
+                                        form.initial_release.available_until
+                                    "
+                                    type="datetime-local"
+                                />
+                                <InputError
+                                    :message="
+                                        form.errors[
+                                            'initial_release.available_until'
+                                        ]
+                                    "
+                                />
+                            </div>
+                        </div>
+
+                        <div class="grid gap-5 md:grid-cols-[1fr_220px]">
+                            <div class="space-y-2">
+                                <Label for="initial-release-file">
+                                    Product package
+                                </Label>
+                                <Input
+                                    id="initial-release-file"
+                                    type="file"
+                                    @change="selectInitialReleaseFile"
+                                />
+                                <p class="text-xs text-muted-foreground">
+                                    Maximum 500 MB. The package is stored
+                                    privately outside the public web root.
+                                </p>
+                                <InputError
+                                    :message="
+                                        form.errors['initial_release.file']
+                                    "
+                                />
+                            </div>
+                            <div class="space-y-2">
+                                <Label for="initial-release-limit">
+                                    Downloads per license
+                                </Label>
+                                <Input
+                                    id="initial-release-limit"
+                                    v-model="
+                                        form.initial_release.download_limit
+                                    "
+                                    type="number"
+                                    min="1"
+                                    placeholder="Unlimited"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="space-y-2">
+                            <Label for="initial-release-notes">
+                                Changelog / release notes
+                            </Label>
+                            <textarea
+                                id="initial-release-notes"
+                                v-model="form.initial_release.release_notes"
+                                rows="7"
+                                placeholder="Added secure payment processing&#10;Added transaction status synchronization"
+                                class="w-full rounded-md border bg-transparent px-3 py-2 text-sm"
+                            />
+                            <InputError
+                                :message="
+                                    form.errors['initial_release.release_notes']
+                                "
+                            />
+                        </div>
+
+                        <label class="flex items-center gap-2 text-sm">
+                            <input
+                                v-model="form.initial_release.status"
+                                type="checkbox"
+                                class="size-4 rounded"
+                            />
+                            Publish this release
+                        </label>
                     </CardContent>
                 </Card>
 

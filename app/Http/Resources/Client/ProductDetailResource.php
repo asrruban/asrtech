@@ -39,9 +39,9 @@ class ProductDetailResource extends JsonResource
             'gallery' => $this->gallery,
             'feature_groups' => $this->feature_groups,
             'requirements' => $this->requirements,
-            'changelog' => $this->changelog,
+            'changelog' => $this->changelogEntries(),
             'addons' => $this->addons,
-            'reviews' => $this->reviews,
+            'reviews' => $this->reviewEntries(),
             'category' => [
                 'name' => $this->category->name,
                 'slug' => $this->category->slug,
@@ -59,6 +59,58 @@ class ProductDetailResource extends JsonResource
                 'twitter_card',
                 'schema_json',
             ])),
+        ];
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function changelogEntries(): array
+    {
+        $legacy = is_array($this->changelog) ? $this->changelog : [];
+
+        if (! $this->relationLoaded('releases')) {
+            return array_values($legacy);
+        }
+
+        $releases = $this->releases->map(fn ($release): array => [
+            'version' => $release->version,
+            'released_at' => $release->released_at?->toDateString(),
+            'notes' => array_values(array_filter(array_map(
+                'trim',
+                preg_split('/\r\n|\r|\n/', (string) $release->release_notes) ?: [],
+            ))),
+        ])->all();
+        $releaseVersions = array_column($releases, 'version');
+
+        return [
+            ...$releases,
+            ...array_values(array_filter(
+                $legacy,
+                fn (mixed $entry): bool => is_array($entry)
+                    && ! in_array($entry['version'] ?? null, $releaseVersions, true),
+            )),
+        ];
+    }
+
+    /** @return list<array<string, mixed>> */
+    private function reviewEntries(): array
+    {
+        $legacy = is_array($this->reviews) ? $this->reviews : [];
+
+        if (! $this->relationLoaded('customerReviews')) {
+            return array_values($legacy);
+        }
+
+        return [
+            ...$this->customerReviews->map(fn ($review): array => [
+                'id' => $review->id,
+                'name' => $review->user?->name ?? 'Customer',
+                'title' => $review->title,
+                'rating' => $review->rating,
+                'content' => $review->content,
+                'reviewed_at' => $review->created_at?->toDateString(),
+                'verified_purchase' => true,
+            ])->all(),
+            ...array_values($legacy),
         ];
     }
 }

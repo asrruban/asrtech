@@ -16,6 +16,7 @@ use App\Http\Controllers\Client\HomeController;
 use App\Http\Controllers\Client\LicenseReissueController;
 use App\Http\Controllers\Client\ProductDocumentationController;
 use App\Http\Controllers\Client\ProductReleaseDownloadController;
+use App\Http\Controllers\Client\ProductReviewController;
 use App\Http\Controllers\Client\PublicPageController;
 use App\Http\Controllers\Client\PublicSupportController;
 use App\Http\Controllers\Client\RefundRequestController;
@@ -31,6 +32,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('products', [StorefrontProductController::class, 'index'])->name('products.index');
+Route::get('categories/{category:slug}', [StorefrontProductController::class, 'category'])
+    ->name('categories.show');
+Route::get('categories/{category:slug}/{group:slug}', [StorefrontProductController::class, 'subcategory'])
+    ->scopeBindings()
+    ->name('subcategories.show');
 Route::get('products/{productType:slug}/{product:slug}/documentation', ProductDocumentationController::class)
     ->scopeBindings()
     ->name('products.documentation');
@@ -209,6 +215,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('checkout/{product:slug}/prices/{price}', CheckoutController::class)
         ->scopeBindings()
         ->name('checkout.store');
+    Route::post(
+        'products/{productType:slug}/{product:slug}/reviews',
+        ProductReviewController::class,
+    )
+        ->scopeBindings()
+        ->middleware('throttle:10,1')
+        ->name('products.reviews.store');
     Route::get('checkout', [CartCheckoutController::class, 'create'])->name('checkout.create');
     Route::post('checkout', [CartCheckoutController::class, 'store'])->name('checkout.cart.store');
     Route::get('client-area/tickets', [SupportTicketController::class, 'index'])->name('support.index');

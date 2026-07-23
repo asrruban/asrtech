@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\SaveProductReleaseRequest;
 use App\Models\Product;
 use App\Models\ProductRelease;
 use App\Services\ProductReleaseFileService;
+use App\Services\ProductReleaseNotificationService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,7 +15,10 @@ use Throwable;
 
 class ProductReleaseController extends Controller
 {
-    public function __construct(private readonly ProductReleaseFileService $files) {}
+    public function __construct(
+        private readonly ProductReleaseFileService $files,
+        private readonly ProductReleaseNotificationService $notifications,
+    ) {}
 
     public function index(Product $product): Response
     {
@@ -44,6 +48,8 @@ class ProductReleaseController extends Controller
                     'download_limit' => $release->download_limit,
                     'downloads_count' => $release->downloads_count,
                     'status' => $release->status,
+                    'notification_queued_at' => $release->notification_queued_at,
+                    'notified_at' => $release->notified_at,
                 ]),
         ]);
     }
@@ -53,7 +59,7 @@ class ProductReleaseController extends Controller
         $storedFile = $this->files->store($product, $request->file('release_file'));
 
         try {
-            $product->releases()->create([
+            $release = $product->releases()->create([
                 ...$request->metadata(),
                 ...$storedFile,
             ]);
@@ -64,6 +70,7 @@ class ProductReleaseController extends Controller
         }
 
         $this->syncLatestVersion($product);
+        $this->scheduleNotification($release);
         $this->flash('Release uploaded successfully.');
 
         return redirect()->route('admin.products.releases.index', $product);
@@ -104,6 +111,7 @@ class ProductReleaseController extends Controller
         }
 
         $this->syncLatestVersion($product);
+        $this->scheduleNotification($release);
         $this->flash('Release updated successfully.');
 
         return redirect()->route('admin.products.releases.index', $product);
@@ -146,5 +154,14 @@ class ProductReleaseController extends Controller
             'type' => 'success',
             'message' => $message,
         ]);
+    }
+
+    private function scheduleNotification(ProductRelease $release): void
+    {
+        try {
+            $this->notifications->schedule($release);
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

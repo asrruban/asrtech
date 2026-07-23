@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Link, router, usePage } from '@inertiajs/vue3';
+import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     ArrowRight,
     CalendarDays,
@@ -67,11 +67,13 @@ interface ChangelogRelease {
 }
 
 interface ProductReview {
+    id?: number;
     name: string;
     title?: string | null;
     rating: number;
     content: string;
     reviewed_at?: string | null;
+    verified_purchase?: boolean;
 }
 
 interface ProductAddon {
@@ -125,12 +127,38 @@ interface Product {
     seo?: Record<string, unknown> | null;
 }
 
+interface ReviewState {
+    can_review: boolean;
+    login_url: string;
+    review?: {
+        rating: number;
+        title?: string | null;
+        content: string;
+        status: string;
+    } | null;
+}
+
 const props = defineProps<{
     product: Product;
     relatedProducts?: RelatedProduct[];
+    reviewState: ReviewState;
 }>();
 const page = usePage();
 const site = computed(() => page.props.site);
+const user = computed(() => page.props.auth?.user);
+const reviewForm = useForm({
+    rating: props.reviewState.review?.rating ?? 5,
+    title: props.reviewState.review?.title ?? '',
+    content: props.reviewState.review?.content ?? '',
+});
+const submitReview = () => {
+    reviewForm.post(`${props.product.url}/reviews`, {
+        preserveScroll: true,
+        onSuccess: () => {
+            activeTab.value = 'reviews';
+        },
+    });
+};
 
 const buying = ref(false);
 const addingToCart = ref(false);
@@ -230,7 +258,7 @@ const tabs = computed(() => [
         value: 'reviews',
         label: 'Reviews',
         count: props.product.reviews?.length || null,
-        show: (props.product.reviews ?? []).length > 0,
+        show: true,
     },
     {
         value: 'documentation',
@@ -1334,7 +1362,11 @@ const handleSwipe = () => {
                         </TabsContent>
 
                         <!-- Reviews Tab -->
-                        <TabsContent value="reviews" class="p-6 sm:p-8 lg:p-10">
+                        <TabsContent
+                            id="reviews"
+                            value="reviews"
+                            class="p-6 sm:p-8 lg:p-10"
+                        >
                             <div
                                 class="flex flex-wrap items-end justify-between gap-4"
                             >
@@ -1351,10 +1383,167 @@ const handleSwipe = () => {
                                     {{ averageRating }} out of 5
                                 </div>
                             </div>
+
+                            <form
+                                v-if="reviewState.can_review"
+                                class="mt-6 space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-white/5"
+                                @submit.prevent="submitReview"
+                            >
+                                <div>
+                                    <h3
+                                        class="font-extrabold text-slate-900 dark:text-white"
+                                    >
+                                        {{
+                                            reviewState.review
+                                                ? 'Update your review'
+                                                : 'Write your review'
+                                        }}
+                                    </h3>
+                                    <p
+                                        class="mt-1 text-sm text-slate-500 dark:text-slate-400"
+                                    >
+                                        Your name will appear with a verified
+                                        purchase badge.
+                                    </p>
+                                    <p
+                                        v-if="
+                                            reviewState.review?.status ===
+                                            'pending'
+                                        "
+                                        class="mt-2 text-xs font-bold text-amber-700 dark:text-amber-300"
+                                    >
+                                        Your review is awaiting moderation.
+                                    </p>
+                                    <p
+                                        v-else-if="
+                                            reviewState.review?.status ===
+                                            'hidden'
+                                        "
+                                        class="mt-2 text-xs font-bold text-slate-600 dark:text-slate-300"
+                                    >
+                                        Your review is currently hidden.
+                                        Updating it will return it to
+                                        moderation.
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
+                                    >
+                                        Rating
+                                    </label>
+                                    <div class="flex gap-1">
+                                        <button
+                                            v-for="number in 5"
+                                            :key="number"
+                                            type="button"
+                                            class="text-[#ffb200]"
+                                            :aria-label="`${number} star rating`"
+                                            @click="reviewForm.rating = number"
+                                        >
+                                            <Star
+                                                class="size-6"
+                                                :class="
+                                                    number <= reviewForm.rating
+                                                        ? 'fill-current'
+                                                        : 'text-slate-300 dark:text-slate-700'
+                                                "
+                                            />
+                                        </button>
+                                    </div>
+                                    <p
+                                        v-if="reviewForm.errors.rating"
+                                        class="text-xs font-medium text-red-600"
+                                    >
+                                        {{ reviewForm.errors.rating }}
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        for="review-title"
+                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
+                                    >
+                                        Review title
+                                    </label>
+                                    <input
+                                        id="review-title"
+                                        v-model="reviewForm.title"
+                                        maxlength="255"
+                                        placeholder="A short summary"
+                                        class="h-11 w-full rounded-md border border-slate-200 bg-white px-3 text-sm dark:border-white/10 dark:bg-slate-950"
+                                    />
+                                    <p
+                                        v-if="reviewForm.errors.title"
+                                        class="text-xs font-medium text-red-600"
+                                    >
+                                        {{ reviewForm.errors.title }}
+                                    </p>
+                                </div>
+                                <div class="space-y-2">
+                                    <label
+                                        for="review-content"
+                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
+                                    >
+                                        Your experience
+                                    </label>
+                                    <textarea
+                                        id="review-content"
+                                        v-model="reviewForm.content"
+                                        rows="5"
+                                        maxlength="5000"
+                                        required
+                                        class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-slate-950"
+                                    />
+                                    <p
+                                        v-if="reviewForm.errors.content"
+                                        class="text-xs font-medium text-red-600"
+                                    >
+                                        {{ reviewForm.errors.content }}
+                                    </p>
+                                </div>
+                                <button
+                                    type="submit"
+                                    :disabled="reviewForm.processing"
+                                    class="inline-flex h-11 items-center justify-center rounded-md bg-[#4fb250] px-5 text-sm font-extrabold text-white transition hover:bg-[#459d46] disabled:opacity-60"
+                                >
+                                    {{
+                                        reviewForm.processing
+                                            ? 'Saving…'
+                                            : reviewState.review
+                                              ? 'Update review'
+                                              : 'Publish review'
+                                    }}
+                                </button>
+                            </form>
+
+                            <div
+                                v-else-if="!user"
+                                class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                            >
+                                Purchased this product?
+                                <Link
+                                    :href="reviewState.login_url"
+                                    class="font-extrabold text-[#357e37] hover:underline dark:text-[#84d780]"
+                                >
+                                    Sign in to write a review.
+                                </Link>
+                            </div>
+
+                            <div
+                                v-else
+                                class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+                            >
+                                Reviews can be written by verified customers
+                                after purchasing this product.
+                            </div>
+
                             <div class="mt-6 grid gap-5 md:grid-cols-2">
                                 <article
-                                    v-for="review in product.reviews"
-                                    :key="`${review.name}-${review.reviewed_at}`"
+                                    v-for="review in product.reviews ?? []"
+                                    :key="
+                                        review.id ??
+                                        `${review.name}-${review.reviewed_at}`
+                                    "
                                     class="rounded-xl border border-slate-200 p-5 dark:border-white/10"
                                 >
                                     <div class="flex gap-1 text-[#ffb200]">
@@ -1390,6 +1579,12 @@ const handleSwipe = () => {
                                         >
                                             {{ review.name }}
                                         </p>
+                                        <p
+                                            v-if="review.verified_purchase"
+                                            class="mt-1 text-[11px] font-bold text-[#357e37] dark:text-[#84d780]"
+                                        >
+                                            Verified purchase
+                                        </p>
                                         <time
                                             v-if="review.reviewed_at"
                                             class="mt-1 block text-xs text-slate-400"
@@ -1399,6 +1594,12 @@ const handleSwipe = () => {
                                         >
                                     </div>
                                 </article>
+                                <p
+                                    v-if="(product.reviews ?? []).length === 0"
+                                    class="text-sm font-medium text-slate-500 dark:text-slate-400"
+                                >
+                                    No customer reviews yet.
+                                </p>
                             </div>
                         </TabsContent>
 
