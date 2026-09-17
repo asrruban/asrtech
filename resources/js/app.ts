@@ -5,17 +5,24 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { initializeFlashToast } from '@/lib/flashToast';
 import AdminLayout from '@/modules/admin/layouts/AdminLayout.vue';
 import ClientLayout from '@/modules/client/layouts/ClientLayout.vue';
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = 'ASR Tech';
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) =>
+        !title
+            ? appName
+            : /ASR\s?Tech/i.test(title)
+              ? title
+              : `${title} - ${appName}`,
     layout: (name) => {
         switch (true) {
             case name === 'Welcome':
                 return null;
-            case name === 'Admin/Auth/Login':
+            case name.startsWith('Admin/Auth/'):
                 return null;
             case name.startsWith('Admin/'):
                 return AdminLayout;
+            case name === 'Dashboard':
+            case name === 'settings/Appearance':
             case name.startsWith('Client/'):
                 return ClientLayout;
             case name.startsWith('settings/'):
@@ -25,9 +32,19 @@ createInertiaApp({
         }
     },
     progress: {
-        color: '#4B5563',
+        color: '#087f75',
     },
 });
+
+// PWA: register the offline shell in production builds only.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {
+            // Offline support is progressive enhancement — never break the app.
+        });
+    });
+}
+
 // This will set light / dark mode on page load...
 initializeTheme();
 // This will listen for flash toast data from the server...

@@ -6,13 +6,14 @@ use App\Models\Order;
 use App\Models\Subscription;
 use App\Services\EmailTemplateService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
-class SubscriptionRenewedMail extends Mailable
+class SubscriptionRenewedMail extends Mailable implements ShouldQueue
 {
     use Concerns\BccFromConfiguration, Queueable, SerializesModels;
 

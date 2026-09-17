@@ -307,11 +307,11 @@ class AdminGeneralSettingsTest extends TestCase
         app(InvoiceService::class)->createForOrder($order);
 
         $this->artisan('invoices:send-reminders')->assertSuccessful();
-        Mail::assertSent(InvoiceMail::class, 1);
+        Mail::assertQueued(InvoiceMail::class, 1);
 
         // A second run does not re-send.
         $this->artisan('invoices:send-reminders')->assertSuccessful();
-        Mail::assertSent(InvoiceMail::class, 1);
+        Mail::assertQueued(InvoiceMail::class, 1);
     }
 
     /**

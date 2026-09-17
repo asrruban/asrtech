@@ -107,6 +107,12 @@ class Product extends Model
         return route('products.documentation', $this->storefrontRouteParameters());
     }
 
+    /** @return HasMany<ProductCompatibility, $this> */
+    public function compatibilityRanges(): HasMany
+    {
+        return $this->hasMany(ProductCompatibility::class)->orderBy('platform')->orderBy('minimum_version_number');
+    }
+
     /** @return HasMany<ProductPrice, $this> */
     public function prices(): HasMany
     {

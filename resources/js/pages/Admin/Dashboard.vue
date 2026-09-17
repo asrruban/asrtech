@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import {
     ArrowRight,
@@ -80,39 +80,38 @@ const initials = (name) =>
 
     <div class="w-full min-w-0 flex-1 space-y-6 p-4 sm:p-6 lg:p-8">
         <section
-            class="relative overflow-hidden rounded-3xl bg-slate-950 px-6 py-8 text-white shadow-2xl shadow-slate-200 sm:px-8 lg:px-10 dark:shadow-none"
+            class="relative overflow-hidden rounded-2xl border border-[var(--client-border)] bg-[var(--client-accent-soft)] px-6 py-8 text-[var(--client-ink)] shadow-sm sm:px-8 lg:px-10 dark:shadow-none"
         >
             <div
-                class="pointer-events-none absolute -top-28 -right-20 size-80 rounded-full bg-cyan-400/20 blur-3xl"
+                class="pointer-events-none absolute -top-28 -right-20 size-80 rounded-full bg-transparent blur-3xl"
             />
             <div
-                class="pointer-events-none absolute -bottom-36 left-1/3 size-80 rounded-full bg-blue-600/25 blur-3xl"
+                class="pointer-events-none absolute -bottom-36 left-1/3 size-80 rounded-full bg-transparent blur-3xl"
             />
             <div class="relative grid items-end gap-8 lg:grid-cols-[1fr_auto]">
                 <div>
                     <div
-                        class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-cyan-200"
+                        class="mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--client-border)] bg-[var(--client-surface)] px-3 py-1.5 text-xs font-medium text-[var(--client-accent-dark)]"
                     >
                         <Sparkles class="size-3.5" />
-                        ASRTech control center
+                        ASR Tech administration
                     </div>
                     <h1
                         class="max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl"
                     >
-                        Everything you need to grow your digital catalog.
+                        A clear view of your business.
                     </h1>
                     <p
-                        class="mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base"
+                        class="mt-3 max-w-2xl text-sm leading-6 text-[var(--client-muted)] sm:text-base"
                     >
-                        Manage WHMCS modules, templates, web-development
-                        services, pricing, pages, and SEO from one focused
-                        workspace.
+                        Manage products, customer accounts, billing, content,
+                        and support from your administration workspace.
                     </p>
                 </div>
                 <div class="flex flex-wrap gap-3">
                     <Button
                         as-child
-                        class="bg-white text-slate-950 hover:bg-slate-100"
+                        class="bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                         <Link href="/admin/products/create">
                             <Plus class="size-4" />
@@ -122,7 +121,7 @@ const initials = (name) =>
                     <Button
                         as-child
                         variant="outline"
-                        class="border-white/15 bg-white/5 text-white hover:bg-white/10 hover:text-white"
+                        class="border-[var(--client-border)] bg-[var(--client-surface)] text-[var(--client-ink)] hover:bg-[var(--client-surface-soft)]"
                     >
                         <Link href="/admin/settings/general">
                             <Settings class="size-4" />
@@ -137,11 +136,11 @@ const initials = (name) =>
             <div
                 v-for="card in statCards"
                 :key="card.label"
-                class="group rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 dark:border-white/10 dark:bg-slate-900 dark:hover:shadow-none"
+                class="group rounded-2xl border border-border bg-[var(--client-surface)] p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/5 dark:hover:shadow-none"
             >
                 <div class="flex items-start justify-between">
                     <div>
-                        <p class="text-sm font-medium text-slate-500">
+                        <p class="text-sm font-medium text-muted-foreground">
                             {{ card.label }}
                         </p>
                         <p class="mt-2 text-3xl font-bold tracking-tight">
@@ -156,7 +155,7 @@ const initials = (name) =>
                     </span>
                 </div>
                 <div
-                    class="mt-4 flex items-center gap-1.5 text-xs text-slate-500"
+                    class="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground"
                 >
                     <TrendingUp class="size-3.5 text-emerald-500" />
                     {{ card.note }}
@@ -168,19 +167,19 @@ const initials = (name) =>
             class="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]"
         >
             <div
-                class="rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-white/10 dark:bg-slate-900"
+                class="rounded-2xl border border-border bg-[var(--client-surface)] shadow-sm"
             >
                 <div
-                    class="flex items-center justify-between border-b border-slate-100 p-5 sm:p-6 dark:border-white/10"
+                    class="flex items-center justify-between border-b border-border p-5 sm:p-6"
                 >
                     <div>
                         <h2 class="font-semibold">Recent client accounts</h2>
-                        <p class="mt-1 text-sm text-slate-500">
+                        <p class="mt-1 text-sm text-muted-foreground">
                             Latest registered customers
                         </p>
                     </div>
                     <span
-                        class="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 dark:bg-white/10 dark:text-slate-300"
+                        class="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold text-muted-foreground"
                     >
                         {{ recentClients.length }} recent
                     </span>
@@ -188,31 +187,28 @@ const initials = (name) =>
 
                 <div
                     v-if="recentClients.length === 0"
-                    class="m-5 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 p-8 text-center dark:border-white/10"
+                    class="m-5 flex min-h-56 flex-col items-center justify-center rounded-2xl border border-dashed border-border p-8 text-center"
                 >
                     <div
-                        class="flex size-12 items-center justify-center rounded-2xl bg-slate-100 dark:bg-white/10"
+                        class="flex size-12 items-center justify-center rounded-2xl bg-muted"
                     >
-                        <Users class="size-5 text-slate-500" />
+                        <Users class="size-5 text-muted-foreground" />
                     </div>
                     <p class="mt-4 font-medium">No clients yet</p>
-                    <p class="mt-1 max-w-xs text-sm text-slate-500">
+                    <p class="mt-1 max-w-xs text-sm text-muted-foreground">
                         Client accounts will appear here after their first
                         account sign up.
                     </p>
                 </div>
 
-                <div
-                    v-else
-                    class="divide-y divide-slate-100 dark:divide-white/10"
-                >
+                <div v-else class="divide-y divide-border">
                     <div
                         v-for="client in recentClients"
                         :key="client.id"
-                        class="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-slate-50 sm:px-6 dark:hover:bg-white/5"
+                        class="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-muted sm:px-6"
                     >
                         <div
-                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 text-xs font-bold text-blue-700 dark:from-cyan-500/20 dark:to-blue-500/20 dark:text-cyan-200"
+                            class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 text-xs font-bold text-blue-700 dark:from-cyan-500/20 dark:to-blue-500/20 dark:text-[var(--client-accent-dark)]"
                         >
                             {{ initials(client.name) }}
                         </div>
@@ -220,12 +216,12 @@ const initials = (name) =>
                             <p class="truncate text-sm font-semibold">
                                 {{ client.name }}
                             </p>
-                            <p class="truncate text-xs text-slate-500">
+                            <p class="truncate text-xs text-muted-foreground">
                                 {{ client.email }}
                             </p>
                         </div>
                         <time
-                            class="hidden shrink-0 text-xs text-slate-400 sm:block"
+                            class="hidden shrink-0 text-xs text-muted-foreground sm:block"
                             :datetime="client.created_at"
                         >
                             {{ formatDate(client.created_at) }}
@@ -236,14 +232,14 @@ const initials = (name) =>
 
             <div class="space-y-6">
                 <div
-                    class="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm sm:p-6 dark:border-white/10 dark:bg-slate-900"
+                    class="rounded-2xl border border-border bg-[var(--client-surface)] p-5 shadow-sm sm:p-6"
                 >
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm font-semibold">
                                 Catalog overview
                             </p>
-                            <p class="mt-1 text-xs text-slate-500">
+                            <p class="mt-1 text-xs text-muted-foreground">
                                 Your content structure
                             </p>
                         </div>
@@ -252,14 +248,14 @@ const initials = (name) =>
                     <p class="mt-6 text-4xl font-bold tracking-tight">
                         {{ catalogTotal }}
                     </p>
-                    <p class="mt-1 text-sm text-slate-500">
+                    <p class="mt-1 text-sm text-muted-foreground">
                         total catalog records
                     </p>
 
                     <div class="mt-6 space-y-3">
                         <div class="flex items-center justify-between text-sm">
                             <span
-                                class="flex items-center gap-2 text-slate-600 dark:text-slate-300"
+                                class="flex items-center gap-2 text-muted-foreground"
                             >
                                 <Package class="size-4 text-blue-500" />
                                 Products
@@ -270,7 +266,7 @@ const initials = (name) =>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span
-                                class="flex items-center gap-2 text-slate-600 dark:text-slate-300"
+                                class="flex items-center gap-2 text-muted-foreground"
                             >
                                 <Tags class="size-4 text-amber-500" />
                                 Categories
@@ -281,7 +277,7 @@ const initials = (name) =>
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <span
-                                class="flex items-center gap-2 text-slate-600 dark:text-slate-300"
+                                class="flex items-center gap-2 text-muted-foreground"
                             >
                                 <Layers3 class="size-4 text-violet-500" />
                                 Subcategories

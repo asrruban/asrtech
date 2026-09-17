@@ -130,11 +130,10 @@ class RecurringSubscriptionTest extends TestCase
         $this->assertSame(LicenseStatus::Active, $subscription->license->fresh()->status);
         $this->assertTrue($subscription->license->fresh()->expires_at->equalTo($periodEnd));
         $this->assertTrue($subscription->current_period_end->equalTo($periodEnd));
-        Mail::assertSent(
-            SubscriptionRenewedMail::class,
+        Mail::assertQueued(SubscriptionRenewedMail::class,
             fn (SubscriptionRenewedMail $mail): bool => $mail->hasTo($subscription->user->email),
         );
-        Mail::assertSentCount(1);
+        Mail::assertQueuedCount(1);
     }
 
     public function test_failed_payment_and_subscription_deletion_update_access_status(): void
@@ -158,7 +157,7 @@ class RecurringSubscriptionTest extends TestCase
             'data' => ['object' => ['id' => 'in_failed', 'subscription' => 'sub_status_123']],
         ])->assertOk();
         $this->assertSame(SubscriptionStatus::PastDue, $subscription->fresh()->status);
-        Mail::assertSent(SubscriptionPaymentFailedMail::class, 1);
+        Mail::assertQueued(SubscriptionPaymentFailedMail::class, 1);
 
         $this->actingAs($subscription->user)
             ->get('/client-area/subscriptions')
@@ -214,6 +213,7 @@ class RecurringSubscriptionTest extends TestCase
             ->assertHeader('X-Inertia-Location', $portalUrl);
 
         $stranger = User::factory()->create();
+        $this->flushSession();
         $this->actingAs($stranger)
             ->post("/client-area/subscriptions/{$subscription->id}/billing-portal")
             ->assertNotFound();
@@ -229,7 +229,7 @@ class RecurringSubscriptionTest extends TestCase
             ->assertRedirect();
         $this->assertTrue($subscription->fresh()->cancel_at_period_end);
         $this->assertSame(LicenseStatus::Active, $subscription->license->fresh()->status);
-        Mail::assertSent(SubscriptionCancellationScheduledMail::class, 1);
+        Mail::assertQueued(SubscriptionCancellationScheduledMail::class, 1);
 
         $this->actingAs($subscription->user)
             ->post("/client-area/subscriptions/{$subscription->id}/resume")
@@ -261,9 +261,11 @@ class RecurringSubscriptionTest extends TestCase
                 ->has('events')
                 ->has('renewals'));
 
+        $this->flushSession();
         $this->actingAs($stranger)
             ->post("/client-area/subscriptions/{$subscription->id}/cancel")
             ->assertNotFound();
+        $this->flushSession();
         $this->actingAs($stranger)
             ->get("/client-area/subscriptions/{$subscription->id}")
             ->assertNotFound();
@@ -298,11 +300,10 @@ class RecurringSubscriptionTest extends TestCase
         $this->artisan('subscriptions:send-renewal-reminders')->assertSuccessful();
         $this->artisan('subscriptions:send-renewal-reminders')->assertSuccessful();
 
-        Mail::assertSent(
-            SubscriptionRenewalReminderMail::class,
+        Mail::assertQueued(SubscriptionRenewalReminderMail::class,
             fn (SubscriptionRenewalReminderMail $mail): bool => $mail->hasTo($subscription->user->email),
         );
-        Mail::assertSentCount(1);
+        Mail::assertQueuedCount(1);
         $this->assertDatabaseCount('subscription_events', 1);
         $this->assertDatabaseHas('subscription_events', [
             'subscription_id' => $subscription->id,

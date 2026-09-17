@@ -429,7 +429,7 @@ const testConfiguration = () => {
                                 </div>
                             </div>
                             <span
-                                class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-slate-500 dark:bg-white/5"
+                                class="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold text-muted-foreground dark:bg-muted"
                             >
                                 Optional
                             </span>
@@ -622,7 +622,7 @@ const testConfiguration = () => {
                         </span>
                     </div>
                     <div
-                        class="mt-8 rounded-2xl bg-white p-5 text-slate-900 shadow-2xl"
+                        class="mt-8 rounded-2xl bg-card p-5 text-card-foreground shadow-2xl"
                     >
                         <span
                             class="flex size-14 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500"
@@ -633,7 +633,7 @@ const testConfiguration = () => {
                             {{ form.name || 'Department name' }}
                         </p>
                         <p
-                            class="mt-2 min-h-15 text-sm leading-5 text-slate-500"
+                            class="mt-2 min-h-15 text-sm leading-5 text-muted-foreground"
                         >
                             {{
                                 form.description ||

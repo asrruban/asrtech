@@ -51,6 +51,6 @@ class FastSpringGateway extends Gateway
             'order_id' => $order->id,
         ]);
 
-        return PaymentResult::redirect('fastspring', $url, 'fastspring_mock_' . uniqid());
+        return PaymentResult::redirect('fastspring', $url, 'fastspring_mock_'.uniqid());
     }
 }

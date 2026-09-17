@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import { KeyRound, ShieldCheck } from '@lucide/vue';
+import { KeyRound } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AuthPanel from '@/modules/client/components/AuthPanel.vue';
 
 const form = useForm({ code: '' });
 
@@ -26,26 +27,16 @@ const submit = () =>
         <meta head-key="robots" name="robots" content="noindex,nofollow" />
     </Head>
 
-    <main
-        class="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-950 px-4 py-12"
-    >
-        <div
-            class="pointer-events-none absolute -top-40 -right-32 size-96 rounded-full bg-cyan-500/20 blur-3xl"
-        />
-        <div
-            class="pointer-events-none absolute -bottom-40 -left-24 size-96 rounded-full bg-blue-600/20 blur-3xl"
-        />
-
-        <div class="relative w-full max-w-md">
-            <div class="mb-6 flex justify-center">
-                <div
-                    class="flex size-14 items-center justify-center rounded-2xl bg-cyan-400 text-slate-950 shadow-xl shadow-cyan-500/20"
-                >
-                    <ShieldCheck class="size-7" />
-                </div>
-            </div>
-
-            <Card class="border-white/10 bg-white shadow-2xl">
+    <main class="min-h-screen bg-[var(--client-surface-soft)]">
+        <AuthPanel
+            :features="false"
+            eyebrow="Administration"
+            title="The workspace behind the work."
+            description="Manage the ASR Tech catalog, customer accounts, billing, content, and support."
+        >
+            <Card
+                class="rounded-2xl border-[var(--client-border)] bg-[var(--client-surface)] py-5 shadow-sm"
+            >
                 <CardHeader class="text-center">
                     <CardTitle class="text-2xl">Verify it’s you</CardTitle>
                     <CardDescription>
@@ -64,6 +55,12 @@ const submit = () =>
                                 <Input
                                     id="code"
                                     v-model="form.code"
+                                    :aria-invalid="Boolean(form.errors.code)"
+                                    :aria-describedby="
+                                        form.errors.code
+                                            ? 'form-code-error'
+                                            : undefined
+                                    "
                                     class="pl-9 font-mono tracking-widest"
                                     inputmode="text"
                                     autocomplete="one-time-code"
@@ -72,7 +69,10 @@ const submit = () =>
                                     required
                                 />
                             </div>
-                            <InputError :message="form.errors.code" />
+                            <InputError
+                                id="form-code-error"
+                                :message="form.errors.code"
+                            />
                         </div>
 
                         <Button
@@ -89,6 +89,6 @@ const submit = () =>
                     </form>
                 </CardContent>
             </Card>
-        </div>
+        </AuthPanel>
     </main>
 </template>

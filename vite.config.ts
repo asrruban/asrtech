@@ -12,10 +12,7 @@ export default defineConfig({
             refresh: true,
             fonts: [
                 bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
-                bunny('Raleway', {
-                    weights: [400, 500, 600, 700, 800],
+                    weights: [400, 500, 600, 700],
                 }),
             ],
         }),

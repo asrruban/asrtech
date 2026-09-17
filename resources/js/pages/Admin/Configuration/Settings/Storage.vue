@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
-import {
-    Cloud,
-    FolderTree,
-    HardDrive,
-    Save,
-    Server,
-    Zap,
-} from '@lucide/vue';
+import { Cloud, FolderTree, HardDrive, Save, Server, Zap } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -160,7 +153,9 @@ const secretPlaceholder = (configured: boolean) =>
                             </span>
 
                             <span
-                                v-if="form.storage_driver === key && key === 's3'"
+                                v-if="
+                                    form.storage_driver === key && key === 's3'
+                                "
                                 class="mt-4 grid gap-4 md:grid-cols-2"
                             >
                                 <span class="space-y-2">
@@ -190,9 +185,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         "
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_s3_secret
-                                        "
+                                        :message="form.errors.storage_s3_secret"
                                     />
                                 </span>
                                 <span class="space-y-2">
@@ -203,9 +196,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         placeholder="us-east-1"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_s3_region
-                                        "
+                                        :message="form.errors.storage_s3_region"
                                     />
                                 </span>
                                 <span class="space-y-2">
@@ -215,9 +206,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         v-model="form.storage_s3_bucket"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_s3_bucket
-                                        "
+                                        :message="form.errors.storage_s3_bucket"
                                     />
                                 </span>
                                 <span class="space-y-2 md:col-span-2">
@@ -242,7 +231,9 @@ const secretPlaceholder = (configured: boolean) =>
                             </span>
 
                             <span
-                                v-if="form.storage_driver === key && key === 'r2'"
+                                v-if="
+                                    form.storage_driver === key && key === 'r2'
+                                "
                                 class="mt-4 grid gap-4 md:grid-cols-2"
                             >
                                 <span class="space-y-2">
@@ -270,9 +261,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         v-model="form.storage_r2_bucket"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_r2_bucket
-                                        "
+                                        :message="form.errors.storage_r2_bucket"
                                     />
                                 </span>
                                 <span class="space-y-2">
@@ -302,9 +291,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         "
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_r2_secret
-                                        "
+                                        :message="form.errors.storage_r2_secret"
                                     />
                                 </span>
                                 <span class="space-y-2 md:col-span-2">
@@ -330,7 +317,9 @@ const secretPlaceholder = (configured: boolean) =>
                             </span>
 
                             <span
-                                v-if="form.storage_driver === key && key === 'b2'"
+                                v-if="
+                                    form.storage_driver === key && key === 'b2'
+                                "
                                 class="mt-4 grid gap-4 md:grid-cols-2"
                             >
                                 <span class="space-y-2">
@@ -340,9 +329,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         v-model="form.storage_b2_key_id"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_b2_key_id
-                                        "
+                                        :message="form.errors.storage_b2_key_id"
                                     />
                                 </span>
                                 <span class="space-y-2">
@@ -377,9 +364,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         s3.us-west-004.backblazeb2.com.
                                     </span>
                                     <InputError
-                                        :message="
-                                            form.errors.storage_b2_region
-                                        "
+                                        :message="form.errors.storage_b2_region"
                                     />
                                 </span>
                                 <span class="space-y-2">
@@ -389,9 +374,7 @@ const secretPlaceholder = (configured: boolean) =>
                                         v-model="form.storage_b2_bucket"
                                     />
                                     <InputError
-                                        :message="
-                                            form.errors.storage_b2_bucket
-                                        "
+                                        :message="form.errors.storage_b2_bucket"
                                     />
                                 </span>
                                 <span class="space-y-2 md:col-span-2">
@@ -447,8 +430,7 @@ const secretPlaceholder = (configured: boolean) =>
                             v-model="form.storage_path_tickets"
                         />
                         <p class="text-xs text-muted-foreground">
-                            Images and files clients attach to support
-                            tickets.
+                            Images and files clients attach to support tickets.
                         </p>
                         <InputError
                             :message="form.errors.storage_path_tickets"

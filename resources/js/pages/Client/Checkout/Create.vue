@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { Link, useForm } from '@inertiajs/vue3';
-import {
-    ArrowLeft,
-    CheckCircle2,
-    CreditCard,
-    LockKeyhole,
-    Package,
-} from '@lucide/vue';
+import { ArrowLeft, CreditCard, LockKeyhole, Package } from '@lucide/vue';
+import OrderTotals from '@/modules/client/components/OrderTotals.vue';
 import SeoHead from '@/modules/client/components/SeoHead.vue';
 
 interface CheckoutItem {
@@ -46,10 +41,14 @@ interface Gateway {
 const props = defineProps<{
     cart: CartSummary;
     paymentGateways: Gateway[];
+    checkoutUrl?: string;
+    backUrl?: string;
+    backLabel?: string;
 }>();
 
 const form = useForm({
     gateway: props.paymentGateways[0]?.key ?? null,
+    checkout: '',
 });
 
 const money = (amount: string | number) =>
@@ -65,229 +64,223 @@ const label = (value: string) =>
         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
-const submit = () => form.post('/checkout');
+const submit = () => form.post(props.checkoutUrl ?? '/checkout');
 </script>
 
 <template>
     <SeoHead
         title="Checkout"
-        description="Review and pay for your ASRTech order securely."
+        description="Review your ASR Tech order and choose an available payment method."
         type="website"
+        :seo="{ robots: 'noindex,follow' }"
     />
-
-    <div class="min-h-[70vh] bg-[#e9edf3] pb-20 dark:bg-slate-950">
-        <header class="bg-[linear-gradient(128deg,#0874df,#064296)] text-white">
-            <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-                <p
-                    class="text-xs font-extrabold tracking-[0.18em] text-[#b7ec37] uppercase"
+    <div class="min-h-[70vh] bg-[var(--client-canvas)] pb-16">
+        <header class="border-b border-border bg-card">
+            <div class="site-container py-12 sm:py-16">
+                <p class="section-kicker">Checkout</p>
+                <div
+                    class="mt-4 flex flex-wrap items-end justify-between gap-6"
                 >
-                    Secure checkout
-                </p>
-                <h1 class="mt-2 text-3xl font-extrabold">Review and pay</h1>
-                <p class="mt-2 text-sm text-blue-100/75">
-                    Confirm your products and choose an available payment
-                    method.
-                </p>
-            </div>
-        </header>
-
-        <main
-            class="mx-auto grid max-w-6xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:px-8"
-        >
-            <div class="space-y-6">
-                <section
-                    class="rounded-sm bg-white p-6 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900 dark:ring-white/10"
-                >
-                    <h2
-                        class="text-lg font-extrabold text-slate-900 dark:text-white"
+                    <div>
+                        <h1 class="display-title">One last check.</h1>
+                        <p class="body-copy mt-4">
+                            Confirm your order and choose how to pay.
+                        </p>
+                    </div>
+                    <ol
+                        aria-label="Checkout progress"
+                        class="flex items-center gap-4 text-sm"
                     >
-                        Order items
-                    </h2>
-                    <div class="mt-5 divide-y dark:divide-white/10">
-                        <div
-                            v-for="item in cart.items"
-                            :key="item.id"
-                            class="flex items-center gap-4 py-4 first:pt-0 last:pb-0"
+                        <li>
+                            <Link
+                                :href="backUrl ?? '/cart'"
+                                class="flex items-center gap-2 text-muted-foreground"
+                                ><span
+                                    class="grid size-7 place-items-center rounded-full border border-border"
+                                    >1</span
+                                >
+                                {{ backLabel ?? 'Cart' }}</Link
+                            >
+                        </li>
+                        <li
+                            aria-hidden="true"
+                            class="h-px w-8 bg-[#cbdcd5]"
+                        ></li>
+                        <li
+                            class="flex items-center gap-2 font-semibold text-primary"
+                            aria-current="step"
                         >
                             <span
-                                class="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-slate-100 p-1.5 dark:bg-slate-800"
+                                class="grid size-7 place-items-center rounded-full bg-accent"
+                                >2</span
                             >
-                                <img
+                            Checkout
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </header>
+        <form
+            class="site-container grid gap-8 py-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_360px]"
+            :aria-busy="form.processing"
+            @submit.prevent="submit"
+        >
+            <div class="space-y-7">
+                <section class="surface-card p-6 sm:p-7">
+                    <div class="flex items-center justify-between gap-3">
+                        <h2 class="text-xl font-semibold">Your order</h2>
+                        <Link
+                            :href="backUrl ?? '/cart'"
+                            class="text-sm font-medium text-primary underline underline-offset-4"
+                            >{{
+                                backLabel ? 'Review request' : 'Edit cart'
+                            }}</Link
+                        >
+                    </div>
+                    <div class="mt-3 divide-y divide-border">
+                        <article
+                            v-for="item in cart.items"
+                            :key="item.id"
+                            class="flex flex-wrap items-center gap-4 py-5 last:pb-0"
+                        >
+                            <span
+                                class="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted p-2"
+                                ><img
                                     v-if="item.product.featured_image"
                                     :src="item.product.featured_image"
                                     :alt="item.product.name"
-                                    class="max-h-full max-w-full object-contain"
-                                />
-                                <Package v-else class="size-6 text-slate-400" />
-                            </span>
+                                    class="max-h-full max-w-full object-contain" /><Package
+                                    v-else
+                                    class="size-6 text-primary"
+                            /></span>
                             <div class="min-w-0 flex-1">
-                                <p
-                                    class="truncate font-extrabold text-slate-900 dark:text-white"
-                                >
-                                    {{ item.product.name }}
-                                </p>
-                                <p
-                                    class="mt-1 text-xs font-semibold text-slate-400"
-                                >
+                                <h3 class="font-semibold">
+                                    <Link
+                                        :href="item.product.url"
+                                        class="hover:text-primary"
+                                        >{{ item.product.name }}</Link
+                                    >
+                                </h3>
+                                <p class="mt-1 text-sm text-muted-foreground">
                                     {{ item.name || label(item.billing_cycle) }}
                                 </p>
                             </div>
-                            <p class="font-extrabold text-[#f5842a]">
+                            <p class="font-semibold">
                                 {{ money(item.amount) }}
                             </p>
-                        </div>
+                        </article>
                     </div>
                 </section>
-
-                <section
-                    class="rounded-sm bg-white p-6 shadow-sm ring-1 ring-slate-200/70 dark:bg-slate-900 dark:ring-white/10"
-                >
+                <fieldset class="surface-card p-6 sm:p-7">
+                    <legend class="sr-only">Payment method</legend>
                     <div class="flex items-center gap-3">
-                        <CreditCard class="size-5 text-blue-600" />
-                        <h2
-                            class="text-lg font-extrabold text-slate-900 dark:text-white"
-                        >
-                            Payment method
-                        </h2>
+                        <CreditCard class="size-5 text-primary" />
+                        <h2 class="text-xl font-semibold">Payment method</h2>
                     </div>
-                    <div class="mt-5 grid gap-3">
+                    <p class="mt-2 text-sm leading-6 text-muted-foreground">
+                        Select one of the available options below.
+                    </p>
+                    <div v-if="paymentGateways.length" class="mt-6 grid gap-3">
                         <label
                             v-for="gateway in paymentGateways"
                             :key="gateway.key"
-                            class="flex cursor-pointer items-start gap-3 rounded-sm border p-4 transition"
+                            class="flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#087f75]"
                             :class="
                                 form.gateway === gateway.key
-                                    ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-500/10'
-                                    : 'border-slate-200 hover:border-slate-300 dark:border-white/10'
+                                    ? 'border-[#087f75] bg-accent'
+                                    : 'border-border hover:border-[#89b4aa]'
                             "
-                        >
-                            <input
+                            ><input
                                 v-model="form.gateway"
                                 type="radio"
                                 name="gateway"
                                 :value="gateway.key"
-                                class="mt-1 size-4 accent-blue-600"
-                            />
-                            <span>
-                                <span
-                                    class="block font-bold text-slate-800 dark:text-white"
-                                    >{{ gateway.name }}</span
-                                >
-                                <span
+                                class="mt-1 size-4 shrink-0 accent-[#087f75]"
+                                :aria-invalid="Boolean(form.errors.gateway)"
+                                :aria-describedby="
+                                    form.errors.gateway
+                                        ? 'gateway-error'
+                                        : undefined
+                                "
+                            /><span
+                                ><span class="block text-sm font-semibold">{{
+                                    gateway.name
+                                }}</span
+                                ><span
                                     v-if="gateway.description"
-                                    class="mt-1 block text-xs leading-5 text-slate-500"
+                                    class="mt-1 block text-sm leading-6 text-muted-foreground"
                                     >{{ gateway.description }}</span
-                                >
-                            </span>
-                        </label>
+                                ></span
+                            ></label
+                        >
+                    </div>
+                    <div
+                        v-else
+                        role="status"
+                        class="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900"
+                    >
+                        Online payment is not available right now. Your cart is
+                        saved.
+                        <Link
+                            href="/contact"
+                            class="font-semibold underline underline-offset-4"
+                            >Contact ASR Tech</Link
+                        >
+                        for help with your order.
                     </div>
                     <p
+                        v-if="form.errors.checkout"
+                        role="alert"
+                        class="mt-4 text-sm text-red-700"
+                    >
+                        {{ form.errors.checkout }}
+                    </p>
+                    <p
                         v-if="form.errors.gateway"
-                        class="mt-3 text-sm text-red-600"
+                        id="gateway-error"
+                        role="alert"
+                        class="mt-4 text-sm text-red-700"
                     >
                         {{ form.errors.gateway }}
                     </p>
-                </section>
-
+                </fieldset>
                 <Link
-                    href="/cart"
-                    class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600"
+                    :href="backUrl ?? '/cart'"
+                    class="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                    ><ArrowLeft class="size-4" /> Return to
+                    {{ backLabel ? 'request' : 'cart' }}</Link
                 >
-                    <ArrowLeft class="size-4" /> Return to cart
-                </Link>
             </div>
-
             <aside
-                class="self-start rounded-sm bg-white p-6 shadow-[0_18px_55px_rgba(40,55,82,0.1)] ring-1 ring-slate-200/70 lg:sticky lg:top-24 dark:bg-slate-900 dark:ring-white/10"
+                class="surface-card self-start p-6 sm:p-7 lg:sticky lg:top-28"
             >
-                <h2
-                    class="text-lg font-extrabold text-slate-900 dark:text-white"
-                >
-                    Payment summary
-                </h2>
-                <dl class="mt-5 space-y-3 text-sm">
-                    <div class="flex justify-between text-slate-500">
-                        <dt>Subtotal</dt>
-                        <dd
-                            class="font-bold text-slate-700 dark:text-slate-200"
-                        >
-                            {{ money(cart.subtotal) }}
-                        </dd>
-                    </div>
-                    <div
-                        v-if="Number(cart.discount_amount) > 0"
-                        class="flex justify-between text-emerald-600"
-                    >
-                        <dt>Promotion ({{ cart.promotion?.code }})</dt>
-                        <dd class="font-bold">
-                            -{{ money(cart.discount_amount) }}
-                        </dd>
-                    </div>
-                    <div
-                        v-if="Number(cart.setup_fee) > 0"
-                        class="flex justify-between text-slate-500"
-                    >
-                        <dt>Setup fees</dt>
-                        <dd
-                            class="font-bold text-slate-700 dark:text-slate-200"
-                        >
-                            {{ money(cart.setup_fee) }}
-                        </dd>
-                    </div>
-                    <div
-                        v-if="Number(cart.tax_amount) > 0"
-                        class="flex justify-between text-slate-500"
-                    >
-                        <dt>{{ cart.tax?.name || 'Tax' }}</dt>
-                        <dd
-                            class="font-bold text-slate-700 dark:text-slate-200"
-                        >
-                            {{ money(cart.tax_amount) }}
-                        </dd>
-                    </div>
-                    <div
-                        class="flex justify-between border-t pt-4 text-lg font-extrabold text-slate-900 dark:border-white/10 dark:text-white"
-                    >
-                        <dt>Total</dt>
-                        <dd>{{ money(cart.total) }}</dd>
-                    </div>
-                </dl>
-
-                <button
-                    type="button"
+                <h2 class="text-xl font-semibold">Payment summary</h2>
+                <OrderTotals :summary="cart" class="mt-7" /><button
+                    type="submit"
                     :disabled="form.processing || paymentGateways.length === 0"
-                    class="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-sm bg-[#58c957] px-5 text-sm font-bold text-white shadow-lg shadow-[#58c957]/20 transition hover:bg-[#45b944] disabled:cursor-not-allowed disabled:opacity-50"
-                    @click="submit"
+                    class="button-primary mt-7 w-full"
                 >
-                    <LockKeyhole class="size-4" />
-                    {{
+                    <LockKeyhole class="size-4" />{{
                         form.processing
                             ? 'Processing…'
                             : `Pay ${money(cart.total)}`
                     }}
                 </button>
-
-                <ul class="mt-5 space-y-2.5 text-xs leading-5 text-slate-500">
-                    <li class="flex items-start gap-2">
-                        <CheckCircle2
-                            class="mt-0.5 size-4 shrink-0 text-[#58c957]"
-                        />
-                        Encrypted payment processing
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <CheckCircle2
-                            class="mt-0.5 size-4 shrink-0 text-[#58c957]"
-                        />
-                        Automatic license provisioning
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <CheckCircle2
-                            class="mt-0.5 size-4 shrink-0 text-[#58c957]"
-                        />
-                        Invoice available in your client area
-                    </li>
-                </ul>
+                <p class="mt-4 text-sm leading-6 text-muted-foreground">
+                    Continue with your selected payment method. You can find
+                    your order and invoice in your client area.
+                </p>
+                <p
+                    class="mt-4 border-t border-border pt-4 text-xs leading-5 text-muted-foreground"
+                >
+                    Need help before paying?
+                    <Link
+                        href="/contact"
+                        class="font-semibold text-primary underline underline-offset-4"
+                        >Contact ASR Tech.</Link
+                    >
+                </p>
             </aside>
-        </main>
+        </form>
     </div>
 </template>

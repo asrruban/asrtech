@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Payments\GatewayRegistry;
 use App\Payments\PaymentResult;
 use App\Payments\PurchaseOutcome;
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -34,11 +35,11 @@ class CheckoutService
      * here; redirect gateways leave it pending until their callback
      * confirms the payment.
      */
-    public function purchase(User $user, Product $product, ProductPrice $price, ?string $gatewayKey = null): PurchaseOutcome
+    public function purchase(User $user, Product $product, ProductPrice $price, ?string $gatewayKey = null, ?Closure $reserveOrder = null): PurchaseOutcome
     {
         $price->setRelation('product', $product);
 
-        return $this->purchaseCart($user, collect([$price]), $gatewayKey);
+        return $this->purchaseCart($user, collect([$price]), $gatewayKey, reserveOrder: $reserveOrder);
     }
 
     /**
@@ -46,7 +47,7 @@ class CheckoutService
      *
      * @param  Collection<int, ProductPrice>  $prices
      */
-    public function purchaseCart(User $user, Collection $prices, ?string $gatewayKey = null, ?string $promotionCode = null): PurchaseOutcome
+    public function purchaseCart(User $user, Collection $prices, ?string $gatewayKey = null, ?string $promotionCode = null, ?Closure $reserveOrder = null): PurchaseOutcome
     {
         $prices = $prices->values();
 
@@ -88,7 +89,7 @@ class CheckoutService
             throw new InvalidArgumentException('Checkout requires a valid cart item.');
         }
 
-        $order = DB::transaction(function () use ($user, $prices, $first, $gatewayKey, $promotionCode): Order {
+        $order = DB::transaction(function () use ($user, $prices, $first, $gatewayKey, $promotionCode, $reserveOrder): Order {
             $isFreeTrial = ($gatewayKey === 'free_trial');
             $quote = $isFreeTrial
                 ? null
@@ -131,6 +132,10 @@ class CheckoutService
                     'status' => 'reserved',
                 ]);
             }
+
+            // Reserve domain-specific purchases before leaving the transaction or charging.
+            // A gateway timeout then leaves a pending order which cannot be charged again.
+            $reserveOrder?->__invoke($order);
 
             return $order->load('items');
         });

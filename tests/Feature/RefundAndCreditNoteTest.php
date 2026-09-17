@@ -128,6 +128,7 @@ class RefundAndCreditNoteTest extends TestCase
             ->assertOk()
             ->assertDownload("{$creditNote->credit_note_number}.pdf");
 
+        $this->flushSession();
         $this->actingAs(User::factory()->create())
             ->get("/client-area/credit-notes/{$creditNote->id}")
             ->assertNotFound();

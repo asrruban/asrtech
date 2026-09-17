@@ -23,12 +23,15 @@ const labels: Record<string, string> = {
             <span class="h-px flex-1 bg-border" />
         </div>
 
-        <div class="grid gap-2" :class="providers.length > 1 ? 'grid-cols-2' : ''">
+        <div
+            class="grid gap-2"
+            :class="providers.length > 1 ? 'grid-cols-2' : ''"
+        >
             <a
                 v-for="provider in providers"
                 :key="provider"
                 :href="`/auth/${provider}/redirect`"
-                class="inline-flex h-10 items-center justify-center gap-2 rounded-md border text-sm font-semibold transition hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4fb250]"
+                class="inline-flex h-10 items-center justify-center gap-2 rounded-md border text-sm font-semibold transition hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#087f75]"
             >
                 <svg
                     v-if="provider === 'google'"

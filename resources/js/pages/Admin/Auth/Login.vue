@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
 import { useForm } from '@inertiajs/vue3';
-import { ShieldCheck } from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import AuthPanel from '@/modules/client/components/AuthPanel.vue';
 const form = useForm({
     email: '',
     password: '',
@@ -30,19 +30,16 @@ const submit = () => {
         <meta head-key="robots" name="robots" content="noindex,nofollow" />
     </Head>
 
-    <main
-        class="flex min-h-screen items-center justify-center bg-muted/40 px-4 py-12"
-    >
-        <div class="w-full max-w-md">
-            <div class="mb-6 flex justify-center">
-                <div
-                    class="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm"
-                >
-                    <ShieldCheck class="size-6" />
-                </div>
-            </div>
-
-            <Card>
+    <main class="min-h-screen bg-[var(--client-surface-soft)]">
+        <AuthPanel
+            :features="false"
+            eyebrow="Administration"
+            title="The workspace behind the work."
+            description="Manage the ASR Tech catalog, customer accounts, billing, content, and support."
+        >
+            <Card
+                class="rounded-2xl border-[var(--client-border)] bg-[var(--client-surface)] py-5 shadow-sm"
+            >
                 <CardHeader class="text-center">
                     <CardTitle class="text-2xl">Admin console</CardTitle>
                     <CardDescription>
@@ -57,12 +54,21 @@ const submit = () => {
                             <Input
                                 id="email"
                                 v-model="form.email"
+                                :aria-invalid="Boolean(form.errors.email)"
+                                :aria-describedby="
+                                    form.errors.email
+                                        ? 'form-email-error'
+                                        : undefined
+                                "
                                 type="email"
                                 autocomplete="username"
                                 autofocus
                                 required
                             />
-                            <InputError :message="form.errors.email" />
+                            <InputError
+                                id="form-email-error"
+                                :message="form.errors.email"
+                            />
                         </div>
 
                         <div class="space-y-2">
@@ -70,11 +76,20 @@ const submit = () => {
                             <Input
                                 id="password"
                                 v-model="form.password"
+                                :aria-invalid="Boolean(form.errors.password)"
+                                :aria-describedby="
+                                    form.errors.password
+                                        ? 'form-password-error'
+                                        : undefined
+                                "
                                 type="password"
                                 autocomplete="current-password"
                                 required
                             />
-                            <InputError :message="form.errors.password" />
+                            <InputError
+                                id="form-password-error"
+                                :message="form.errors.password"
+                            />
                         </div>
 
                         <label
@@ -98,6 +113,6 @@ const submit = () => {
                     </form>
                 </CardContent>
             </Card>
-        </div>
+        </AuthPanel>
     </main>
 </template>

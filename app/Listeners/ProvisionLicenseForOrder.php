@@ -6,6 +6,7 @@ use App\Enums\BillingCycle;
 use App\Enums\LicenseStatus;
 use App\Events\OrderPaid;
 use App\Models\License;
+use App\Models\Order;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Str;
 
@@ -69,7 +70,7 @@ class ProvisionLicenseForOrder
         return $key;
     }
 
-    private function expiresAt(BillingCycle $cycle, ?CarbonInterface $paidAt, \App\Models\Order $order): ?CarbonInterface
+    private function expiresAt(BillingCycle $cycle, ?CarbonInterface $paidAt, Order $order): ?CarbonInterface
     {
         $paidAt ??= now();
 

@@ -40,6 +40,6 @@ class FreeTrialGateway extends Gateway
 
     public function charge(Order $order): PaymentResult
     {
-        return PaymentResult::success('free_trial', 'free_trial_ref_' . uniqid());
+        return PaymentResult::success('free_trial', 'free_trial_ref_'.uniqid());
     }
 }

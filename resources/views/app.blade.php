@@ -5,29 +5,39 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
+        {{-- Match the persisted appearance before styles load to avoid a theme flash. --}}
         <script>
             (function() {
-                const appearance = '{{ $appearance ?? "system" }}';
+                const valid = (value) => ['light', 'dark', 'system'].includes(value);
+                const serverAppearance = @js($appearance ?? 'system');
+                let appearance = valid(serverAppearance) ? serverAppearance : 'system';
 
-                if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
+                try {
+                    const stored = window.localStorage.getItem('appearance');
+                    if (valid(stored)) {
+                        appearance = stored;
                     }
+                } catch {
+                    // Cookie or system appearance works when local storage is blocked.
                 }
+
+                const dark = appearance === 'dark' ||
+                    (appearance === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                document.documentElement.classList.toggle('dark', dark);
+                document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
             })();
         </script>
 
         {{-- Inline style to set the HTML background color based on our theme in app.css --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: #ffffff;
+                color-scheme: light;
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: #102323;
+                color-scheme: dark;
             }
         </style>
 
@@ -38,6 +48,15 @@
             <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         @endif
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+        {{-- PWA: installable client portal --}}
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#063023">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="ASRTech">
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
 
         {{-- Search engine ownership verification (Global SEO settings) --}}
         @foreach ([
@@ -89,7 +108,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            @include('partials.seo')
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

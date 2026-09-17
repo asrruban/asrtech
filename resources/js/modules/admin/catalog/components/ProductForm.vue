@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import ProductCompatibilityFields from '@/modules/admin/catalog/components/ProductCompatibilityFields.vue';
 import ProductRichContentFields from '@/modules/admin/catalog/components/ProductRichContentFields.vue';
 import SectionSidebar from '@/modules/admin/components/SectionSidebar.vue';
 import SeoFields from '@/modules/admin/seo/components/SeoFields.vue';
@@ -41,6 +42,7 @@ const sections = [
     { value: 'pricing', label: 'Pricing and licenses' },
     { value: 'features', label: 'Feature groups' },
     { value: 'requirements', label: 'Requirements' },
+    { value: 'compatibility', label: 'Verified compatibility' },
     ...(!props.product
         ? [{ value: 'release', label: 'Product file and release' }]
         : []),
@@ -70,6 +72,15 @@ const form = useForm({
     release_date: props.product?.release_date ?? '',
     compatibility: props.product?.compatibility ?? '',
     php_compatibility: props.product?.php_compatibility ?? '',
+    compatibility_ranges_present: true,
+    compatibility_ranges: (props.product?.compatibility_ranges ?? []).map(
+        (range) => ({
+            platform: range.platform,
+            minimum_version: range.minimum_version,
+            maximum_version: range.maximum_version,
+            published: range.published,
+        }),
+    ),
     short_description: props.product?.short_description ?? '',
     description: props.product?.description ?? '',
     featured_image: props.product?.featured_image ?? '',
@@ -303,6 +314,9 @@ const submit = () => {
         const { initial_release: _initialRelease, ...editableData } =
             transformed;
 
+        // The initial upload belongs only to new products; edits use release management.
+        void _initialRelease;
+
         return { ...editableData, _method: 'put' };
     });
 
@@ -310,7 +324,11 @@ const submit = () => {
         onError: (errors) => {
             const fields = Object.keys(errors);
 
-            if (fields.some((field) => field.startsWith('seo.'))) {
+            if (
+                fields.some((field) => field.startsWith('compatibility_ranges'))
+            ) {
+                activeSection.value = 'compatibility';
+            } else if (fields.some((field) => field.startsWith('seo.'))) {
                 activeSection.value = 'seo';
             } else if (fields.some((field) => field.startsWith('prices'))) {
                 activeSection.value = 'pricing';
@@ -966,6 +984,12 @@ const label = (value) =>
                         <InputError :message="form.errors.prices" />
                     </CardContent>
                 </Card>
+
+                <ProductCompatibilityFields
+                    v-show="activeSection === 'compatibility'"
+                    v-model="form.compatibility_ranges"
+                    :errors="form.errors"
+                />
 
                 <ProductRichContentFields
                     :form="form"

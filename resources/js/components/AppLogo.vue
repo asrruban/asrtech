@@ -1,14 +1,10 @@
-<script setup lang="ts">
-import AppLogoIcon from '@/components/AppLogoIcon.vue';
-</script>
-
 <template>
-    <div
-        class="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground"
+    <span
+        class="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-[#087f75] text-sm font-bold text-white"
+        aria-hidden="true"
+        >A<span class="text-[#b5ded3]">.</span></span
     >
-        <AppLogoIcon class="size-5 fill-current text-white dark:text-black" />
-    </div>
-    <div class="ml-1 grid flex-1 text-left text-sm">
-        <span class="mb-0.5 truncate leading-tight font-semibold">ASRTech</span>
-    </div>
+    <span class="ml-1 truncate text-base font-semibold tracking-tight"
+        >ASR <span class="font-normal">Tech</span></span
+    >
 </template>

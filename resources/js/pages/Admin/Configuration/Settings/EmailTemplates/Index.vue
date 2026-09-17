@@ -4,12 +4,7 @@ import { Lock, Mail, Pencil, Plus, Trash2 } from '@lucide/vue';
 import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -61,9 +56,9 @@ const removeTemplate = (template: TemplateRow) => {
                 Email templates
             </h1>
             <p class="mt-1 text-muted-foreground">
-                Manage the emails sent to clients. System templates are used
-                by the application and can be edited or disabled; custom
-                templates can also be deleted.
+                Manage the emails sent to clients. System templates are used by
+                the application and can be edited or disabled; custom templates
+                can also be deleted.
             </p>
         </div>
 
@@ -130,7 +125,9 @@ const removeTemplate = (template: TemplateRow) => {
                 </div>
                 <table v-else class="w-full text-sm">
                     <thead>
-                        <tr class="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
+                        <tr
+                            class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
+                        >
                             <th class="px-4 py-3">Template</th>
                             <th class="hidden px-4 py-3 md:table-cell">
                                 Subject
@@ -147,8 +144,12 @@ const removeTemplate = (template: TemplateRow) => {
                             class="border-b last:border-0 hover:bg-muted/40"
                         >
                             <td class="px-4 py-3">
-                                <span class="flex items-center gap-2 font-medium">
-                                    <Mail class="size-4 text-muted-foreground" />
+                                <span
+                                    class="flex items-center gap-2 font-medium"
+                                >
+                                    <Mail
+                                        class="size-4 text-muted-foreground"
+                                    />
                                     {{ template.name }}
                                     <span
                                         v-if="template.is_system"
@@ -159,11 +160,16 @@ const removeTemplate = (template: TemplateRow) => {
                                     </span>
                                 </span>
                             </td>
-                            <td class="hidden max-w-64 truncate px-4 py-3 text-muted-foreground md:table-cell">
+                            <td
+                                class="hidden max-w-64 truncate px-4 py-3 text-muted-foreground md:table-cell"
+                            >
                                 {{ template.subject }}
                             </td>
                             <td class="px-4 py-3 text-muted-foreground">
-                                {{ props.categories[template.category] ?? template.category }}
+                                {{
+                                    props.categories[template.category] ??
+                                    template.category
+                                }}
                             </td>
                             <td class="px-4 py-3">
                                 <span
@@ -181,11 +187,7 @@ const removeTemplate = (template: TemplateRow) => {
                             </td>
                             <td class="px-4 py-3">
                                 <div class="flex justify-end gap-1">
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        as-child
-                                    >
+                                    <Button variant="ghost" size="sm" as-child>
                                         <Link
                                             :href="`/admin/settings/emailtemplates/${template.id}`"
                                         >

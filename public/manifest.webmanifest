@@ -1,0 +1,50 @@
+{
+    "name": "ASRTech Client Portal",
+    "short_name": "ASRTech",
+    "description": "Licenses, invoices, subscriptions, and support — ASRTech client portal.",
+    "id": "/client-area",
+    "start_url": "/client-area",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#041f15",
+    "theme_color": "#063023",
+    "icons": [
+        {
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Invoices",
+            "url": "/client-area/invoices",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Support tickets",
+            "url": "/client-area/tickets",
+            "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+        }
+    ]
+}

@@ -147,9 +147,9 @@ const submit = () =>
                         verification
                     </CardTitle>
                     <CardDescription>
-                        Ownership verification codes — paste either the code
-                        or the full meta tag; the code is extracted
-                        automatically. Rendered on every page.
+                        Ownership verification codes — paste either the code or
+                        the full meta tag; the code is extracted automatically.
+                        Rendered on every page.
                     </CardDescription>
                 </CardHeader>
                 <CardContent class="grid gap-5 md:grid-cols-2">
@@ -190,9 +190,7 @@ const submit = () =>
                         <p class="text-xs text-muted-foreground">
                             Measurement ID from GA4 data streams.
                         </p>
-                        <InputError
-                            :message="form.errors.ga4_measurement_id"
-                        />
+                        <InputError :message="form.errors.ga4_measurement_id" />
                     </div>
                     <div class="space-y-2">
                         <Label for="gtm">Google Tag Manager</Label>
@@ -234,10 +232,7 @@ const submit = () =>
                 <CardContent class="space-y-5">
                     <div class="space-y-2">
                         <Label for="home-title">Home meta title</Label>
-                        <Input
-                            id="home-title"
-                            v-model="form.home_meta_title"
-                        />
+                        <Input id="home-title" v-model="form.home_meta_title" />
                         <InputError :message="form.errors.home_meta_title" />
                     </div>
                     <div class="space-y-2">
@@ -348,10 +343,7 @@ const submit = () =>
                                 :alt="slot.label"
                                 class="max-h-full max-w-full object-contain"
                             />
-                            <span
-                                v-else
-                                class="text-xs text-muted-foreground"
-                            >
+                            <span v-else class="text-xs text-muted-foreground">
                                 Not uploaded
                             </span>
                         </div>

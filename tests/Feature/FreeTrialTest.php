@@ -9,10 +9,10 @@ use App\Enums\SubscriptionStatus;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\ProductPrice;
-use App\Models\User;
 use App\Models\Subscription;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Date;
 use Tests\TestCase;
 
 class FreeTrialTest extends TestCase
@@ -75,7 +75,7 @@ class FreeTrialTest extends TestCase
         $user = User::factory()->create();
 
         $now = now();
-        \Illuminate\Support\Facades\Date::setTestNow($now);
+        Date::setTestNow($now);
 
         $this->actingAs($user)
             ->post("/checkout/{$product->slug}/prices/{$price->id}", [
@@ -100,7 +100,7 @@ class FreeTrialTest extends TestCase
         $this->assertSame(LicenseStatus::Active, $license->status);
         $this->assertEquals(7, (int) round($now->diffInDays($license->expires_at)));
 
-        \Illuminate\Support\Facades\Date::setTestNow(null);
+        Date::setTestNow(null);
     }
 
     public function test_checkout_fails_if_trial_already_used(): void
@@ -138,7 +138,7 @@ class FreeTrialTest extends TestCase
         $user = User::factory()->create();
 
         $now = now();
-        \Illuminate\Support\Facades\Date::setTestNow($now);
+        Date::setTestNow($now);
 
         // 1. Create a trialing subscription
         $this->actingAs($user)
@@ -165,7 +165,7 @@ class FreeTrialTest extends TestCase
         $this->assertSame(LicenseStatus::Active, $subscription->license->status);
         $this->assertEquals($expectedDays, (int) round($now->diffInDays($subscription->license->expires_at)));
 
-        \Illuminate\Support\Facades\Date::setTestNow(null);
+        Date::setTestNow(null);
     }
 
     private function createTrialProduct(): Product

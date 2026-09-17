@@ -124,7 +124,9 @@ const removeTemplate = () => {
                                     class="h-9 w-full rounded-md border bg-transparent px-3 text-sm disabled:cursor-not-allowed disabled:opacity-50"
                                 >
                                     <option
-                                        v-for="(label, value) in props.categories"
+                                        v-for="(
+                                            label, value
+                                        ) in props.categories"
                                         :key="value"
                                         :value="value"
                                     >
@@ -181,7 +183,9 @@ const removeTemplate = () => {
                         <CardTitle>Status</CardTitle>
                     </CardHeader>
                     <CardContent class="space-y-4">
-                        <label class="flex items-center gap-2 text-sm font-medium">
+                        <label
+                            class="flex items-center gap-2 text-sm font-medium"
+                        >
                             <input
                                 v-model="form.enabled"
                                 type="checkbox"

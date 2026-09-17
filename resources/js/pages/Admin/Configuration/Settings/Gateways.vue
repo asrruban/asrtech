@@ -70,7 +70,8 @@ const availableGateways = computed(() =>
 
 const expanded = ref<string | null>(
     props.gateways.find(
-        (gateway) => gateway.active && !gateway.configured && gateway.implemented,
+        (gateway) =>
+            gateway.active && !gateway.configured && gateway.implemented,
     )?.key ?? null,
 );
 
@@ -96,7 +97,11 @@ const activate = (gateway: GatewayModule) =>
     router.post(`/admin/settings/gateways/${gateway.key}/activate`);
 
 const deactivate = (gateway: GatewayModule) => {
-    if (confirm(`Deactivate ${gateway.name}? It will no longer be offered at checkout.`)) {
+    if (
+        confirm(
+            `Deactivate ${gateway.name}? It will no longer be offered at checkout.`,
+        )
+    ) {
         router.delete(`/admin/settings/gateways/${gateway.key}`);
     }
 };
@@ -129,8 +134,8 @@ const configError = (gateway: GatewayModule, field: string) =>
             </h1>
             <p class="mt-1 text-muted-foreground">
                 Activate a gateway first, then configure its credentials.
-                Gateways are offered at checkout once they are active and
-                fully configured.
+                Gateways are offered at checkout once they are active and fully
+                configured.
             </p>
         </div>
 
@@ -141,7 +146,9 @@ const configError = (gateway: GatewayModule, field: string) =>
 
             <Card v-for="gateway in activeGateways" :key="gateway.key">
                 <CardHeader>
-                    <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div
+                        class="flex flex-wrap items-start justify-between gap-3"
+                    >
                         <div>
                             <span class="flex flex-wrap items-center gap-2">
                                 <CardTitle>{{ gateway.name }}</CardTitle>
@@ -263,7 +270,9 @@ const configError = (gateway: GatewayModule, field: string) =>
                                     >
                                         <option value="">—</option>
                                         <option
-                                            v-for="(optionLabel, value) in field.options"
+                                            v-for="(
+                                                optionLabel, value
+                                            ) in field.options"
                                             :key="value"
                                             :value="value"
                                         >
@@ -371,7 +380,9 @@ const configError = (gateway: GatewayModule, field: string) =>
 
             <Card v-for="gateway in availableGateways" :key="gateway.key">
                 <CardHeader>
-                    <div class="flex flex-wrap items-start justify-between gap-3">
+                    <div
+                        class="flex flex-wrap items-start justify-between gap-3"
+                    >
                         <div>
                             <span class="flex flex-wrap items-center gap-2">
                                 <CardTitle>{{ gateway.name }}</CardTitle>

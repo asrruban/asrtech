@@ -32,6 +32,7 @@ enum AdminRole: string
             self::SuperAdmin => ['*'],
             self::Billing => [
                 'billing.manage',
+                'reports.view',
                 'users.view',
                 'users.manage',
                 'licenses.view',

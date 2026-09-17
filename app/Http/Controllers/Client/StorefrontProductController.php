@@ -9,6 +9,7 @@ use App\Http\Resources\Client\ProductDetailResource;
 use App\Models\Category;
 use App\Models\Group;
 use App\Models\Product;
+use App\Models\ProductCompatibility;
 use App\Models\ProductType;
 use App\Models\User;
 use App\Payments\Gateway;
@@ -47,11 +48,19 @@ class StorefrontProductController extends Controller
         ?Category $category = null,
         ?Group $group = null,
     ): Response {
+        $versionRules = ['nullable', 'string', 'regex:'.ProductCompatibility::VERSION_PATTERN];
+        $compatibility = $request->validate([
+            'whmcs_version' => $versionRules,
+            'wordpress_version' => $versionRules,
+            'php_version' => $versionRules,
+        ], [
+            '*.regex' => 'Enter a stable version such as 8.2 or 8.2.1. Wildcards and prerelease versions are not supported.',
+        ]);
         $type = $request->string('type')->toString();
         $search = $request->string('search')->trim()->toString();
 
         return Inertia::render('Client/Products/Index', [
-            'filters' => compact('type', 'search'),
+            'filters' => [...compact('type', 'search'), ...$compatibility],
             'productTypes' => ProductType::query()
                 ->where('status', true)
                 ->orderBy('name')
@@ -77,6 +86,22 @@ class StorefrontProductController extends Controller
                     $query->where('name', 'like', "%{$search}%")
                         ->orWhere('short_description', 'like', "%{$search}%");
                 }))
+                ->when(array_filter($compatibility), function (Builder $query) use ($compatibility): void {
+                    foreach (ProductCompatibility::PLATFORMS as $platform => $label) {
+                        $version = $compatibility[$platform.'_version'] ?? null;
+
+                        if (! is_string($version) || $version === '') {
+                            continue;
+                        }
+
+                        $number = ProductCompatibility::versionNumber($version);
+                        $query->whereHas('compatibilityRanges', fn (Builder $ranges) => $ranges
+                            ->where('platform', $platform)
+                            ->where('published', true)
+                            ->where('minimum_version_number', '<=', $number)
+                            ->where('maximum_version_number', '>=', $number));
+                    }
+                })
                 ->orderByDesc('featured')
                 ->latest()
                 ->paginate(12)
@@ -143,6 +168,7 @@ class StorefrontProductController extends Controller
             'category:id,name,slug',
             'productType:id,name,key,slug',
             'visiblePrices',
+            'compatibilityRanges' => fn ($query) => $query->where('published', true),
             'seo',
             'customerReviews' => fn ($query) => $query->approved()->latest(),
             'customerReviews.user:id,name',

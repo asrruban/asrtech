@@ -104,9 +104,9 @@ const statusLabel = (status: string) =>
 const statusClass = (status: string) =>
     ({
         issued: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
-        paid: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        paid: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         partially_refunded:
-            'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+            'bg-blue-50 text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-emerald-200',
         refunded: 'bg-slate-100 text-slate-600 dark:bg-white/10',
         void: 'bg-slate-100 text-slate-600 dark:bg-white/10',
     })[status] ?? 'bg-slate-100 text-slate-600';
@@ -152,7 +152,7 @@ const formatDate = (date: string | null) =>
             </Link>
             <a
                 :href="`/client-area/invoice/${props.invoice.id}/download`"
-                class="inline-flex items-center gap-2 rounded-lg bg-[#4fb250] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3f9f40]"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#087f75] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#06655e]"
             >
                 <Download class="size-4" /> Download PDF
             </a>
@@ -319,7 +319,7 @@ const formatDate = (date: string | null) =>
                         v-for="credit in props.invoice.credit_notes"
                         :key="credit.id"
                         :href="`/client-area/credit-notes/${credit.id}`"
-                        class="flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition hover:border-[#4fb250]"
+                        class="flex items-center justify-between rounded-lg border px-4 py-3 text-sm transition hover:border-[#087f75]"
                     >
                         <span class="font-mono font-semibold">{{
                             credit.credit_note_number
@@ -345,7 +345,9 @@ const formatDate = (date: string | null) =>
                 class="rounded-2xl border bg-card p-6 shadow-sm"
             >
                 <div class="flex items-start gap-3">
-                    <span class="rounded-xl bg-[#4fb250]/10 p-2 text-[#357e37]">
+                    <span
+                        class="rounded-xl bg-[#087f75]/10 p-2 text-[var(--client-accent-dark)]"
+                    >
                         <RotateCcw class="size-5" />
                     </span>
                     <div>
@@ -366,6 +368,12 @@ const formatDate = (date: string | null) =>
                         <label class="text-sm font-semibold">Amount</label>
                         <input
                             v-model="refundForm.amount"
+                            :aria-invalid="Boolean(refundForm.errors.amount)"
+                            :aria-describedby="
+                                refundForm.errors.amount
+                                    ? 'refundForm-amount-error'
+                                    : undefined
+                            "
                             type="number"
                             min="0.01"
                             :max="props.refundPolicy.refundable_amount"
@@ -378,12 +386,21 @@ const formatDate = (date: string | null) =>
                             {{ money(props.refundPolicy.refundable_amount) }}
                             refundable.
                         </p>
-                        <InputError :message="refundForm.errors.amount" />
+                        <InputError
+                            id="refundForm-amount-error"
+                            :message="refundForm.errors.amount"
+                        />
                     </div>
                     <div>
                         <label class="text-sm font-semibold">Reason</label>
                         <textarea
                             v-model="refundForm.reason"
+                            :aria-invalid="Boolean(refundForm.errors.reason)"
+                            :aria-describedby="
+                                refundForm.errors.reason
+                                    ? 'refundForm-reason-error'
+                                    : undefined
+                            "
                             rows="4"
                             minlength="10"
                             maxlength="2000"
@@ -391,13 +408,16 @@ const formatDate = (date: string | null) =>
                             class="mt-1.5 w-full rounded-lg border bg-transparent px-3 py-2 text-sm"
                             placeholder="Tell our billing team why you are requesting a refund."
                         />
-                        <InputError :message="refundForm.errors.reason" />
+                        <InputError
+                            id="refundForm-reason-error"
+                            :message="refundForm.errors.reason"
+                        />
                         <InputError :message="refundRequestError" />
                     </div>
                     <button
                         type="submit"
                         :disabled="refundForm.processing"
-                        class="inline-flex h-10 items-center gap-2 rounded-lg bg-[#4fb250] px-5 text-sm font-bold text-white transition hover:bg-[#3f9f40] disabled:opacity-50"
+                        class="inline-flex h-10 items-center gap-2 rounded-lg bg-[#087f75] px-5 text-sm font-bold text-white transition hover:bg-[#06655e] disabled:opacity-50"
                     >
                         <RotateCcw class="size-4" />
                         {{
@@ -478,7 +498,7 @@ const formatDate = (date: string | null) =>
                             <Link
                                 v-if="request.credit_note_id"
                                 :href="`/client-area/credit-notes/${request.credit_note_id}`"
-                                class="text-xs font-bold text-[#357e37] hover:underline"
+                                class="text-xs font-bold text-[var(--client-accent-dark)] hover:underline"
                                 >View credit note</Link
                             >
                         </div>

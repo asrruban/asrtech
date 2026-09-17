@@ -27,6 +27,10 @@ class ProductDetailResource extends JsonResource
             'release_date' => $this->release_date,
             'compatibility' => $this->compatibility,
             'php_compatibility' => $this->php_compatibility,
+            'compatibility_ranges' => $this->whenLoaded('compatibilityRanges', fn () => $this->compatibilityRanges
+                ->where('published', true)
+                ->map(fn ($range): array => $range->only(['platform', 'minimum_version', 'maximum_version']))
+                ->values()->all()),
             'short_description' => $this->short_description,
             'description' => $this->description,
             'featured_image' => $this->featured_image,

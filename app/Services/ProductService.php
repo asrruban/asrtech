@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Product;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -34,9 +35,20 @@ class ProductService
                 $referencePrices,
             ));
 
+            $replaceCompatibility = array_key_exists('compatibility_ranges', $data);
+            $compatibilityRanges = Arr::pull($data, 'compatibility_ranges', []);
             $product->fill($data)->save();
-            $product->prices()->delete();
-            $product->prices()->createMany($prices);
+
+            if ($replaceCompatibility) {
+                $product->compatibilityRanges()->delete();
+                $product->compatibilityRanges()->createMany($compatibilityRanges);
+            }
+            // Preserve price identities used by subscriptions and maintenance agreements.
+            $cycles = array_column($prices, 'billing_cycle');
+            $product->prices()->whereNotIn('billing_cycle', $cycles)->update(['enabled' => false]);
+            foreach ($prices as $price) {
+                $product->prices()->updateOrCreate(['billing_cycle' => $price['billing_cycle']], $price);
+            }
             $product->seo()->updateOrCreate([], $seo);
 
             return $product->refresh()->load(['prices', 'seo']);

@@ -2,30 +2,18 @@
 import { Link, router, useForm, usePage } from '@inertiajs/vue3';
 import {
     ArrowRight,
-    CalendarDays,
     Check,
-    CheckCircle2,
     ChevronLeft,
     ChevronRight,
-    Code2,
     ExternalLink,
     FileText,
-    Info,
-    Package,
-    PackageCheck,
-    ShieldCheck,
     ShoppingCart,
     Star,
 } from '@lucide/vue';
 import { computed, ref } from 'vue';
-import {
-    Tabs,
-    TabsContent,
-    TabsIndicator,
-    TabsList,
-    TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ProductGalleryLightbox from '@/modules/client/components/ProductGalleryLightbox.vue';
+import ProductVisual from '@/modules/client/components/ProductVisual.vue';
 import RelatedProductCard from '@/modules/client/components/RelatedProductCard.vue';
 import SeoHead from '@/modules/client/components/SeoHead.vue';
 
@@ -108,6 +96,11 @@ interface Product {
     release_date?: string | null;
     compatibility?: string | null;
     php_compatibility?: string | null;
+    compatibility_ranges?: {
+        platform: 'whmcs' | 'wordpress' | 'php';
+        minimum_version: string;
+        maximum_version: string;
+    }[];
     short_description?: string | null;
     description?: string | null;
     featured_image?: string | null;
@@ -144,30 +137,29 @@ const props = defineProps<{
     reviewState: ReviewState;
 }>();
 const page = usePage();
-const site = computed(() => page.props.site);
 const user = computed(() => page.props.auth?.user);
+const activeTab = ref('overview');
 const reviewForm = useForm({
     rating: props.reviewState.review?.rating ?? 5,
     title: props.reviewState.review?.title ?? '',
     content: props.reviewState.review?.content ?? '',
 });
-const submitReview = () => {
+const submitReview = () =>
     reviewForm.post(`${props.product.url}/reviews`, {
         preserveScroll: true,
         onSuccess: () => {
             activeTab.value = 'reviews';
         },
     });
-};
-
 const buying = ref(false);
 const addingToCart = ref(false);
-
+const purchaseError = ref('');
 const sendToCart = (stayOnProduct: boolean) => {
     if (!selectedPrice.value || buying.value || addingToCart.value) {
         return;
     }
 
+    purchaseError.value = '';
     router.post(
         `/cart/${props.product.slug}/prices/${selectedPrice.value.id}`,
         { stay_on_product: stayOnProduct },
@@ -180,6 +172,9 @@ const sendToCart = (stayOnProduct: boolean) => {
                     buying.value = true;
                 }
             },
+            onError: (errors) => {
+                purchaseError.value = Object.values(errors).join(' ');
+            },
             onFinish: () => {
                 buying.value = false;
                 addingToCart.value = false;
@@ -187,10 +182,6 @@ const sendToCart = (stayOnProduct: boolean) => {
         },
     );
 };
-
-const buyNow = () => sendToCart(false);
-const addToCart = () => sendToCart(true);
-
 const enabledPrices = computed(() =>
     (props.product.prices ?? []).filter((price) => price.enabled),
 );
@@ -201,170 +192,50 @@ const selectedPriceIndex = ref(initialPriceIndex >= 0 ? initialPriceIndex : 0);
 const selectedPrice = computed(
     () => enabledPrices.value[selectedPriceIndex.value] ?? null,
 );
-
 const media = computed<MediaItem[]>(() => {
     const gallery = props.product.gallery ?? [];
 
-    if (!props.product.featured_image) {
-        return gallery;
-    }
-
-    return [
-        {
-            url: props.product.featured_image,
-            alt_text: props.product.name,
-        },
-        ...gallery.filter(
-            (image) => image.url !== props.product.featured_image,
-        ),
-    ];
+    return props.product.featured_image
+        ? [
+              {
+                  url: props.product.featured_image,
+                  alt_text: props.product.name,
+              },
+              ...gallery.filter(
+                  (image) => image.url !== props.product.featured_image,
+              ),
+          ]
+        : gallery;
 });
-
+const currentImageIndex = ref(0);
 const lightboxOpen = ref(false);
 const lightboxIndex = ref(0);
-
 const openLightbox = (index: number) => {
-    if (media.value.length === 0) {
+    if (!media.value.length) {
         return;
     }
 
     lightboxIndex.value = index;
     lightboxOpen.value = true;
 };
-
-const activeTab = ref('overview');
-
-const tabs = computed(() => [
-    { value: 'overview', label: 'Overview', count: null, show: true },
-    {
-        value: 'features',
-        label: 'Features',
-        count: null,
-        show: (props.product.feature_groups ?? []).length > 0,
-    },
-    {
-        value: 'screenshots',
-        label: 'Screenshots',
-        count: media.value.length > 1 ? media.value.length : null,
-        show: media.value.length > 1,
-    },
-    {
-        value: 'changelog',
-        label: 'Changelog',
-        count: props.product.changelog?.length || null,
-        show: (props.product.changelog ?? []).length > 0,
-    },
-    {
-        value: 'reviews',
-        label: 'Reviews',
-        count: props.product.reviews?.length || null,
-        show: true,
-    },
-    {
-        value: 'documentation',
-        label: 'Documentation',
-        count: null,
-        show:
-            Boolean(props.product.documentation_content) ||
-            Boolean(props.product.documentation_url),
-    },
-]);
-
-const averageRating = computed(() => {
-    const reviews = props.product.reviews ?? [];
-
-    if (reviews.length === 0) {
-        return null;
+const changeImage = (direction: number) => {
+    if (media.value.length) {
+        currentImageIndex.value =
+            (currentImageIndex.value + direction + media.value.length) %
+            media.value.length;
     }
-
-    return (
-        reviews.reduce((total, review) => total + Number(review.rating), 0) /
-        reviews.length
-    ).toFixed(1);
-});
-
-const starsFilled = computed(() => Math.round(Number(averageRating.value)));
-
-const ribbon = computed(
-    () =>
-        props.product.badge ||
-        props.product.compatibility ||
-        (props.product.version ? `v${props.product.version}` : null),
-);
-
-const discountPercent = computed(() => {
-    if (!selectedPrice.value?.sale_price) {
-        return null;
-    }
-
-    const percent = Math.round(
-        (1 -
-            Number(selectedPrice.value.sale_price) /
-                Number(selectedPrice.value.price)) *
-            100,
-    );
-
-    return percent >= 5 ? percent : null;
-});
-
-const cardRibbon = computed(() => {
-    if (props.product.trial_url) {
-        return 'Free Trial';
-    }
-
-    return discountPercent.value ? `Save ${discountPercent.value}%` : null;
-});
-
-const includes = computed(() => {
-    if (selectedPrice.value?.features?.length) {
-        return selectedPrice.value.features;
-    }
-
-    return [
-        'Instant license delivery after payment',
-        'Free module updates',
-        'Access to technical support',
-        'Secure online ordering',
-    ];
-});
-
-const label = (value: string) =>
-    value
-        .split('_')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-
-const money = (currency: string, amount: string | number) =>
-    new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency,
-        maximumFractionDigits: 2,
-    }).format(Number(amount));
-
-const cycleLabel = (cycle: string) => {
-    if (cycle === 'monthly') {
-        return 'Monthly';
-    }
-
-    if (cycle === 'yearly') {
-        return 'Annually';
-    }
-
-    return 'One-Time Payment';
 };
-
-const purchaseUrl = (price: ProductPrice | null = selectedPrice.value) => {
-    if (price?.purchase_url || props.product.purchase_url) {
-        return price?.purchase_url || props.product.purchase_url;
-    }
-
-    if (site.value.supportEmail) {
-        return `mailto:${site.value.supportEmail}?subject=${encodeURIComponent(`Order: ${props.product.name}`)}`;
-    }
-
-    return null;
+const touchStartX = ref(0);
+const handleTouchStart = (event: TouchEvent) => {
+    touchStartX.value = event.changedTouches[0].screenX;
 };
+const handleTouchEnd = (event: TouchEvent) => {
+    const distance = event.changedTouches[0].screenX - touchStartX.value;
 
+    if (Math.abs(distance) > 50) {
+        changeImage(distance < 0 ? 1 : -1);
+    }
+};
 const documentationHref = computed(() =>
     props.product.documentation_content
         ? props.product.documentation_path
@@ -375,68 +246,90 @@ const documentationIsExternal = computed(
         !props.product.documentation_content &&
         Boolean(props.product.documentation_url),
 );
+const tabs = computed(() =>
+    [
+        { value: 'overview', label: 'Overview', show: true },
+        {
+            value: 'features',
+            label: 'Features',
+            show: Boolean(props.product.feature_groups?.length),
+        },
+        {
+            value: 'screenshots',
+            label: 'Screenshots',
+            show: media.value.length > 0,
+        },
+        {
+            value: 'changelog',
+            label: 'Changelog',
+            show: Boolean(props.product.changelog?.length),
+        },
+        {
+            value: 'documentation',
+            label: 'Documentation',
+            show: Boolean(documentationHref.value),
+        },
+        { value: 'reviews', label: 'Reviews', show: true },
+    ].filter((tab) => tab.show),
+);
+const publicReviews = computed(() =>
+    (props.product.reviews ?? []).filter(
+        (review) => review.verified_purchase === true,
+    ),
+);
+const averageRating = computed(() => {
+    const reviews = publicReviews.value;
 
-const catalogTrail = computed(() => {
-    if (props.product.type === 'whmcs_module') {
-        return ['WHMCS', 'Extension Modules'];
-    }
-
-    if (props.product.type === 'template') {
-        return ['Templates', 'Website Templates'];
-    }
-
-    return ['Services', 'Web Development'];
+    return reviews.length
+        ? (
+              reviews.reduce(
+                  (total, review) => total + Number(review.rating),
+                  0,
+              ) / reviews.length
+          ).toFixed(1)
+        : null;
 });
-
+const productInformation = computed(() =>
+    [
+        { label: 'Category', value: props.product.category.name },
+        { label: 'Version', value: props.product.version },
+        { label: 'Compatibility', value: props.product.compatibility },
+        { label: 'PHP compatibility', value: props.product.php_compatibility },
+        {
+            label: 'Last updated',
+            value: props.product.release_date
+                ? formatDate(props.product.release_date)
+                : null,
+        },
+    ].filter((item) => item.value),
+);
+const label = (value: string) =>
+    value
+        .split('_')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+const money = (currency: string, amount: string | number) =>
+    new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 2,
+    }).format(Number(amount));
+const cycleLabel = (cycle: string) =>
+    cycle === 'monthly'
+        ? 'Billed monthly'
+        : cycle === 'yearly'
+          ? 'Billed annually'
+          : 'One-time payment';
+const purchaseUrl = () =>
+    selectedPrice.value?.purchase_url ||
+    props.product.purchase_url ||
+    '/contact';
 const formatDate = (date: string) =>
     new Intl.DateTimeFormat('en', {
         day: 'numeric',
         month: 'short',
         year: 'numeric',
     }).format(new Date(date));
-
-// Gallery Slider Logic
-const currentImageIndex = ref(0);
-
-const nextImage = () => {
-    if (media.value.length === 0) {
-        return;
-    }
-
-    currentImageIndex.value =
-        (currentImageIndex.value + 1) % media.value.length;
-};
-
-const prevImage = () => {
-    if (media.value.length === 0) {
-        return;
-    }
-
-    currentImageIndex.value =
-        (currentImageIndex.value - 1 + media.value.length) % media.value.length;
-};
-
-const touchStartX = ref(0);
-const touchEndX = ref(0);
-
-const handleTouchStart = (e: TouchEvent) => {
-    touchStartX.value = e.changedTouches[0].screenX;
-};
-
-const handleTouchEnd = (e: TouchEvent) => {
-    touchEndX.value = e.changedTouches[0].screenX;
-    handleSwipe();
-};
-
-const handleSwipe = () => {
-    const swipeThreshold = 50;
-
-    if (touchEndX.value < touchStartX.value - swipeThreshold) {
-        nextImage();
-    } else if (touchEndX.value > touchStartX.value + swipeThreshold) {
-        prevImage();
-    }
-};
 </script>
 
 <template>
@@ -447,1287 +340,928 @@ const handleSwipe = () => {
         :seo="product.seo"
         type="product"
     />
-
-    <div class="bg-[#e9edf3] pb-20 font-raleway dark:bg-slate-950">
-        <!-- ModulesGarden-inspired product stage, adapted to ASRTech branding. -->
-        <section
-            class="relative overflow-hidden bg-[radial-gradient(circle_at_78%_36%,rgba(43,174,255,0.24),transparent_28%),radial-gradient(circle_at_12%_80%,rgba(0,35,105,0.45),transparent_35%),linear-gradient(128deg,#0874df_0%,#075dbb_48%,#064296_100%)] pt-5 pb-8 text-white sm:pt-7 sm:pb-10 lg:pb-12"
-        >
-            <div
-                class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:42px_42px] opacity-[0.07]"
-            ></div>
-            <div
-                class="pointer-events-none absolute top-24 -right-28 size-96 rounded-full border-[70px] border-white/5"
-            ></div>
-            <div
-                class="pointer-events-none absolute -bottom-56 -left-32 size-[34rem] rounded-full border-[90px] border-sky-300/5"
-            ></div>
-
-            <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <!-- Breadcrumbs -->
+    <div
+        class="bg-[var(--client-canvas)] pb-16 [overflow-wrap:anywhere] text-foreground"
+    >
+        <header class="border-b border-border bg-card">
+            <div class="site-container py-8 sm:py-12">
                 <nav
-                    class="flex min-w-0 [scrollbar-width:none] items-center gap-2 overflow-x-auto pb-1 text-[11px] font-semibold whitespace-nowrap text-blue-100/75 sm:text-xs [&::-webkit-scrollbar]:hidden"
                     aria-label="Breadcrumb"
+                    class="mb-8 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
                 >
-                    <Link href="/products" class="transition hover:text-white">
-                        {{ catalogTrail[0] }}
-                    </Link>
-                    <ChevronRight class="size-3 shrink-0 text-blue-200/40" />
-                    <span>{{ catalogTrail[1] }}</span>
-                    <ChevronRight class="size-3 shrink-0 text-blue-200/40" />
-                    <span class="truncate text-white">{{
+                    <Link href="/products" class="hover:text-primary"
+                        >Products</Link
+                    ><ChevronRight class="size-3" aria-hidden="true" /><span>{{
                         product.category.name
-                    }}</span>
+                    }}</span
+                    ><ChevronRight class="size-3" aria-hidden="true" /><span
+                        aria-current="page"
+                        >{{ product.name }}</span
+                    >
                 </nav>
-
-                <!-- 2-Column Hero Content Grid -->
-                <div
-                    class="mt-6 grid items-start gap-7 md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:mt-8 lg:gap-10"
-                >
-                    <!-- Left Column: Gallery & Screenshots -->
-                    <!-- Slider Gallery (lightSlider look-alike) -->
-                    <div class="hidden space-y-3 md:block">
+                <div class="grid gap-10 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+                    <div class="min-w-0">
                         <div
-                            class="relative overflow-hidden rounded-sm border border-white/10 bg-[radial-gradient(circle_at_50%_44%,rgba(255,255,255,0.2),transparent_34%),linear-gradient(145deg,#2cb7ef,#187fd3_62%,#0d62b9)] shadow-2xl shadow-blue-950/25"
+                            class="relative overflow-hidden rounded-2xl border border-border bg-muted"
                             @touchstart="handleTouchStart"
                             @touchend="handleTouchEnd"
                         >
-                            <!-- Custom Ribbon -->
-                            <div
-                                v-if="ribbon"
-                                class="pointer-events-none absolute top-0 left-0 z-10 h-28 w-28 overflow-hidden"
+                            <button
+                                v-if="media.length"
+                                type="button"
+                                class="flex aspect-[16/11] w-full items-center justify-center p-6 sm:p-10"
+                                :aria-label="`Enlarge ${product.name} image ${currentImageIndex + 1}`"
+                                @click="openLightbox(currentImageIndex)"
                             >
+                                <img
+                                    :src="media[currentImageIndex].url"
+                                    :alt="
+                                        media[currentImageIndex].alt_text ||
+                                        product.name
+                                    "
+                                    decoding="async"
+                                    class="max-h-96 max-w-full rounded-lg object-contain"
+                                />
+                            </button>
+                            <ProductVisual
+                                v-else
+                                :name="product.name"
+                                :type="product.type"
+                            />
+                            <span
+                                v-if="product.badge"
+                                class="absolute top-4 left-4 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-primary"
+                                >{{ product.badge }}</span
+                            >
+                            <div
+                                v-if="media.length > 1"
+                                class="absolute right-3 bottom-3 flex items-center gap-2 rounded-full border border-border bg-card p-1"
+                            >
+                                <button
+                                    type="button"
+                                    class="grid size-9 place-items-center rounded-full hover:bg-muted"
+                                    aria-label="Previous product image"
+                                    @click="changeImage(-1)"
+                                >
+                                    <ChevronLeft class="size-4" />
+                                </button>
                                 <span
-                                    class="absolute top-[22px] left-[-39px] w-36 -rotate-45 bg-[#b7ec37] py-1 text-center text-[9px] font-extrabold tracking-wider whitespace-nowrap text-[#0f3f68] uppercase shadow-md"
+                                    class="min-w-9 text-center text-xs"
+                                    aria-live="polite"
+                                    >{{ currentImageIndex + 1 }} /
+                                    {{ media.length }}</span
                                 >
-                                    {{ ribbon }}
-                                </span>
-                            </div>
-
-                            <!-- Main Slider Item Display -->
-                            <div
-                                class="relative flex min-h-[330px] w-full items-center justify-center p-8 lg:min-h-[390px]"
-                            >
                                 <button
                                     type="button"
-                                    class="flex w-full items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                                    :aria-label="`View larger screenshot`"
-                                    @click="openLightbox(currentImageIndex)"
+                                    class="grid size-9 place-items-center rounded-full hover:bg-muted"
+                                    aria-label="Next product image"
+                                    @click="changeImage(1)"
                                 >
-                                    <img
-                                        v-if="media.length > 0"
-                                        :src="media[currentImageIndex].url"
-                                        :alt="
-                                            media[currentImageIndex].alt_text ||
-                                            product.name
-                                        "
-                                        class="max-h-[310px] w-auto max-w-[92%] rounded-md bg-white/95 object-contain shadow-2xl shadow-blue-950/25 transition duration-500 hover:scale-[1.01] lg:max-h-[350px]"
-                                    />
-                                    <Package
-                                        v-else
-                                        class="size-24 text-white/40"
-                                    />
+                                    <ChevronRight class="size-4" />
                                 </button>
-
-                                <!-- Left Arrow -->
-                                <button
-                                    v-if="media.length > 1"
-                                    type="button"
-                                    class="absolute top-1/2 left-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-blue-950/45 text-white transition hover:bg-blue-950/70 focus-visible:outline-2 focus-visible:outline-white"
-                                    aria-label="Previous image"
-                                    @click="prevImage"
-                                >
-                                    <ChevronLeft class="size-6" />
-                                </button>
-
-                                <!-- Right Arrow -->
-                                <button
-                                    v-if="media.length > 1"
-                                    type="button"
-                                    class="absolute top-1/2 right-3 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-blue-950/45 text-white transition hover:bg-blue-950/70 focus-visible:outline-2 focus-visible:outline-white"
-                                    aria-label="Next image"
-                                    @click="nextImage"
-                                >
-                                    <ChevronRight class="size-6" />
-                                </button>
-
-                                <!-- Counter Badge (visible on mobile/tablet) -->
-                                <div
-                                    v-if="media.length > 1"
-                                    class="absolute bottom-0 flex items-center justify-center rounded-full bg-black/40 px-3 py-1 text-[11px] font-bold text-white backdrop-blur-sm"
-                                >
-                                    {{ currentImageIndex + 1 }} /
-                                    {{ media.length }}
-                                </div>
                             </div>
                         </div>
-
-                        <!-- Gallery Thumbnails (Click to update slide) -->
                         <div
                             v-if="media.length > 1"
-                            class="flex [scrollbar-width:thin] gap-2 overflow-x-auto"
+                            class="mt-3 flex gap-3 overflow-x-auto pb-2"
+                            aria-label="Product image thumbnails"
                         >
                             <button
                                 v-for="(image, index) in media"
                                 :key="image.url"
                                 type="button"
-                                class="shrink-0 overflow-hidden rounded-sm border-2 bg-white/10 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                                class="shrink-0 overflow-hidden rounded-lg border-2 bg-card p-1"
                                 :class="
                                     index === currentImageIndex
-                                        ? 'border-[#b7ec37] opacity-100 shadow-lg shadow-blue-950/20'
-                                        : 'border-white/10 opacity-60 hover:border-white/40 hover:opacity-100'
+                                        ? 'border-[#087f75]'
+                                        : 'border-border'
                                 "
-                                :aria-label="`Slide to image ${index + 1}`"
+                                :aria-label="`Show image ${index + 1}`"
+                                :aria-pressed="index === currentImageIndex"
                                 @click="currentImageIndex = index"
                             >
                                 <img
                                     :src="image.url"
-                                    :alt="image.alt_text || product.name"
-                                    class="h-14 w-20 object-cover lg:h-16 lg:w-24"
+                                    alt=""
+                                    loading="lazy"
+                                    class="h-14 w-20 object-contain"
                                 />
                             </button>
                         </div>
-                    </div>
-
-                    <!-- Right Column: Product Metadata & Pricing Card -->
-                    <div class="space-y-6">
-                        <!-- Product Icon, Title and Details -->
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4 md:block">
-                                <button
-                                    type="button"
-                                    class="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-white/15 bg-sky-400/25 p-2 shadow-lg shadow-blue-950/20 md:hidden"
-                                    aria-label="View product screenshots"
-                                    @click="openLightbox(currentImageIndex)"
-                                >
-                                    <img
-                                        v-if="media.length > 0"
-                                        :src="media[0].url"
-                                        :alt="product.name"
-                                        class="max-h-full max-w-full rounded-sm bg-white object-contain"
-                                    />
-                                    <Package v-else class="size-9 text-white" />
-                                </button>
-                                <div class="min-w-0 space-y-1">
-                                    <h1
-                                        class="text-xl leading-tight font-extrabold tracking-tight text-white sm:text-3xl lg:text-[2.15rem]"
-                                    >
-                                        {{ product.name }}
-                                    </h1>
-                                    <p
-                                        class="line-clamp-2 text-xs leading-5 font-medium text-blue-100/75 md:hidden"
-                                    >
-                                        {{ product.short_description }}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <!-- Rating and Badges -->
-                            <div
-                                class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-semibold text-blue-100/85 sm:text-xs"
+                        <div
+                            v-if="product.demo_url || documentationHref"
+                            class="mt-5 flex flex-wrap gap-3"
+                        >
+                            <a
+                                v-if="product.demo_url"
+                                :href="product.demo_url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="button-secondary"
+                                >View demo <ExternalLink class="size-4"
+                            /></a>
+                            <a
+                                v-if="documentationHref"
+                                :href="documentationHref"
+                                :target="
+                                    documentationIsExternal
+                                        ? '_blank'
+                                        : undefined
+                                "
+                                :rel="
+                                    documentationIsExternal
+                                        ? 'noopener noreferrer'
+                                        : undefined
+                                "
+                                class="button-secondary"
+                                ><FileText class="size-4" /> Documentation</a
                             >
-                                <button
-                                    v-if="averageRating"
-                                    type="button"
-                                    class="flex items-center gap-1.5 transition hover:text-white"
-                                    @click="activeTab = 'reviews'"
-                                >
-                                    <span class="flex gap-0.5 text-[#ffb200]">
-                                        <Star
-                                            v-for="number in 5"
-                                            :key="number"
-                                            class="size-3 fill-current"
-                                            :class="
-                                                number <= starsFilled
-                                                    ? 'text-[#ffb200]'
-                                                    : 'text-white/20'
-                                            "
-                                        />
-                                    </span>
-                                    <span>{{ averageRating }}</span>
-                                </button>
-                                <span
-                                    v-if="product.version"
-                                    class="flex items-center gap-1"
-                                >
-                                    <Info class="size-3 text-blue-300" /> v{{
-                                        product.version
-                                    }}
-                                </span>
-                                <span
-                                    v-if="product.release_date"
-                                    class="flex items-center gap-1"
-                                >
-                                    <CalendarDays
-                                        class="size-3 text-blue-300"
-                                    />
-                                    {{ formatDate(product.release_date) }}
-                                </span>
-                                <span
-                                    v-if="product.compatibility"
-                                    class="flex items-center gap-1"
-                                >
-                                    <PackageCheck
-                                        class="size-3 text-blue-300"
-                                    />
-                                    {{ product.compatibility }}
-                                </span>
-                                <span
-                                    v-if="product.php_compatibility"
-                                    class="flex items-center gap-1"
-                                >
-                                    <Code2 class="size-3 text-blue-300" />
-                                    {{ product.php_compatibility }}
-                                </span>
-                            </div>
                         </div>
-
-                        <!-- Pricing Cycles Tab Row -->
-                        <div class="space-y-0">
-                            <div
-                                class="flex [scrollbar-width:none] gap-1 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                                role="tablist"
-                                aria-label="License options"
+                    </div>
+                    <div>
+                        <p class="section-kicker">
+                            {{ product.category.name }}
+                        </p>
+                        <h1
+                            class="mt-3 text-3xl leading-tight font-semibold tracking-[-0.035em] sm:text-4xl lg:text-5xl"
+                        >
+                            {{ product.name }}
+                        </h1>
+                        <p
+                            v-if="product.short_description"
+                            class="body-copy mt-5"
+                        >
+                            {{ product.short_description }}
+                        </p>
+                        <div
+                            class="mt-5 flex flex-wrap items-center gap-3 text-xs text-muted-foreground"
+                        >
+                            <span
+                                v-if="product.version"
+                                class="rounded-md bg-muted px-2.5 py-1.5"
+                                >Version {{ product.version }}</span
                             >
-                                <div
-                                    v-for="(price, index) in enabledPrices"
-                                    :key="price.id"
-                                    class="relative"
-                                >
-                                    <button
-                                        type="button"
-                                        role="tab"
-                                        :aria-selected="
-                                            selectedPriceIndex === index
-                                        "
-                                        class="shrink-0 px-3 py-3 text-xs font-bold transition duration-200 focus-visible:outline-2 focus-visible:outline-white sm:px-4 sm:text-sm"
+                            <span
+                                v-if="product.compatibility"
+                                class="rounded-md bg-muted px-2.5 py-1.5"
+                                >{{ product.compatibility }}</span
+                            >
+                            <a
+                                v-if="averageRating"
+                                href="#product-details"
+                                class="inline-flex items-center gap-1.5 text-primary"
+                                @click="activeTab = 'reviews'"
+                                ><Star class="size-4" /> {{ averageRating }} / 5
+                                · {{ publicReviews.length }} reviews</a
+                            >
+                        </div>
+                        <div
+                            class="mt-7 rounded-2xl border border-border p-5 sm:p-6"
+                        >
+                            <fieldset v-if="enabledPrices.length" class="mb-6">
+                                <legend class="mb-3 text-sm font-semibold">
+                                    Choose your plan
+                                </legend>
+                                <div class="flex flex-wrap gap-2">
+                                    <label
+                                        v-for="(price, index) in enabledPrices"
+                                        :key="price.id"
+                                        class="relative cursor-pointer rounded-lg border px-4 py-3 text-sm font-medium focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#087f75]"
                                         :class="
                                             selectedPriceIndex === index
-                                                ? 'text-white'
-                                                : 'text-blue-100/70 hover:text-white'
+                                                ? 'border-[#087f75] bg-accent text-primary'
+                                                : 'border-border text-muted-foreground'
                                         "
-                                        @click="selectedPriceIndex = index"
                                     >
-                                        {{
+                                        <input
+                                            v-model="selectedPriceIndex"
+                                            type="radio"
+                                            name="product-plan"
+                                            :value="index"
+                                            class="sr-only"
+                                        />{{
                                             price.name ||
                                             label(price.billing_cycle)
                                         }}
-                                    </button>
-
-                                    <!-- Pointer Arrow pointing to the Pricing Card -->
-                                    <div
-                                        v-if="selectedPriceIndex === index"
-                                        class="absolute -bottom-px left-1/2 z-20 hidden h-0 w-0 -translate-x-1/2 border-r-[7px] border-b-[7px] border-l-[7px] border-r-transparent border-b-white border-l-transparent sm:block"
-                                    ></div>
+                                    </label>
                                 </div>
-
-                                <a
-                                    v-if="product.demo_url"
-                                    :href="product.demo_url"
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    class="flex shrink-0 items-center gap-1 px-3 py-3 text-xs font-bold text-blue-100/75 transition hover:text-white sm:px-4 sm:text-sm"
-                                >
-                                    Live Demo <ExternalLink class="size-3" />
-                                </a>
-                            </div>
-
-                            <!-- Pricing Card Block (White Overlay Card) -->
-                            <div
-                                class="relative overflow-hidden rounded-sm bg-white text-slate-900 shadow-2xl shadow-blue-950/25 dark:bg-slate-900 dark:text-white"
-                            >
-                                <!-- Card Orange Banner / Ribbon -->
+                            </fieldset>
+                            <template v-if="selectedPrice">
                                 <div
-                                    v-if="cardRibbon"
-                                    class="absolute top-0 right-0 z-10 h-24 w-24 overflow-hidden"
+                                    class="flex flex-wrap items-baseline gap-x-3 gap-y-1"
                                 >
-                                    <span
-                                        class="absolute top-[18px] right-[-44px] w-40 rotate-45 bg-[#f5842a] py-1 text-center text-[9px] font-extrabold tracking-wider whitespace-nowrap text-white uppercase shadow-md"
-                                    >
-                                        {{ cardRibbon }}
-                                    </span>
-                                </div>
-
-                                <!-- Desktop layout: 2 columns; Mobile layout: stacks -->
-                                <div
-                                    class="grid divide-y divide-slate-100 sm:grid-cols-[0.85fr_1.15fr] sm:divide-x sm:divide-y-0 dark:divide-white/10"
-                                >
-                                    <!-- Price & Purchase Side -->
-                                    <div
-                                        class="flex flex-col justify-between p-5 sm:p-6"
-                                    >
-                                        <div>
-                                            <p
-                                                class="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase"
-                                            >
-                                                Price
-                                            </p>
-                                            <template v-if="selectedPrice">
-                                                <div
-                                                    class="mt-2 flex items-baseline gap-2"
-                                                >
-                                                    <p
-                                                        v-if="
-                                                            selectedPrice.sale_price
-                                                        "
-                                                        class="text-sm font-bold text-slate-400 line-through"
-                                                    >
-                                                        {{
-                                                            money(
-                                                                selectedPrice.currency,
-                                                                selectedPrice.price,
-                                                            )
-                                                        }}
-                                                    </p>
-                                                    <p
-                                                        class="text-3xl leading-none font-light tracking-tight text-[#f5842a] sm:text-4xl"
-                                                    >
-                                                        {{
-                                                            money(
-                                                                selectedPrice.currency,
-                                                                selectedPrice.sale_price ||
-                                                                    selectedPrice.price,
-                                                            )
-                                                        }}
-                                                    </p>
-                                                </div>
-                                                <p
-                                                    class="mt-1 text-xs font-semibold text-slate-500"
-                                                >
-                                                    {{
-                                                        cycleLabel(
-                                                            selectedPrice.billing_cycle,
-                                                        )
-                                                    }}
-                                                </p>
-                                                <p
-                                                    v-if="
-                                                        Number(
-                                                            selectedPrice.setup_fee,
-                                                        ) > 0
-                                                    "
-                                                    class="mt-1 text-[11px] text-slate-400"
-                                                >
-                                                    +
-                                                    {{
-                                                        money(
-                                                            selectedPrice.currency,
-                                                            selectedPrice.setup_fee ||
-                                                                0,
-                                                        )
-                                                    }}
-                                                    setup fee
-                                                </p>
-                                            </template>
-                                            <template v-else>
-                                                <p
-                                                    class="mt-2 text-xl font-extrabold text-slate-800 dark:text-white"
-                                                >
-                                                    Custom quote
-                                                </p>
-                                                <p
-                                                    class="text-xs text-slate-500"
-                                                >
-                                                    Talk to our team
-                                                </p>
-                                            </template>
-                                        </div>
-
-                                        <!-- Mobile purchase buttons row -->
-                                        <div
-                                            class="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-1"
-                                        >
-                                            <button
-                                                v-if="selectedPrice"
-                                                type="button"
-                                                :disabled="buying"
-                                                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#58c957] px-4 text-sm font-bold text-white shadow-lg shadow-[#58c957]/20 transition duration-200 hover:bg-[#45b944] disabled:opacity-50"
-                                                @click="buyNow"
-                                            >
-                                                {{
-                                                    buying
-                                                        ? 'Adding…'
-                                                        : 'Buy Now'
-                                                }}
-                                            </button>
-                                            <a
-                                                v-else-if="purchaseUrl()"
-                                                :href="
-                                                    purchaseUrl() || undefined
-                                                "
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#58c957] px-4 text-sm font-bold text-white shadow-lg shadow-[#58c957]/20 transition duration-200 hover:bg-[#45b944]"
-                                            >
-                                                Buy Now
-                                            </a>
-
-                                            <button
-                                                v-if="selectedPrice"
-                                                type="button"
-                                                :disabled="addingToCart"
-                                                class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-bold text-slate-600 transition hover:border-blue-400 hover:text-blue-600 disabled:opacity-50"
-                                                @click="addToCart"
-                                            >
-                                                <ShoppingCart class="size-4" />
-                                                {{
-                                                    addingToCart
-                                                        ? 'Adding…'
-                                                        : 'Add To Cart'
-                                                }}
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <!-- Includes & Guarantee Side -->
-                                    <div
-                                        class="bg-slate-50/40 p-6 dark:bg-slate-900/20"
-                                    >
-                                        <Tabs
-                                            default-value="includes"
-                                            class="gap-4"
-                                        >
-                                            <TabsList
-                                                class="relative h-auto w-full justify-start gap-4 rounded-none border-b border-slate-200 bg-transparent p-0 dark:border-white/10"
-                                            >
-                                                <TabsTrigger
-                                                    value="includes"
-                                                    class="h-auto flex-none rounded-none border-0 bg-transparent px-0 pt-0 pb-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#4fb250] data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:text-[#84d780]"
-                                                >
-                                                    Includes
-                                                </TabsTrigger>
-                                                <TabsTrigger
-                                                    value="guarantee"
-                                                    class="h-auto flex-none rounded-none border-0 bg-transparent px-0 pt-0 pb-2 text-[10px] font-extrabold tracking-wider text-slate-400 uppercase shadow-none data-[state=active]:bg-transparent data-[state=active]:text-[#4fb250] data-[state=active]:shadow-none dark:data-[state=active]:bg-transparent dark:data-[state=active]:text-[#84d780]"
-                                                >
-                                                    30-Day Guarantee
-                                                </TabsTrigger>
-                                                <TabsIndicator
-                                                    class="bg-[#4fb250]"
-                                                />
-                                            </TabsList>
-                                            <TabsContent
-                                                value="includes"
-                                                class="pt-4"
-                                            >
-                                                <ul class="space-y-2.5">
-                                                    <li
-                                                        v-for="item in includes"
-                                                        :key="item"
-                                                        class="flex items-start gap-2.5 text-xs leading-5 font-semibold text-slate-600 dark:text-slate-300"
-                                                    >
-                                                        <Check
-                                                            class="mt-0.5 size-4 shrink-0 text-[#4fb250]"
-                                                        />
-                                                        <span>{{ item }}</span>
-                                                    </li>
-                                                </ul>
-                                            </TabsContent>
-                                            <TabsContent
-                                                value="guarantee"
-                                                class="pt-4"
-                                            >
-                                                <div
-                                                    class="flex items-start gap-3"
-                                                >
-                                                    <ShieldCheck
-                                                        class="mt-0.5 size-8 shrink-0 text-[#4fb250]"
-                                                    />
-                                                    <p
-                                                        class="text-xs leading-5 font-semibold text-slate-600 dark:text-slate-300"
-                                                    >
-                                                        Order with confidence —
-                                                        if the product doesn't
-                                                        fit your project,
-                                                        contact our support team
-                                                        within 30 days of
-                                                        purchase and we'll make
-                                                        it right.
-                                                    </p>
-                                                </div>
-                                            </TabsContent>
-                                        </Tabs>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Product content navigation continues the blue catalog stage. -->
-        <div
-            class="relative z-30 bg-[#06479a] text-white shadow-[0_8px_22px_rgba(15,46,89,0.16)]"
-        >
-            <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between">
-                    <!-- Left: Scrollable Tabs -->
-                    <div
-                        class="flex [scrollbar-width:none] gap-1 overflow-x-auto [&::-webkit-scrollbar]:hidden"
-                        role="tablist"
-                    >
-                        <div
-                            v-for="tab in tabs.filter((item) => item.show)"
-                            :key="tab.value"
-                            class="relative"
-                        >
-                            <button
-                                type="button"
-                                role="tab"
-                                :aria-selected="activeTab === tab.value"
-                                class="shrink-0 px-3 py-4 text-xs font-bold transition duration-200 sm:px-4 sm:text-sm"
-                                :class="
-                                    activeTab === tab.value
-                                        ? 'text-white'
-                                        : 'text-blue-100/60 hover:text-white'
-                                "
-                                @click="activeTab = tab.value"
-                            >
-                                {{ tab.label }}
-                                <span
-                                    v-if="tab.count"
-                                    class="ml-1 rounded-full bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-white/10 dark:text-slate-300"
-                                >
-                                    {{ tab.count }}
-                                </span>
-                            </button>
-
-                            <!-- Pointer triangle pointing down -->
-                            <div
-                                v-if="activeTab === tab.value"
-                                class="absolute bottom-0 left-1/2 z-20 h-0 w-0 -translate-x-1/2 border-r-[7px] border-b-[7px] border-l-[7px] border-r-transparent border-b-[#e9edf3] border-l-transparent dark:border-b-slate-950"
-                            ></div>
-                        </div>
-                    </div>
-
-                    <!-- Right: Documentation Button (Desktop only) -->
-                    <a
-                        v-if="documentationHref"
-                        :href="documentationHref"
-                        :target="documentationIsExternal ? '_blank' : undefined"
-                        :rel="
-                            documentationIsExternal ? 'noreferrer' : undefined
-                        "
-                        class="hidden h-9 items-center gap-1.5 border-l border-white/15 px-4 text-xs font-bold text-blue-100 transition hover:text-white sm:inline-flex"
-                    >
-                        <FileText class="size-4" /> Documentation
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Main Tab Content Container -->
-        <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-            <div class="grid gap-8">
-                <!-- White Content Card -->
-                <div
-                    class="overflow-hidden rounded-sm bg-white shadow-[0_18px_55px_rgba(40,55,82,0.12)] ring-1 ring-slate-200/60 dark:bg-slate-900 dark:ring-white/10"
-                >
-                    <Tabs v-model="activeTab" class="gap-0">
-                        <TabsContent value="overview">
-                            <div class="grid">
-                                <article class="p-6 sm:p-8 lg:p-10">
-                                    <h2
-                                        class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
-                                    >
-                                        Overview
-                                    </h2>
-                                    <div
-                                        class="mt-4 text-sm leading-7 font-medium whitespace-pre-line text-slate-600 sm:text-[15px] sm:leading-8 dark:text-slate-300"
+                                    <p
+                                        class="text-4xl font-semibold tracking-tight"
                                     >
                                         {{
-                                            product.description ||
-                                            product.short_description
+                                            money(
+                                                selectedPrice.currency,
+                                                selectedPrice.sale_price ??
+                                                    selectedPrice.price,
+                                            )
                                         }}
-                                    </div>
-                                </article>
-
-                                <!-- Product Info Panel inside Overview tab -->
-                                <aside
-                                    class="border-t border-slate-100 bg-slate-50/50 p-6 sm:p-8 dark:border-white/10 dark:bg-slate-950/40"
-                                >
-                                    <h2
-                                        class="text-xs font-extrabold tracking-wider text-slate-800 uppercase dark:text-slate-100"
-                                    >
-                                        Product information
-                                    </h2>
-                                    <dl
-                                        class="mt-4 grid gap-4 divide-y divide-slate-200 text-sm sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-3 dark:divide-white/10"
-                                    >
-                                        <div
-                                            v-if="product.version"
-                                            class="flex flex-col gap-1 py-2"
-                                        >
-                                            <dt class="text-slate-500">
-                                                Version
-                                            </dt>
-                                            <dd
-                                                class="font-bold text-slate-800 dark:text-slate-200"
-                                            >
-                                                {{ product.version }}
-                                            </dd>
-                                        </div>
-                                        <div class="flex flex-col gap-1 py-2">
-                                            <dt class="text-slate-500">
-                                                Category
-                                            </dt>
-                                            <dd
-                                                class="font-bold text-slate-800 dark:text-slate-200"
-                                            >
-                                                {{ product.category.name }}
-                                            </dd>
-                                        </div>
-                                        <div
-                                            v-if="product.compatibility"
-                                            class="flex flex-col gap-1 py-2"
-                                        >
-                                            <dt class="text-slate-500">
-                                                Compatibility
-                                            </dt>
-                                            <dd
-                                                class="font-bold text-slate-800 dark:text-slate-200"
-                                            >
-                                                {{ product.compatibility }}
-                                            </dd>
-                                        </div>
-                                        <div
-                                            v-if="product.php_compatibility"
-                                            class="flex flex-col gap-1 py-2"
-                                        >
-                                            <dt class="text-slate-500">PHP</dt>
-                                            <dd
-                                                class="font-bold text-slate-800 dark:text-slate-200"
-                                            >
-                                                {{ product.php_compatibility }}
-                                            </dd>
-                                        </div>
-                                        <div
-                                            v-if="product.release_date"
-                                            class="flex flex-col gap-1 py-2"
-                                        >
-                                            <dt class="text-slate-500">
-                                                Last update
-                                            </dt>
-                                            <dd
-                                                class="font-bold text-slate-800 dark:text-slate-200"
-                                            >
-                                                {{
-                                                    formatDate(
-                                                        product.release_date,
-                                                    )
-                                                }}
-                                            </dd>
-                                        </div>
-                                    </dl>
-
-                                    <!-- Requirements block -->
-                                    <div
-                                        v-if="product.requirements?.length"
-                                        class="mt-6 border-t border-slate-200/60 pt-6 dark:border-white/10"
-                                    >
-                                        <h3
-                                            class="text-xs font-extrabold tracking-wider text-slate-800 uppercase dark:text-slate-100"
-                                        >
-                                            Requirements
-                                        </h3>
-                                        <ul
-                                            class="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2"
-                                        >
-                                            <li
-                                                v-for="requirement in product.requirements"
-                                                :key="requirement.label"
-                                                class="flex items-start gap-2 text-xs leading-5 text-slate-600 dark:text-slate-300"
-                                            >
-                                                <Check
-                                                    class="mt-0.5 size-3.5 shrink-0 text-[#4fb250]"
-                                                />
-                                                <span
-                                                    ><strong
-                                                        >{{
-                                                            requirement.label
-                                                        }}:</strong
-                                                    >
-                                                    {{
-                                                        requirement.value
-                                                    }}</span
-                                                >
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </aside>
-                            </div>
-
-                            <!-- Optional Services / Addons inside Overview tab -->
-                            <div
-                                v-if="product.addons?.length"
-                                class="border-t border-slate-100 bg-slate-50/50 p-6 sm:p-8 dark:border-white/10 dark:bg-slate-950/30"
-                            >
-                                <h2
-                                    class="text-lg font-extrabold text-slate-800 sm:text-xl dark:text-white"
-                                >
-                                    Optional services
-                                </h2>
-                                <div class="mt-5 grid gap-4 md:grid-cols-2">
-                                    <div
-                                        v-for="addon in product.addons"
-                                        :key="addon.name"
-                                        class="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center dark:border-white/10 dark:bg-slate-900"
-                                    >
-                                        <div>
-                                            <h3
-                                                class="font-bold text-slate-800 dark:text-white"
-                                            >
-                                                {{ addon.name }}
-                                            </h3>
-                                            <p
-                                                v-if="addon.description"
-                                                class="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400"
-                                            >
-                                                {{ addon.description }}
-                                            </p>
-                                        </div>
-                                        <div
-                                            class="flex shrink-0 items-center justify-between gap-3 sm:block sm:text-right"
-                                        >
-                                            <p
-                                                v-if="addon.price"
-                                                class="font-extrabold text-[#f5842a]"
-                                            >
-                                                {{
-                                                    money(
-                                                        addon.currency,
-                                                        addon.sale_price ||
-                                                            addon.price,
-                                                    )
-                                                }}
-                                            </p>
-                                            <a
-                                                v-if="
-                                                    addon.purchase_url ||
-                                                    purchaseUrl()
-                                                "
-                                                :href="
-                                                    addon.purchase_url ||
-                                                    purchaseUrl() ||
-                                                    undefined
-                                                "
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                class="mt-1 inline-flex text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                                                >Add service →</a
-                                            >
-                                            <span
-                                                v-else
-                                                class="mt-1 inline-flex text-xs font-bold text-slate-400"
-                                                >Contact sales</span
-                                            >
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </TabsContent>
-
-                        <!-- Features Tab -->
-                        <TabsContent
-                            value="features"
-                            class="p-6 sm:p-8 lg:p-10"
-                        >
-                            <h2
-                                class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
-                            >
-                                Features
-                            </h2>
-                            <div class="mt-6 grid gap-6 md:grid-cols-2">
-                                <div
-                                    v-for="group in product.feature_groups"
-                                    :key="group.title"
-                                    class="rounded-xl border border-slate-200/80 p-5 sm:p-6 dark:border-white/10"
-                                >
-                                    <div class="flex items-start gap-3">
-                                        <span
-                                            class="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#eff9ef] text-[#4fb250] dark:bg-[#4fb250]/10"
-                                        >
-                                            <Check class="size-4" />
-                                        </span>
-                                        <div>
-                                            <h3
-                                                class="font-extrabold text-slate-800 dark:text-white"
-                                            >
-                                                {{ group.title }}
-                                            </h3>
-                                            <p
-                                                v-if="group.description"
-                                                class="mt-0.5 text-xs leading-5 text-slate-500 dark:text-slate-400"
-                                            >
-                                                {{ group.description }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <ul
-                                        class="mt-4 space-y-2.5 border-t border-slate-100 pt-4 dark:border-white/10"
-                                    >
-                                        <li
-                                            v-for="feature in group.features"
-                                            :key="feature"
-                                            class="flex items-start gap-2.5 text-sm leading-6 font-medium text-slate-600 dark:text-slate-300"
-                                        >
-                                            <CheckCircle2
-                                                class="mt-1 size-4 shrink-0 text-[#4fb250]"
-                                            />
-                                            <span>{{ feature }}</span>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </TabsContent>
-
-                        <!-- Screenshots Tab -->
-                        <TabsContent
-                            value="screenshots"
-                            class="p-6 sm:p-8 lg:p-10"
-                        >
-                            <h2
-                                class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
-                            >
-                                Screenshots
-                            </h2>
-                            <div class="mt-6 grid gap-5 sm:grid-cols-2">
-                                <button
-                                    v-for="(image, index) in media"
-                                    :key="image.url"
-                                    type="button"
-                                    class="group overflow-hidden rounded-xl border border-slate-200 bg-[#f7f9fa] text-left transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4fb250] dark:border-white/10 dark:bg-slate-950"
-                                    @click="openLightbox(index)"
-                                >
-                                    <img
-                                        :src="image.url"
-                                        :alt="image.alt_text || product.name"
-                                        class="aspect-[16/10] w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                                    />
-                                    <span
-                                        class="block border-t border-slate-200 px-4 py-3 text-xs font-semibold text-slate-600 dark:border-white/10 dark:text-slate-300"
+                                    </p>
+                                    <del
+                                        v-if="selectedPrice.sale_price != null"
+                                        class="text-lg text-muted-foreground"
                                         >{{
-                                            image.alt_text || product.name
-                                        }}</span
+                                            money(
+                                                selectedPrice.currency,
+                                                selectedPrice.price,
+                                            )
+                                        }}</del
                                     >
-                                </button>
-                            </div>
-                        </TabsContent>
-
-                        <!-- Changelog Tab -->
-                        <TabsContent
-                            value="changelog"
-                            class="p-6 sm:p-8 lg:p-10"
-                        >
-                            <h2
-                                class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
-                            >
-                                Changelog
-                            </h2>
-                            <div class="mt-6 space-y-5">
-                                <article
-                                    v-for="release in product.changelog"
-                                    :key="`${release.version}-${release.released_at}`"
-                                    class="grid gap-4 rounded-xl border-l-4 border-[#4fb250] bg-[#f7f9fa] p-5 sm:grid-cols-[170px_minmax(0,1fr)] sm:p-6 dark:bg-slate-950/50"
-                                >
-                                    <div>
-                                        <h3
-                                            class="font-extrabold text-slate-900 dark:text-white"
-                                        >
-                                            Version {{ release.version }}
-                                        </h3>
-                                        <time
-                                            v-if="release.released_at"
-                                            class="mt-1 block text-xs text-slate-500"
-                                            >{{
-                                                formatDate(release.released_at)
-                                            }}</time
-                                        >
-                                    </div>
-                                    <ul class="space-y-2.5">
-                                        <li
-                                            v-for="note in release.notes"
-                                            :key="note"
-                                            class="flex items-start gap-2.5 text-sm leading-6 font-medium text-slate-600 dark:text-slate-300"
-                                        >
-                                            <Check
-                                                class="mt-1 size-4 shrink-0 text-[#4fb250]"
-                                            />
-                                            <span>{{ note }}</span>
-                                        </li>
-                                    </ul>
-                                </article>
-                            </div>
-                        </TabsContent>
-
-                        <!-- Reviews Tab -->
-                        <TabsContent
-                            id="reviews"
-                            value="reviews"
-                            class="p-6 sm:p-8 lg:p-10"
-                        >
-                            <div
-                                class="flex flex-wrap items-end justify-between gap-4"
-                            >
-                                <h2
-                                    class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
-                                >
-                                    Reviews
-                                </h2>
-                                <div
-                                    v-if="averageRating"
-                                    class="flex items-center gap-2 rounded-md bg-[#eff9ef] px-3 py-2 text-sm font-extrabold text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]"
-                                >
-                                    <Star class="size-4 fill-current" />
-                                    {{ averageRating }} out of 5
                                 </div>
-                            </div>
-
-                            <form
-                                v-if="reviewState.can_review"
-                                class="mt-6 space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-white/10 dark:bg-white/5"
-                                @submit.prevent="submitReview"
-                            >
-                                <div>
-                                    <h3
-                                        class="font-extrabold text-slate-900 dark:text-white"
-                                    >
-                                        {{
-                                            reviewState.review
-                                                ? 'Update your review'
-                                                : 'Write your review'
-                                        }}
-                                    </h3>
-                                    <p
-                                        class="mt-1 text-sm text-slate-500 dark:text-slate-400"
-                                    >
-                                        Your name will appear with a verified
-                                        purchase badge.
-                                    </p>
-                                    <p
-                                        v-if="
-                                            reviewState.review?.status ===
-                                            'pending'
-                                        "
-                                        class="mt-2 text-xs font-bold text-amber-700 dark:text-amber-300"
-                                    >
-                                        Your review is awaiting moderation.
-                                    </p>
-                                    <p
-                                        v-else-if="
-                                            reviewState.review?.status ===
-                                            'hidden'
-                                        "
-                                        class="mt-2 text-xs font-bold text-slate-600 dark:text-slate-300"
-                                    >
-                                        Your review is currently hidden.
-                                        Updating it will return it to
-                                        moderation.
-                                    </p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label
-                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
-                                    >
-                                        Rating
-                                    </label>
-                                    <div class="flex gap-1">
-                                        <button
-                                            v-for="number in 5"
-                                            :key="number"
-                                            type="button"
-                                            class="text-[#ffb200]"
-                                            :aria-label="`${number} star rating`"
-                                            @click="reviewForm.rating = number"
-                                        >
-                                            <Star
-                                                class="size-6"
-                                                :class="
-                                                    number <= reviewForm.rating
-                                                        ? 'fill-current'
-                                                        : 'text-slate-300 dark:text-slate-700'
-                                                "
-                                            />
-                                        </button>
-                                    </div>
-                                    <p
-                                        v-if="reviewForm.errors.rating"
-                                        class="text-xs font-medium text-red-600"
-                                    >
-                                        {{ reviewForm.errors.rating }}
-                                    </p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label
-                                        for="review-title"
-                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
-                                    >
-                                        Review title
-                                    </label>
-                                    <input
-                                        id="review-title"
-                                        v-model="reviewForm.title"
-                                        maxlength="255"
-                                        placeholder="A short summary"
-                                        class="h-11 w-full rounded-md border border-slate-200 bg-white px-3 text-sm dark:border-white/10 dark:bg-slate-950"
-                                    />
-                                    <p
-                                        v-if="reviewForm.errors.title"
-                                        class="text-xs font-medium text-red-600"
-                                    >
-                                        {{ reviewForm.errors.title }}
-                                    </p>
-                                </div>
-                                <div class="space-y-2">
-                                    <label
-                                        for="review-content"
-                                        class="block text-sm font-bold text-slate-700 dark:text-slate-200"
-                                    >
-                                        Your experience
-                                    </label>
-                                    <textarea
-                                        id="review-content"
-                                        v-model="reviewForm.content"
-                                        rows="5"
-                                        maxlength="5000"
-                                        required
-                                        class="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm dark:border-white/10 dark:bg-slate-950"
-                                    />
-                                    <p
-                                        v-if="reviewForm.errors.content"
-                                        class="text-xs font-medium text-red-600"
-                                    >
-                                        {{ reviewForm.errors.content }}
-                                    </p>
-                                </div>
-                                <button
-                                    type="submit"
-                                    :disabled="reviewForm.processing"
-                                    class="inline-flex h-11 items-center justify-center rounded-md bg-[#4fb250] px-5 text-sm font-extrabold text-white transition hover:bg-[#459d46] disabled:opacity-60"
-                                >
+                                <p class="mt-2 text-sm text-muted-foreground">
                                     {{
-                                        reviewForm.processing
-                                            ? 'Saving…'
-                                            : reviewState.review
-                                              ? 'Update review'
-                                              : 'Publish review'
+                                        cycleLabel(selectedPrice.billing_cycle)
                                     }}
-                                </button>
-                            </form>
-
-                            <div
-                                v-else-if="!user"
-                                class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                            >
-                                Purchased this product?
-                                <Link
-                                    :href="reviewState.login_url"
-                                    class="font-extrabold text-[#357e37] hover:underline dark:text-[#84d780]"
-                                >
-                                    Sign in to write a review.
-                                </Link>
-                            </div>
-
-                            <div
-                                v-else
-                                class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
-                            >
-                                Reviews can be written by verified customers
-                                after purchasing this product.
-                            </div>
-
-                            <div class="mt-6 grid gap-5 md:grid-cols-2">
-                                <article
-                                    v-for="review in product.reviews ?? []"
-                                    :key="
-                                        review.id ??
-                                        `${review.name}-${review.reviewed_at}`
-                                    "
-                                    class="rounded-xl border border-slate-200 p-5 dark:border-white/10"
-                                >
-                                    <div class="flex gap-1 text-[#ffb200]">
-                                        <Star
-                                            v-for="number in 5"
-                                            :key="number"
-                                            class="size-4"
-                                            :class="
-                                                number <= review.rating
-                                                    ? 'fill-current'
-                                                    : 'text-slate-200 dark:text-slate-700'
-                                            "
-                                        />
-                                    </div>
-                                    <h3
-                                        class="mt-4 font-extrabold text-slate-900 dark:text-white"
-                                    >
-                                        {{
-                                            review.title ||
-                                            'Verified customer review'
-                                        }}
-                                    </h3>
-                                    <p
-                                        class="mt-3 text-sm leading-6 font-medium text-slate-600 dark:text-slate-300"
-                                    >
-                                        {{ review.content }}
-                                    </p>
-                                    <div
-                                        class="mt-5 border-t border-slate-100 pt-4 dark:border-white/10"
-                                    >
-                                        <p
-                                            class="text-xs font-extrabold text-slate-700 dark:text-slate-200"
-                                        >
-                                            {{ review.name }}
-                                        </p>
-                                        <p
-                                            v-if="review.verified_purchase"
-                                            class="mt-1 text-[11px] font-bold text-[#357e37] dark:text-[#84d780]"
-                                        >
-                                            Verified purchase
-                                        </p>
-                                        <time
-                                            v-if="review.reviewed_at"
-                                            class="mt-1 block text-xs text-slate-400"
-                                            >{{
-                                                formatDate(review.reviewed_at)
-                                            }}</time
-                                        >
-                                    </div>
-                                </article>
-                                <p
-                                    v-if="(product.reviews ?? []).length === 0"
-                                    class="text-sm font-medium text-slate-500 dark:text-slate-400"
-                                >
-                                    No customer reviews yet.
                                 </p>
-                            </div>
-                        </TabsContent>
-
-                        <!-- Documentation Tab -->
-                        <TabsContent
-                            value="documentation"
-                            class="p-6 sm:p-8 lg:p-10"
-                        >
-                            <div
-                                class="flex flex-wrap items-start justify-between gap-5"
-                            >
-                                <h2
-                                    class="text-xl font-extrabold tracking-tight text-slate-800 sm:text-2xl dark:text-white"
+                                <p
+                                    v-if="Number(selectedPrice.setup_fee) > 0"
+                                    class="mt-2 text-sm text-muted-foreground"
                                 >
-                                    Documentation
+                                    Plus
+                                    {{
+                                        money(
+                                            selectedPrice.currency,
+                                            selectedPrice.setup_fee || 0,
+                                        )
+                                    }}
+                                    setup fee
+                                </p>
+                                <p
+                                    v-if="selectedPrice.description"
+                                    class="mt-4 text-sm leading-6 text-muted-foreground"
+                                >
+                                    {{ selectedPrice.description }}
+                                </p>
+                                <ul
+                                    v-if="selectedPrice.features?.length"
+                                    class="mt-5 space-y-2 border-t border-border pt-5"
+                                >
+                                    <li
+                                        v-for="feature in selectedPrice.features"
+                                        :key="feature"
+                                        class="flex gap-2 text-sm leading-6 text-muted-foreground"
+                                    >
+                                        <Check
+                                            class="mt-1 size-4 shrink-0 text-primary"
+                                        /><span>{{ feature }}</span>
+                                    </li>
+                                </ul>
+                                <div class="mt-6 grid gap-3 sm:grid-cols-2">
+                                    <button
+                                        type="button"
+                                        class="button-primary"
+                                        :disabled="buying || addingToCart"
+                                        @click="sendToCart(false)"
+                                    >
+                                        {{ buying ? 'Adding…' : 'Buy now'
+                                        }}<ArrowRight class="size-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="button-secondary"
+                                        :disabled="buying || addingToCart"
+                                        @click="sendToCart(true)"
+                                    >
+                                        <ShoppingCart class="size-4" />{{
+                                            addingToCart
+                                                ? 'Adding…'
+                                                : 'Add to cart'
+                                        }}
+                                    </button>
+                                </div>
+                            </template>
+                            <template v-else
+                                ><h2 class="text-xl font-semibold">
+                                    Let's discuss your requirements.
                                 </h2>
-                                <a
-                                    v-if="documentationHref"
-                                    :href="documentationHref"
-                                    :target="
-                                        documentationIsExternal
-                                            ? '_blank'
-                                            : undefined
-                                    "
-                                    :rel="
-                                        documentationIsExternal
-                                            ? 'noreferrer'
-                                            : undefined
-                                    "
-                                    class="inline-flex h-10 items-center gap-2 rounded-md border border-slate-200 px-4 text-sm font-bold text-slate-600 transition hover:border-[#4fb250] hover:text-[#4fb250] dark:border-white/10 dark:text-slate-300"
+                                <p
+                                    class="mt-2 text-sm leading-6 text-muted-foreground"
                                 >
-                                    <FileText class="size-4" /> Open complete
-                                    docs <ExternalLink class="size-3.5" />
-                                </a>
-                            </div>
-                            <div
-                                v-if="product.documentation_content"
-                                class="mt-6 rounded-xl border-l-4 border-[#4fb250] bg-[#f7f9fa] p-5 text-sm leading-7 font-medium whitespace-pre-line text-slate-600 sm:p-7 dark:bg-slate-950/50 dark:text-slate-300"
+                                    Contact ASR Tech for availability, scope,
+                                    and pricing.
+                                </p>
+                                <a
+                                    :href="purchaseUrl()"
+                                    class="button-primary mt-5"
+                                    >{{
+                                        product.purchase_url
+                                            ? 'View purchase options'
+                                            : 'Request information'
+                                    }}<ArrowRight class="size-4" /></a
+                            ></template>
+                            <p
+                                v-if="purchaseError"
+                                role="alert"
+                                class="mt-4 text-sm text-red-700"
                             >
-                                {{ product.documentation_content }}
-                            </div>
-                        </TabsContent>
-                    </Tabs>
-                </div>
-
-                <!-- Documentation Button (Mobile only) -->
-                <div class="sm:hidden">
-                    <a
-                        v-if="documentationHref"
-                        :href="documentationHref"
-                        :target="documentationIsExternal ? '_blank' : undefined"
-                        :rel="
-                            documentationIsExternal ? 'noreferrer' : undefined
-                        "
-                        class="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-[#5cb85c] px-4 text-sm font-bold text-[#5cb85c] transition hover:bg-[#5cb85c]/5"
-                    >
-                        <FileText class="size-4" /> Documentation
-                    </a>
+                                {{ purchaseError }}
+                            </p>
+                            <a
+                                v-if="product.trial_url"
+                                :href="product.trial_url"
+                                class="mt-4 inline-flex text-sm font-medium text-primary underline underline-offset-4"
+                                >View trial details</a
+                            >
+                        </div>
+                        <p class="mt-4 text-sm leading-6 text-muted-foreground">
+                            Need to check compatibility or support terms?
+                            <Link
+                                href="/contact"
+                                class="font-semibold text-primary underline underline-offset-4"
+                                >Ask before ordering.</Link
+                            >
+                        </p>
+                    </div>
                 </div>
             </div>
-        </main>
-
-        <!-- See Also Section -->
-        <section
-            v-if="props.relatedProducts?.length"
-            aria-labelledby="see-also-heading"
-            class="mx-auto mt-12 max-w-6xl px-4 pb-12 sm:px-6 lg:px-8"
+        </header>
+        <Tabs
+            id="product-details"
+            v-model="activeTab"
+            class="scroll-mt-24 gap-0"
         >
-            <h2
-                id="see-also-heading"
-                class="text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl dark:text-white"
-            >
-                See Also
-            </h2>
-            <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="border-b border-border bg-card">
+                <div class="site-container overflow-x-auto">
+                    <TabsList
+                        aria-label="Product details"
+                        class="h-auto min-w-max justify-start gap-1 rounded-none bg-transparent py-3"
+                        ><TabsTrigger
+                            v-for="tab in tabs"
+                            :key="tab.value"
+                            :value="tab.value"
+                            class="h-11 rounded-lg px-4 text-sm font-medium text-muted-foreground data-[state=active]:bg-accent data-[state=active]:text-primary data-[state=active]:shadow-none"
+                            >{{ tab.label }}</TabsTrigger
+                        ></TabsList
+                    >
+                </div>
+            </div>
+            <div class="site-container pt-8 sm:pt-12">
+                <TabsContent
+                    value="overview"
+                    class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]"
+                >
+                    <div class="space-y-8">
+                        <article class="surface-card p-6 sm:p-9">
+                            <p class="section-kicker">The details</p>
+                            <h2
+                                class="mt-3 text-2xl font-semibold tracking-tight"
+                            >
+                                About this product
+                            </h2>
+                            <p
+                                class="mt-5 text-base leading-8 whitespace-pre-line text-muted-foreground"
+                            >
+                                {{
+                                    product.description ||
+                                    product.short_description ||
+                                    'Contact ASR Tech for more information about this product.'
+                                }}
+                            </p>
+                        </article>
+                        <section
+                            v-if="product.addons?.length"
+                            class="surface-card p-6 sm:p-9"
+                        >
+                            <h2 class="text-2xl font-semibold">
+                                Optional services
+                            </h2>
+                            <div class="mt-5 divide-y divide-border">
+                                <article
+                                    v-for="addon in product.addons"
+                                    :key="addon.name"
+                                    class="flex flex-wrap items-start justify-between gap-4 py-5"
+                                >
+                                    <div class="max-w-md">
+                                        <h3 class="font-semibold">
+                                            {{ addon.name }}
+                                        </h3>
+                                        <p
+                                            v-if="addon.description"
+                                            class="mt-2 text-sm leading-6 text-muted-foreground"
+                                        >
+                                            {{ addon.description }}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p
+                                            v-if="addon.price != null"
+                                            class="font-semibold"
+                                        >
+                                            {{
+                                                money(
+                                                    addon.currency,
+                                                    addon.sale_price ??
+                                                        addon.price,
+                                                )
+                                            }}
+                                        </p>
+                                        <a
+                                            :href="
+                                                addon.purchase_url || '/contact'
+                                            "
+                                            class="mt-2 inline-flex text-sm font-medium text-primary underline underline-offset-4"
+                                            >{{
+                                                addon.purchase_url
+                                                    ? 'View service'
+                                                    : 'Ask about this service'
+                                            }}</a
+                                        >
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                    </div>
+                    <aside class="surface-card self-start p-6">
+                        <h2 class="text-lg font-semibold">
+                            Product information
+                        </h2>
+                        <dl class="mt-5 divide-y divide-border">
+                            <div
+                                v-for="item in productInformation"
+                                :key="item.label"
+                                class="py-3"
+                            >
+                                <dt class="text-xs text-muted-foreground">
+                                    {{ item.label }}
+                                </dt>
+                                <dd class="mt-1 text-sm font-medium">
+                                    {{ item.value }}
+                                </dd>
+                            </div>
+                        </dl>
+                        <section
+                            class="mt-6 border-t border-border pt-5"
+                            aria-label="Verified compatibility"
+                        >
+                            <h3 class="font-semibold">
+                                Verified compatibility
+                            </h3>
+                            <dl
+                                v-if="product.compatibility_ranges?.length"
+                                class="mt-3 space-y-3"
+                            >
+                                <div
+                                    v-for="(
+                                        range, index
+                                    ) in product.compatibility_ranges"
+                                    :key="index"
+                                >
+                                    <dt class="text-xs text-muted-foreground">
+                                        {{
+                                            {
+                                                whmcs: 'WHMCS',
+                                                wordpress: 'WordPress',
+                                                php: 'PHP',
+                                            }[range.platform]
+                                        }}
+                                    </dt>
+                                    <dd class="mt-1 text-sm font-medium">
+                                        {{ range.minimum_version
+                                        }}<template
+                                            v-if="
+                                                range.minimum_version !==
+                                                range.maximum_version
+                                            "
+                                            >–{{
+                                                range.maximum_version
+                                            }}
+                                            (inclusive)</template
+                                        >
+                                    </dd>
+                                </div>
+                            </dl>
+                            <p
+                                v-else
+                                class="mt-3 text-sm leading-6 text-muted-foreground"
+                            >
+                                Verified version ranges have not been published
+                                yet.
+                                <Link
+                                    href="/contact"
+                                    class="font-medium text-primary underline underline-offset-4"
+                                    >Ask about your setup</Link
+                                >
+                                before purchasing.
+                            </p>
+                        </section>
+                        <template v-if="product.requirements?.length"
+                            ><h3
+                                class="mt-6 border-t border-border pt-5 font-semibold"
+                            >
+                                Requirements
+                            </h3>
+                            <dl class="mt-3 space-y-3">
+                                <div
+                                    v-for="requirement in product.requirements"
+                                    :key="requirement.label"
+                                >
+                                    <dt class="text-xs text-muted-foreground">
+                                        {{ requirement.label }}
+                                    </dt>
+                                    <dd class="mt-1 text-sm leading-6">
+                                        {{ requirement.value }}
+                                    </dd>
+                                </div>
+                            </dl></template
+                        >
+                    </aside>
+                </TabsContent>
+                <TabsContent value="features" class="surface-card p-6 sm:p-9"
+                    ><h2 class="text-2xl font-semibold">What it can do</h2>
+                    <div class="mt-7 grid gap-6 md:grid-cols-2">
+                        <article
+                            v-for="group in product.feature_groups"
+                            :key="group.title"
+                            class="rounded-xl border border-border p-6"
+                        >
+                            <h3 class="text-lg font-semibold">
+                                {{ group.title }}
+                            </h3>
+                            <p
+                                v-if="group.description"
+                                class="mt-2 text-sm leading-6 text-muted-foreground"
+                            >
+                                {{ group.description }}
+                            </p>
+                            <ul class="mt-5 space-y-3">
+                                <li
+                                    v-for="feature in group.features"
+                                    :key="feature"
+                                    class="flex gap-3 text-sm leading-6 text-muted-foreground"
+                                >
+                                    <Check
+                                        class="mt-1 size-4 shrink-0 text-primary"
+                                    />{{ feature }}
+                                </li>
+                            </ul>
+                        </article>
+                    </div></TabsContent
+                >
+                <TabsContent value="screenshots" class="surface-card p-6 sm:p-9"
+                    ><h2 class="text-2xl font-semibold">A closer look</h2>
+                    <p class="mt-2 text-sm text-muted-foreground">
+                        Select an image to view it at full size.
+                    </p>
+                    <div class="mt-7 grid gap-6 md:grid-cols-2">
+                        <button
+                            v-for="(image, index) in media"
+                            :key="image.url"
+                            type="button"
+                            class="overflow-hidden rounded-xl border border-border bg-[var(--client-canvas)] text-left"
+                            @click="openLightbox(index)"
+                        >
+                            <img
+                                :src="image.url"
+                                :alt="
+                                    image.alt_text ||
+                                    `${product.name} image ${index + 1}`
+                                "
+                                loading="lazy"
+                                class="aspect-[16/10] w-full object-contain p-4"
+                            /><span
+                                class="block border-t border-border bg-card p-4 text-sm text-muted-foreground"
+                                >{{
+                                    image.alt_text || `Image ${index + 1}`
+                                }}</span
+                            >
+                        </button>
+                    </div></TabsContent
+                >
+                <TabsContent value="changelog" class="surface-card p-6 sm:p-9"
+                    ><h2 class="text-2xl font-semibold">Release notes</h2>
+                    <div class="mt-7 divide-y divide-border">
+                        <article
+                            v-for="release in product.changelog"
+                            :key="`${release.version}-${release.released_at}`"
+                            class="grid gap-5 py-7 first:pt-0 sm:grid-cols-[180px_1fr]"
+                        >
+                            <div>
+                                <h3 class="font-semibold">
+                                    Version {{ release.version }}
+                                </h3>
+                                <time
+                                    v-if="release.released_at"
+                                    :datetime="release.released_at"
+                                    class="mt-2 block text-sm text-muted-foreground"
+                                    >{{ formatDate(release.released_at) }}</time
+                                >
+                            </div>
+                            <ul class="space-y-3">
+                                <li
+                                    v-for="note in release.notes"
+                                    :key="note"
+                                    class="flex gap-3 text-sm leading-6 text-muted-foreground"
+                                >
+                                    <Check
+                                        class="mt-1 size-4 shrink-0 text-primary"
+                                    />{{ note }}
+                                </li>
+                            </ul>
+                        </article>
+                    </div></TabsContent
+                >
+                <TabsContent
+                    value="documentation"
+                    class="surface-card p-6 sm:p-9"
+                    ><div
+                        class="flex flex-wrap items-center justify-between gap-5"
+                    >
+                        <h2 class="text-2xl font-semibold">Documentation</h2>
+                        <a
+                            v-if="documentationHref"
+                            :href="documentationHref"
+                            :target="
+                                documentationIsExternal ? '_blank' : undefined
+                            "
+                            :rel="
+                                documentationIsExternal
+                                    ? 'noopener noreferrer'
+                                    : undefined
+                            "
+                            class="button-secondary"
+                            >Open documentation <ArrowRight class="size-4"
+                        /></a>
+                    </div>
+                    <p
+                        v-if="product.documentation_content"
+                        class="mt-7 text-sm leading-8 whitespace-pre-line text-muted-foreground"
+                    >
+                        {{ product.documentation_content }}
+                    </p></TabsContent
+                >
+                <TabsContent value="reviews" class="surface-card p-6 sm:p-9">
+                    <div
+                        class="flex flex-wrap items-center justify-between gap-3"
+                    >
+                        <h2 class="text-2xl font-semibold">Customer reviews</h2>
+                        <span
+                            v-if="averageRating"
+                            class="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm font-medium text-primary"
+                            ><Star class="size-4" />{{ averageRating }} out of
+                            5</span
+                        >
+                    </div>
+                    <form
+                        v-if="reviewState.can_review"
+                        class="mt-6 space-y-5 rounded-xl border border-border bg-[var(--client-canvas)] p-5 sm:p-6"
+                        @submit.prevent="submitReview"
+                    >
+                        <div>
+                            <h3 class="text-lg font-semibold">
+                                {{
+                                    reviewState.review
+                                        ? 'Update your review'
+                                        : 'Share your experience'
+                                }}
+                            </h3>
+                            <p class="mt-2 text-sm text-muted-foreground">
+                                Your name will appear with your review.
+                            </p>
+                            <p
+                                v-if="reviewState.review?.status === 'pending'"
+                                class="mt-2 text-sm text-amber-800"
+                            >
+                                Your review is awaiting moderation.
+                            </p>
+                            <p
+                                v-else-if="
+                                    reviewState.review?.status === 'hidden'
+                                "
+                                class="mt-2 text-sm text-muted-foreground"
+                            >
+                                Your review is hidden. Updating it will return
+                                it to moderation.
+                            </p>
+                        </div>
+                        <fieldset>
+                            <legend class="mb-2 text-sm font-semibold">
+                                Rating
+                            </legend>
+                            <div class="flex flex-wrap gap-2">
+                                <label
+                                    v-for="number in 5"
+                                    :key="number"
+                                    class="cursor-pointer rounded-lg border px-3 py-2 text-sm focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#087f75]"
+                                    :class="
+                                        reviewForm.rating === number
+                                            ? 'border-[#087f75] bg-accent text-primary'
+                                            : 'border-border bg-card'
+                                    "
+                                    ><input
+                                        v-model="reviewForm.rating"
+                                        type="radio"
+                                        name="review-rating"
+                                        :value="number"
+                                        class="sr-only"
+                                        :aria-label="`${number} ${number === 1 ? 'star' : 'stars'}`"
+                                    />{{ number }}
+                                    <span aria-hidden="true">★</span></label
+                                >
+                            </div>
+                            <p
+                                v-if="reviewForm.errors.rating"
+                                role="alert"
+                                class="mt-2 text-sm text-red-700"
+                            >
+                                {{ reviewForm.errors.rating }}
+                            </p>
+                        </fieldset>
+                        <div>
+                            <label
+                                for="review-title"
+                                class="mb-2 block text-sm font-semibold"
+                                >Review title</label
+                            ><input
+                                id="review-title"
+                                v-model="reviewForm.title"
+                                maxlength="255"
+                                class="h-11 w-full rounded-lg border border-border bg-card px-3 text-sm"
+                                :aria-invalid="Boolean(reviewForm.errors.title)"
+                                :aria-describedby="
+                                    reviewForm.errors.title
+                                        ? 'review-title-error'
+                                        : undefined
+                                "
+                            />
+                            <p
+                                v-if="reviewForm.errors.title"
+                                id="review-title-error"
+                                role="alert"
+                                class="mt-2 text-sm text-red-700"
+                            >
+                                {{ reviewForm.errors.title }}
+                            </p>
+                        </div>
+                        <div>
+                            <label
+                                for="review-content"
+                                class="mb-2 block text-sm font-semibold"
+                                >Your experience</label
+                            ><textarea
+                                id="review-content"
+                                v-model="reviewForm.content"
+                                rows="5"
+                                maxlength="5000"
+                                required
+                                class="w-full rounded-lg border border-border bg-card p-3 text-sm"
+                                :aria-invalid="
+                                    Boolean(reviewForm.errors.content)
+                                "
+                                :aria-describedby="
+                                    reviewForm.errors.content
+                                        ? 'review-content-error'
+                                        : undefined
+                                "
+                            />
+                            <p
+                                v-if="reviewForm.errors.content"
+                                id="review-content-error"
+                                role="alert"
+                                class="mt-2 text-sm text-red-700"
+                            >
+                                {{ reviewForm.errors.content }}
+                            </p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <button
+                                type="submit"
+                                class="button-primary"
+                                :disabled="reviewForm.processing"
+                            >
+                                {{
+                                    reviewForm.processing
+                                        ? 'Saving…'
+                                        : reviewState.review
+                                          ? 'Update review'
+                                          : 'Submit review'
+                                }}
+                            </button>
+                            <p
+                                v-if="reviewForm.recentlySuccessful"
+                                role="status"
+                                class="text-sm text-primary"
+                            >
+                                Your review has been saved.
+                            </p>
+                        </div>
+                    </form>
+                    <p
+                        v-else-if="!user"
+                        class="mt-6 rounded-xl bg-muted p-5 text-sm leading-6 text-muted-foreground"
+                    >
+                        Purchased this product?
+                        <Link
+                            :href="reviewState.login_url"
+                            class="font-semibold text-primary underline underline-offset-4"
+                            >Sign in to write a review.</Link
+                        >
+                    </p>
+                    <p v-else class="mt-6 text-sm text-muted-foreground">
+                        Customers who have purchased this product can submit a
+                        review.
+                    </p>
+                    <div
+                        v-if="publicReviews.length"
+                        class="mt-8 grid gap-6 md:grid-cols-2"
+                    >
+                        <article
+                            v-for="review in publicReviews"
+                            :key="
+                                review.id ??
+                                `${review.name}-${review.reviewed_at}`
+                            "
+                            class="rounded-xl border border-border p-6"
+                        >
+                            <p class="text-sm font-semibold text-primary">
+                                {{ review.rating }} / 5
+                            </p>
+                            <h3
+                                v-if="review.title"
+                                class="mt-3 text-lg font-semibold"
+                            >
+                                {{ review.title }}
+                            </h3>
+                            <p
+                                class="mt-3 text-sm leading-7 text-muted-foreground"
+                            >
+                                {{ review.content }}
+                            </p>
+                            <div class="mt-5 border-t border-border pt-4">
+                                <p class="text-sm font-semibold">
+                                    {{ review.name }}
+                                </p>
+                                <p
+                                    v-if="review.verified_purchase"
+                                    class="mt-1 text-xs text-primary"
+                                >
+                                    Verified purchase
+                                </p>
+                                <time
+                                    v-if="review.reviewed_at"
+                                    :datetime="review.reviewed_at"
+                                    class="mt-2 block text-xs text-muted-foreground"
+                                    >{{ formatDate(review.reviewed_at) }}</time
+                                >
+                            </div>
+                        </article>
+                    </div>
+                    <p v-else class="mt-8 py-5 text-sm text-muted-foreground">
+                        No customer reviews yet.
+                    </p>
+                </TabsContent>
+            </div>
+        </Tabs>
+        <section
+            v-if="relatedProducts?.length"
+            class="site-container pt-16"
+            aria-labelledby="related-products-title"
+        >
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p class="section-kicker">Keep exploring</p>
+                    <h2 id="related-products-title" class="section-title mt-3">
+                        More from the catalog
+                    </h2>
+                </div>
+                <Link href="/products" class="button-secondary"
+                    >All products <ArrowRight class="size-4"
+                /></Link>
+            </div>
+            <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <RelatedProductCard
-                    v-for="related in props.relatedProducts"
+                    v-for="related in relatedProducts"
                     :key="related.slug"
                     :product="related"
                 />
             </div>
         </section>
-
-        <!-- Call to Action Banner -->
-        <section
-            class="mt-12 bg-[linear-gradient(150deg,#123c9a_0%,#0e2f7c_100%)] text-white"
-        >
+        <section class="site-container pt-16">
             <div
-                class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-12 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8"
+                class="flex flex-col gap-6 rounded-2xl border border-border bg-accent p-7 sm:p-10 lg:flex-row lg:items-center lg:justify-between"
             >
                 <div>
-                    <p
-                        class="text-xs font-extrabold tracking-[0.2em] text-[#9ade2f] uppercase"
-                    >
-                        Ready to get started?
-                    </p>
+                    <p class="section-kicker">Make it work for you</p>
                     <h2
-                        class="mt-2 max-w-3xl text-2xl font-extrabold sm:text-3xl"
+                        class="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl"
                     >
-                        Put {{ product.name }} to work for your business.
+                        Have a question about this product?
                     </h2>
-                    <p class="mt-2 text-sm text-blue-100/80">
-                        Professional setup assistance and product support are
-                        available.
+                    <p
+                        class="mt-3 max-w-xl text-sm leading-6 text-muted-foreground"
+                    >
+                        Discuss compatibility, custom changes, installation, or
+                        ongoing maintenance with ASR Tech.
                     </p>
                 </div>
-                <button
-                    v-if="selectedPrice"
-                    type="button"
-                    :disabled="buying"
-                    class="inline-flex h-12 min-w-36 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#58c957] px-6 text-sm font-bold text-white shadow-lg shadow-black/10 transition hover:bg-[#45b944] disabled:opacity-60"
-                    @click="buyNow"
-                >
-                    {{ buying ? 'Adding…' : 'Buy Now' }}
-                    <ArrowRight v-if="!buying" class="size-4" />
-                </button>
-                <a
-                    v-else-if="purchaseUrl()"
-                    :href="purchaseUrl() || undefined"
-                    target="_blank"
-                    rel="noreferrer"
-                    class="inline-flex h-12 min-w-36 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#58c957] px-6 text-sm font-bold text-white shadow-lg shadow-black/10 transition hover:bg-[#45b944]"
-                >
-                    Buy Now <ArrowRight class="size-4" />
-                </a>
+                <Link href="/contact" class="button-primary shrink-0"
+                    >Discuss Your Project <ArrowRight class="size-4"
+                /></Link>
             </div>
         </section>
-
         <ProductGalleryLightbox
             v-model:open="lightboxOpen"
             :images="media"

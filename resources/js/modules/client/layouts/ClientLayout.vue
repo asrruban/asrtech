@@ -1,347 +1,337 @@
 <script setup lang="ts">
-import { Link } from '@inertiajs/vue3';
-import { usePage } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import {
+    ArrowDownRight,
     ArrowRight,
-    ExternalLink,
-    Mail,
+    ArrowUpRight,
+    Bell,
     Menu,
-    ShoppingCart,
+    ShoppingBag,
     X,
 } from '@lucide/vue';
-import { computed, ref } from 'vue';
-import { Button } from '@/components/ui/button';
+import { computed, ref, watch } from 'vue';
+import MobileTabBar from '@/modules/client/components/MobileTabBar.vue';
+
 const page = usePage();
 const site = computed(() => page.props.site);
+const business = computed(() => page.props.business);
 const user = computed(() => page.props.auth?.user);
 const cartCount = computed(() => page.props.cartState?.count ?? 0);
-const impersonating = computed(
-    () => Boolean(page.props.auth?.admin) && Boolean(page.props.auth?.user),
+const unread = computed(
+    () => page.props.clientBadges?.unreadNotifications ?? 0,
 );
+const impersonating = computed(() => page.props.auth?.impersonating === true);
 const mobileOpen = ref(false);
-const navigation = computed(() => [
+const menuButton = ref<HTMLButtonElement | null>(null);
+const navigation = [
     { label: 'Home', href: '/' },
+    { label: 'Services', href: '/services' },
     { label: 'Products', href: '/products' },
-    { label: 'Software Development', href: '/software-development' },
-    { label: 'Support', href: '/support' },
-]);
-const accountNavigation = computed(() =>
-    user.value
-        ? { label: 'Client Area', href: '/client-area' }
-        : { label: 'Sign in', href: '/login' },
+    { label: 'About', href: '/about' },
+    { label: 'Contact', href: '/contact' },
+];
+const showCatalogPreview = computed(
+    () =>
+        site.value.localPreview &&
+        (page.url === '/' ||
+            /^\/(products|categories|cart|checkout)(\/|\?|$)/.test(page.url)),
 );
-const isActive = (href) =>
-    href === '/' ? page.url === '/' : page.url.startsWith(href);
+const isActive = (href: string) =>
+    href === '/' ? page.url.split('?')[0] === '/' : page.url.startsWith(href);
+function closeMenu() {
+    mobileOpen.value = false;
+    menuButton.value?.focus();
+}
+watch(
+    () => page.url,
+    () => {
+        mobileOpen.value = false;
+    },
+);
 </script>
 
 <template>
-    <div class="min-h-screen bg-background text-foreground">
+    <div class="client-site min-h-screen bg-background text-foreground">
+        <a class="skip-link" href="#main-content">Skip to content</a>
         <div
             v-if="impersonating"
-            class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 bg-amber-500 px-4 py-2 text-center text-sm font-semibold text-amber-950"
+            class="flex flex-wrap items-center justify-center gap-3 bg-amber-100 px-4 py-2 text-center text-sm text-amber-950"
         >
-            <span> Admin view — you are browsing as {{ user?.name }}. </span>
+            <span>Admin view: browsing as {{ user?.name }}</span>
             <Link
                 href="/impersonation/leave"
                 method="post"
                 as="button"
-                class="underline underline-offset-2 hover:no-underline"
+                class="font-semibold underline"
+                >Return to admin</Link
             >
-                Return to admin
-            </Link>
         </div>
-        <header
-            class="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-xl"
-        >
+        <header class="site-header" @keydown.esc="closeMenu">
             <div
-                class="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+                class="site-container flex h-22 items-center justify-between gap-5"
             >
                 <Link
                     href="/"
-                    class="flex items-center gap-3 font-bold tracking-tight"
+                    class="brand-wordmark shrink-0"
+                    aria-label="ASR Tech home"
                 >
                     <template v-if="site.logoDarkUrl && site.logoLightUrl">
                         <img
                             :src="site.logoDarkUrl"
-                            :alt="site.companyName"
-                            class="h-9 w-auto dark:hidden"
+                            :alt="business.name"
+                            class="h-10 max-w-44 object-contain dark:hidden"
                         />
                         <img
                             :src="site.logoLightUrl"
-                            :alt="site.companyName"
-                            class="hidden h-9 w-auto dark:block"
+                            :alt="business.name"
+                            class="hidden h-10 max-w-44 object-contain dark:block"
                         />
                     </template>
                     <img
                         v-else-if="site.logoUrl"
                         :src="site.logoUrl"
-                        :alt="site.companyName"
-                        class="h-9 w-auto"
+                        :alt="business.name"
+                        class="h-10 max-w-44 object-contain"
                     />
-                    <span
-                        v-else
-                        class="flex size-9 items-center justify-center rounded-lg bg-slate-950 text-sm text-white"
-                        >ASR</span
+                    <template v-else
+                        ><span class="wordmark-symbol" aria-hidden="true"
+                            ><span></span><span></span><span></span></span
+                        ><span
+                            >ASR<span class="font-normal"> Tech</span
+                            ><span class="text-primary">.</span></span
+                        ></template
                     >
-                    <span class="text-lg">{{ site.companyName }}</span>
                 </Link>
-
-                <nav class="hidden items-center gap-7 md:flex">
+                <nav
+                    class="hidden items-center gap-7 lg:flex"
+                    aria-label="Main navigation"
+                >
                     <Link
                         v-for="item in navigation"
                         :key="item.href"
                         :href="item.href"
-                        class="text-sm font-medium transition-colors hover:text-primary"
-                        :class="
-                            isActive(item.href)
-                                ? 'text-foreground'
-                                : 'text-muted-foreground'
-                        "
+                        :aria-current="isActive(item.href) ? 'page' : undefined"
+                        class="nav-link"
+                        :class="{ 'is-active': isActive(item.href) }"
+                        >{{ item.label }}</Link
                     >
-                        {{ item.label }}
-                    </Link>
+                </nav>
+                <div class="flex items-center gap-2 sm:gap-3">
                     <Link
                         href="/cart"
-                        class="relative inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-slate-100 hover:text-primary dark:hover:bg-white/5"
-                        aria-label="Shopping cart"
+                        class="header-icon relative"
+                        :aria-label="`Shopping cart, ${cartCount} items`"
+                        ><ShoppingBag class="size-5" /><span
+                            v-if="cartCount"
+                            class="count-badge"
+                            >{{ cartCount > 99 ? '99+' : cartCount }}</span
+                        ></Link
                     >
-                        <ShoppingCart class="size-4" />
-                        <span
-                            v-if="cartCount > 0"
-                            class="absolute -top-1 -right-1 flex min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] leading-4 font-bold text-white"
-                        >
-                            {{ cartCount > 99 ? '99+' : cartCount }}
-                        </span>
-                    </Link>
                     <Link
                         v-if="user"
-                        href="/logout"
-                        method="post"
-                        as="button"
-                        class="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                        href="/client-area/notifications"
+                        class="header-icon relative hidden sm:inline-flex"
+                        :aria-label="`Notifications, ${unread} unread`"
+                        ><Bell class="size-5" /><span
+                            v-if="unread"
+                            class="count-badge"
+                            >{{ unread > 99 ? '99+' : unread }}</span
+                        ></Link
                     >
-                        Sign out
-                    </Link>
-                    <Button as-child size="sm">
-                        <Link :href="accountNavigation.href">
-                            {{ accountNavigation.label }}
-                            <ArrowRight class="size-4" />
-                        </Link>
-                    </Button>
-                </nav>
-
-                <button
-                    class="rounded-md p-2 md:hidden"
-                    aria-label="Toggle menu"
-                    @click="mobileOpen = !mobileOpen"
-                >
-                    <X v-if="mobileOpen" class="size-5" />
-                    <Menu v-else class="size-5" />
-                </button>
-            </div>
-            <div
-                v-if="mobileOpen"
-                class="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity md:hidden"
-                @click="mobileOpen = false"
-            ></div>
-
-            <div
-                class="fixed top-0 bottom-0 left-0 z-50 w-4/5 max-w-sm transform bg-background p-6 shadow-2xl transition-transform duration-300 ease-in-out md:hidden"
-                :class="mobileOpen ? 'translate-x-0' : '-translate-x-full'"
-            >
-                <div class="mb-8 flex items-center justify-between">
                     <Link
-                        href="/"
-                        class="flex items-center gap-3 font-bold tracking-tight"
-                        @click="mobileOpen = false"
-                    >
-                        <template v-if="site.logoDarkUrl && site.logoLightUrl">
-                            <img
-                                :src="site.logoDarkUrl"
-                                :alt="site.companyName"
-                                class="h-8 w-auto dark:hidden"
-                            />
-                            <img
-                                :src="site.logoLightUrl"
-                                :alt="site.companyName"
-                                class="hidden h-8 w-auto dark:block"
-                            />
-                        </template>
-                        <img
-                            v-else-if="site.logoUrl"
-                            :src="site.logoUrl"
-                            :alt="site.companyName"
-                            class="h-8 w-auto"
-                        />
-                        <span
-                            v-else
-                            class="flex size-8 items-center justify-center rounded-lg bg-slate-950 text-xs text-white"
-                            >ASR</span
-                        >
-                        <span class="text-base">{{ site.companyName }}</span>
-                    </Link>
+                        :href="user ? '/client-area' : '/login'"
+                        class="button-secondary hidden min-h-11 px-4 text-sm sm:inline-flex"
+                        >Client Area <ArrowUpRight class="size-4"
+                    /></Link>
                     <button
-                        class="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
-                        aria-label="Close menu"
-                        @click="mobileOpen = false"
+                        ref="menuButton"
+                        class="header-icon lg:hidden"
+                        :aria-expanded="mobileOpen"
+                        aria-controls="mobile-navigation"
+                        :aria-label="
+                            mobileOpen ? 'Close navigation' : 'Open navigation'
+                        "
+                        @click="mobileOpen = !mobileOpen"
                     >
-                        <X class="size-5" />
+                        <X v-if="mobileOpen" class="size-5" /><Menu
+                            v-else
+                            class="size-5"
+                        />
                     </button>
                 </div>
-
-                <nav class="space-y-2">
+            </div>
+            <nav
+                v-if="mobileOpen"
+                id="mobile-navigation"
+                class="site-container mobile-navigation lg:hidden"
+                aria-label="Mobile navigation"
+            >
+                <Link
+                    v-for="item in navigation"
+                    :key="item.href"
+                    :href="item.href"
+                    :aria-current="isActive(item.href) ? 'page' : undefined"
+                    class="flex items-center justify-between border-b py-3 font-medium"
+                    :class="{ 'text-primary': isActive(item.href) }"
+                    >{{ item.label }}<ArrowUpRight class="size-4"
+                /></Link>
+                <div class="flex flex-wrap gap-3 py-5">
                     <Link
-                        v-for="item in navigation"
-                        :key="item.href"
-                        :href="item.href"
-                        class="block rounded-md px-4 py-3 text-sm font-medium transition-colors hover:bg-slate-100 hover:text-primary dark:hover:bg-white/5"
-                        :class="
-                            isActive(item.href)
-                                ? 'bg-slate-100 text-primary dark:bg-white/10 dark:text-white'
-                                : 'text-foreground'
-                        "
-                        @click="mobileOpen = false"
-                    >
-                        {{ item.label }}
-                    </Link>
-                </nav>
-
-                <div
-                    class="mt-8 border-t border-slate-100 pt-6 dark:border-white/10"
-                >
-                    <Link
-                        href="/cart"
-                        class="flex items-center justify-between rounded-md px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-slate-100 hover:text-primary dark:hover:bg-white/5"
-                        @click="mobileOpen = false"
-                    >
-                        <span class="flex items-center gap-2">
-                            <ShoppingCart class="size-4" /> Shopping cart
-                        </span>
-                        <span
-                            v-if="cartCount > 0"
-                            class="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white"
-                        >
-                            {{ cartCount }}
-                        </span>
-                    </Link>
-                    <Link
+                        :href="user ? '/client-area' : '/login'"
+                        class="button-primary"
+                        >Client Area <ArrowRight class="size-4" /></Link
+                    ><Link href="/support" class="button-secondary"
+                        >Support</Link
+                    ><Link
                         v-if="user"
                         href="/logout"
                         method="post"
                         as="button"
-                        class="block w-full rounded-md px-4 py-3 text-left text-sm font-medium text-foreground transition-colors hover:bg-slate-100 hover:text-primary dark:hover:bg-white/5"
-                        @click="mobileOpen = false"
+                        class="button-secondary"
+                        >Sign out</Link
                     >
-                        Sign out
-                    </Link>
-
-                    <Button as-child class="mt-4 w-full">
-                        <Link
-                            :href="accountNavigation.href"
-                            @click="mobileOpen = false"
-                        >
-                            {{ accountNavigation.label }}
-                            <ArrowRight class="ml-2 size-4" />
-                        </Link>
-                    </Button>
                 </div>
-            </div>
+            </nav>
         </header>
 
-        <main><slot /></main>
-
-        <footer class="border-t bg-slate-950 text-slate-300">
+        <main id="main-content" tabindex="-1">
             <div
-                class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.2fr_.8fr_.8fr_.9fr] lg:px-8"
+                v-if="showCatalogPreview"
+                class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs leading-5 text-amber-950"
+                role="note"
             >
-                <div>
-                    <p class="text-lg font-semibold text-white">
-                        {{ site.companyName }}
-                    </p>
-                    <p class="mt-3 max-w-sm text-sm leading-6 text-slate-400">
-                        {{ site.tagline }}
-                    </p>
-                </div>
-                <div>
-                    <p class="font-semibold text-white">Explore</p>
-                    <div class="mt-3 space-y-2 text-sm">
-                        <Link class="block hover:text-white" href="/products"
-                            >All products</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/products?type=whmcs_module"
-                            >WHMCS modules</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/products?type=template"
-                            >Templates</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/software-development"
-                            >Software development</Link
-                        >
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold text-white">Support & legal</p>
-                    <div class="mt-3 space-y-2 text-sm">
-                        <Link class="block hover:text-white" href="/support"
-                            >Support center</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/support/ticket"
-                            >Open a ticket</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/terms-of-service"
-                            >Terms of Service</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/privacy-policy"
-                            >Privacy Policy</Link
-                        >
-                        <Link
-                            class="block hover:text-white"
-                            href="/refund-policy"
-                            >Refund Policy</Link
-                        >
-                    </div>
-                </div>
-                <div>
-                    <p class="font-semibold text-white">Contact</p>
-                    <a
-                        v-if="site.supportEmail"
-                        :href="`mailto:${site.supportEmail}`"
-                        class="mt-3 flex items-center gap-2 text-sm hover:text-white"
-                        ><Mail class="size-4" /> {{ site.supportEmail }}</a
-                    >
-                    <div class="mt-4 flex gap-3">
-                        <a
-                            v-if="site.social.linkedin"
-                            :href="site.social.linkedin"
-                            aria-label="LinkedIn"
-                            ><ExternalLink class="size-5"
-                        /></a>
-                        <a
-                            v-if="site.social.github"
-                            :href="site.social.github"
-                            aria-label="GitHub"
-                            ><ExternalLink class="size-5"
-                        /></a>
-                    </div>
-                </div>
+                Local preview includes sample catalog records. Product
+                availability, pricing, and license terms need business approval
+                before launch.
             </div>
-            <div
-                class="border-t border-white/10 py-5 text-center text-xs text-slate-500"
-            >
-                © {{ new Date().getFullYear() }} {{ site.companyName }}. All
-                rights reserved.
+            <slot />
+        </main>
+        <MobileTabBar />
+
+        <footer class="site-footer">
+            <div class="site-container">
+                <div
+                    class="grid gap-10 border-b border-white/15 py-14 md:grid-cols-[1.2fr_1fr] md:gap-20"
+                >
+                    <div>
+                        <span class="section-kicker text-teal-300"
+                            >Let's build something useful</span
+                        >
+                        <p
+                            class="mt-4 max-w-xl text-3xl leading-tight font-semibold tracking-tight sm:text-4xl"
+                        >
+                            Your next idea.<br />Our next conversation.
+                        </p>
+                    </div>
+                    <div class="flex flex-col items-start justify-end gap-5">
+                        <p class="max-w-md text-sm leading-7 text-slate-300">
+                            A new website, a better workflow, or a technical
+                            issue that needs a closer look. Tell us where you'd
+                            like to start.
+                        </p>
+                        <Link
+                            href="/contact"
+                            class="inline-flex items-center gap-8 border-b border-teal-300 pb-2 font-semibold text-teal-200"
+                            >Discuss Your Project <ArrowUpRight class="size-5"
+                        /></Link>
+                    </div>
+                </div>
+                <div
+                    class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_.8fr_.9fr_1.1fr]"
+                >
+                    <div>
+                        <Link
+                            href="/"
+                            class="text-2xl font-semibold tracking-tight"
+                            >ASR <span class="font-normal">Tech</span
+                            ><span class="text-teal-300">.</span></Link
+                        >
+                        <p
+                            class="mt-4 max-w-xs text-sm leading-7 text-slate-300"
+                        >
+                            Development, practical software, and technical care
+                            for your business.
+                        </p>
+                        <p
+                            class="mt-6 flex items-center gap-2 text-xs text-teal-200"
+                        >
+                            <ArrowDownRight class="size-4" /> Based in
+                            Bangladesh. Built around your needs.
+                        </p>
+                    </div>
+                    <div>
+                        <p class="footer-label">Explore</p>
+                        <nav class="footer-links" aria-label="Footer explore">
+                            <Link href="/maintenance">Maintenance plans</Link
+                            ><Link href="/services">Services</Link
+                            ><Link href="/products">Products</Link
+                            ><Link href="/about">About ASR Tech</Link
+                            ><Link href="/contact">Contact</Link
+                            ><Link href="/announcements">Announcements</Link>
+                        </nav>
+                    </div>
+                    <div>
+                        <p class="footer-label">Client resources</p>
+                        <nav class="footer-links" aria-label="Client resources">
+                            <Link href="/client-area/projects"
+                                >Project workspace</Link
+                            ><Link href="/client-area">Client Area</Link
+                            ><Link href="/support">Support center</Link
+                            ><Link href="/support/ticket">Open a ticket</Link
+                            ><Link href="/client-area/products"
+                                >Licenses & downloads</Link
+                            ><Link href="/client-area/invoices">Invoices</Link
+                            ><Link
+                                v-if="user"
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                class="text-left"
+                                >Sign out</Link
+                            >
+                        </nav>
+                    </div>
+                    <div>
+                        <p class="footer-label">Find us</p>
+                        <address
+                            class="mt-5 text-sm leading-7 text-slate-300 not-italic"
+                        >
+                            {{ business.address }}
+                        </address>
+                        <a
+                            :href="business.facebook"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="mt-4 inline-flex items-center gap-2 text-sm text-teal-200"
+                            >Facebook <ArrowUpRight class="size-4" /><span
+                                class="sr-only"
+                            >
+                                (opens in a new tab)</span
+                            ></a
+                        ><a
+                            v-if="site.supportEmail"
+                            :href="`mailto:${site.supportEmail}`"
+                            class="mt-3 block text-sm break-all text-slate-300"
+                            >{{ site.supportEmail }}</a
+                        >
+                    </div>
+                </div>
+                <div
+                    class="flex flex-col justify-between gap-5 border-t border-white/15 py-6 text-xs text-slate-400 sm:flex-row"
+                >
+                    <p>
+                        © {{ new Date().getFullYear() }} {{ business.name }}.
+                        All rights reserved.
+                    </p>
+                    <nav
+                        class="flex flex-wrap gap-x-6 gap-y-3"
+                        aria-label="Legal"
+                    >
+                        <Link href="/terms-of-service">Terms of Service</Link
+                        ><Link href="/privacy-policy">Privacy Policy</Link
+                        ><Link href="/refund-policy">Refund Policy</Link>
+                    </nav>
+                </div>
             </div>
         </footer>
     </div>

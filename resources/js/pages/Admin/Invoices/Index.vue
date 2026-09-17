@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
-import { Download, FileText, Search } from '@lucide/vue';
-import { ref } from 'vue';
+import { Head, Link, router, useForm } from '@inertiajs/vue3';
+import { Download, FileText, MailWarning, Search } from '@lucide/vue';
+import { ref, computed } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,38 @@ const props = defineProps(['filters', 'statuses', 'invoices']);
 
 const search = ref(props.filters.search ?? '');
 const status = ref(props.filters.status ?? '');
+const selected = ref<number[]>([]);
+
+const selectableIds = computed(() =>
+    props.invoices.data
+        .filter((invoice: { status: string }) => invoice.status === 'issued')
+        .map((invoice: { id: number }) => invoice.id),
+);
+
+const allSelected = computed(
+    () =>
+        selectableIds.value.length > 0 &&
+        selectableIds.value.every((id: number) => selected.value.includes(id)),
+);
+
+const toggleAll = () => {
+    selected.value = allSelected.value ? [] : [...selectableIds.value];
+};
+
+const toggle = (id: number) => {
+    selected.value = selected.value.includes(id)
+        ? selected.value.filter((value) => value !== id)
+        : [...selected.value, id];
+};
+
+const bulkForm = useForm({ ids: [] as number[] });
+
+const bulkRemind = () => {
+    bulkForm.ids = selected.value;
+    bulkForm.post('/admin/invoices/bulk-remind', {
+        onSuccess: () => (selected.value = []),
+    });
+};
 
 const applyFilters = () =>
     router.get(
@@ -93,6 +125,23 @@ const paginationLabel = (value: string) =>
         <Card>
             <CardContent class="p-0">
                 <div
+                    v-if="selected.length > 0"
+                    class="flex items-center justify-between border-b bg-muted/40 px-5 py-3"
+                >
+                    <p class="text-sm font-medium">
+                        {{ selected.length }} issued invoice(s) selected
+                    </p>
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        :disabled="bulkForm.processing"
+                        @click="bulkRemind"
+                    >
+                        <MailWarning class="size-4" />
+                        Send reminders
+                    </Button>
+                </div>
+                <div
                     v-if="invoices.data.length === 0"
                     class="p-10 text-center text-sm text-muted-foreground"
                 >
@@ -104,6 +153,15 @@ const paginationLabel = (value: string) =>
                             <tr
                                 class="border-b text-xs font-semibold tracking-wide text-muted-foreground uppercase"
                             >
+                                <th class="w-10 px-5 py-3.5">
+                                    <input
+                                        type="checkbox"
+                                        class="size-4 rounded"
+                                        :checked="allSelected"
+                                        aria-label="Select all issued invoices"
+                                        @change="toggleAll"
+                                    />
+                                </th>
                                 <th class="px-5 py-3.5">Invoice</th>
                                 <th class="px-5 py-3.5">Customer</th>
                                 <th class="px-5 py-3.5">Product</th>
@@ -120,6 +178,16 @@ const paginationLabel = (value: string) =>
                                 :key="invoice.id"
                                 class="border-b last:border-b-0 hover:bg-muted/40"
                             >
+                                <td class="px-5 py-4">
+                                    <input
+                                        v-if="invoice.status === 'issued'"
+                                        type="checkbox"
+                                        class="size-4 rounded"
+                                        :checked="selected.includes(invoice.id)"
+                                        :aria-label="`Select ${invoice.invoice_number}`"
+                                        @change="toggle(invoice.id)"
+                                    />
+                                </td>
                                 <td
                                     class="px-5 py-4 font-mono text-xs font-semibold"
                                 >

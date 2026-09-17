@@ -50,7 +50,7 @@ const date = (value: string) =>
             </Link>
             <a
                 :href="`/client-area/credit-notes/${creditNote.id}/download`"
-                class="inline-flex items-center gap-2 rounded-lg bg-[#4fb250] px-4 py-2 text-sm font-bold text-white"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#087f75] px-4 py-2 text-sm font-bold text-white"
             >
                 <Download class="size-4" /> Download PDF
             </a>
@@ -62,7 +62,9 @@ const date = (value: string) =>
             <header class="flex flex-wrap justify-between gap-4 border-b p-6">
                 <div>
                     <div class="flex items-center gap-2">
-                        <ReceiptText class="size-5 text-[#4fb250]" />
+                        <ReceiptText
+                            class="size-5 text-[var(--client-accent)]"
+                        />
                         <h2 class="font-mono text-lg font-bold">
                             {{ creditNote.credit_note_number }}
                         </h2>

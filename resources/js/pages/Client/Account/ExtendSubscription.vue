@@ -84,16 +84,22 @@ const submit = () => {
                             class="relative flex cursor-pointer items-start gap-4 rounded-xl border p-4 transition hover:bg-muted/30"
                             :class="
                                 form.gateway === gateway.key
-                                    ? 'border-blue-500 bg-blue-50/10'
+                                    ? 'border-red-500 bg-blue-50/10'
                                     : 'border-border'
                             "
                         >
                             <input
                                 v-model="form.gateway"
+                                :aria-invalid="Boolean(form.errors.gateway)"
+                                :aria-describedby="
+                                    form.errors.gateway
+                                        ? 'form-gateway-error'
+                                        : undefined
+                                "
                                 type="radio"
                                 name="gateway"
                                 :value="gateway.key"
-                                class="mt-1 size-4 border-border text-blue-600 focus:ring-blue-500"
+                                class="mt-1 size-4 border-border text-[var(--client-accent)] focus:ring-red-500"
                             />
                             <div class="flex-1">
                                 <span
@@ -107,13 +113,17 @@ const submit = () => {
                             </div>
                         </label>
                     </div>
-                    <InputError :message="form.errors.gateway" class="mt-2" />
+                    <InputError
+                        id="form-gateway-error"
+                        :message="form.errors.gateway"
+                        class="mt-2"
+                    />
                 </div>
 
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="inline-flex h-12 w-full items-center justify-center rounded-xl bg-blue-600 font-bold text-white shadow-lg shadow-blue-600/10 transition hover:bg-blue-700 disabled:opacity-50"
+                    class="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[#087f75] font-bold text-white shadow-lg shadow-red-600/10 transition hover:bg-[#087f75] disabled:opacity-50"
                 >
                     <CreditCard class="mr-2 size-5" /> Pay & Activate
                     Subscription
@@ -181,7 +191,7 @@ const submit = () => {
                                 >Total Due Now</span
                             >
                             <span
-                                class="text-lg font-extrabold text-blue-600"
+                                class="text-lg font-extrabold text-[var(--client-accent)]"
                                 >{{
                                     money(
                                         props.subscription.currency,

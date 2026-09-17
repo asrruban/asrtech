@@ -51,7 +51,7 @@ class NewGatewaysTest extends TestCase
     {
         $order = $this->makePendingOrder('paddle');
 
-        $this->get(route('gateways.return', 'paddle') . '?order_id=' . $order->id)
+        $this->get(route('gateways.return', 'paddle').'?order_id='.$order->id)
             ->assertRedirect(route('account.index'));
 
         $this->assertSame(OrderStatus::Paid, $order->fresh()->status);
@@ -62,7 +62,7 @@ class NewGatewaysTest extends TestCase
     {
         $order = $this->makePendingOrder('fastspring');
 
-        $this->get(route('gateways.return', 'fastspring') . '?order_id=' . $order->id)
+        $this->get(route('gateways.return', 'fastspring').'?order_id='.$order->id)
             ->assertRedirect(route('account.index'));
 
         $this->assertSame(OrderStatus::Paid, $order->fresh()->status);
@@ -86,14 +86,14 @@ class NewGatewaysTest extends TestCase
         return Order::query()->create([
             'user_id' => $user->id,
             'product_id' => $product->id,
-            'order_number' => 'ORD-20260721-MOCK-' . uniqid(),
+            'order_number' => 'ORD-20260721-MOCK-'.uniqid(),
             'currency' => 'USD',
             'amount' => 149,
             'setup_fee' => 0,
             'billing_cycle' => 'one_time',
             'status' => OrderStatus::Pending,
             'payment_method' => $gateway,
-            'payment_reference' => 'mock_ref_' . uniqid(),
+            'payment_reference' => 'mock_ref_'.uniqid(),
         ]);
     }
 }

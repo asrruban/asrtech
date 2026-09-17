@@ -193,8 +193,7 @@ class AdminInvoiceManagementTest extends TestCase
         $this->post("/admin/invoices/{$invoice->id}/send")
             ->assertRedirect("/admin/users/{$invoice->order->user_id}/invoice/{$invoice->id}");
 
-        Mail::assertSent(
-            InvoiceMail::class,
+        Mail::assertQueued(InvoiceMail::class,
             fn (InvoiceMail $mail) => $mail->hasTo($invoice->order->user->email),
         );
     }

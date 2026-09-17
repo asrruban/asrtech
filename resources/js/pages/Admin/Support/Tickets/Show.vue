@@ -4,12 +4,7 @@ import { ArrowLeft, Send, Trash2, UserRound } from '@lucide/vue';
 import { watch } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
 interface Reply {
@@ -128,7 +123,7 @@ const formatDate = (date: string | null) =>
                                 {{ formatDate(reply.created_at) }}
                             </span>
                         </div>
-                        <p class="whitespace-pre-wrap text-sm leading-relaxed">
+                        <p class="text-sm leading-relaxed whitespace-pre-wrap">
                             {{ reply.message }}
                         </p>
                     </div>

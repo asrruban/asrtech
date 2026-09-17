@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ChevronLeft, ChevronRight, X } from '@lucide/vue';
 import { ref, watch } from 'vue';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 interface LightboxImage {
     url: string;
@@ -30,10 +35,17 @@ watch(
     },
 );
 
-const previous = () =>
-    (current.value =
-        (current.value - 1 + props.images.length) % props.images.length);
-const next = () => (current.value = (current.value + 1) % props.images.length);
+const previous = () => {
+    if (props.images.length) {
+        current.value =
+            (current.value - 1 + props.images.length) % props.images.length;
+    }
+};
+const next = () => {
+    if (props.images.length) {
+        current.value = (current.value + 1) % props.images.length;
+    }
+};
 </script>
 
 <template>
@@ -47,6 +59,10 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
             <DialogTitle class="sr-only">
                 {{ images[current]?.alt_text || 'Product screenshot' }}
             </DialogTitle>
+            <DialogDescription class="sr-only"
+                >Use the left and right arrow keys to move between product
+                images. Press Escape to close.</DialogDescription
+            >
 
             <div class="relative">
                 <img
@@ -58,7 +74,7 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
 
                 <button
                     type="button"
-                    class="absolute -top-3 -right-3 flex size-9 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                    class="absolute -top-3 -right-3 flex size-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg transition hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     aria-label="Close gallery"
                     @click="emit('update:open', false)"
                 >
@@ -68,7 +84,7 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
                 <template v-if="images.length > 1">
                     <button
                         type="button"
-                        class="absolute top-1/2 left-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-5"
+                        class="absolute top-1/2 left-2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-left-5"
                         aria-label="Previous image"
                         @click="previous"
                     >
@@ -76,7 +92,7 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
                     </button>
                     <button
                         type="button"
-                        class="absolute top-1/2 right-2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-5"
+                        class="absolute top-1/2 right-2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:-right-5"
                         aria-label="Next image"
                         @click="next"
                     >
@@ -85,7 +101,10 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
                 </template>
             </div>
 
-            <p class="text-center text-xs font-semibold text-white/90">
+            <p
+                class="text-center text-sm font-medium text-white"
+                aria-live="polite"
+            >
                 <span v-if="images[current]?.alt_text">
                     {{ images[current].alt_text }} ·
                 </span>
@@ -103,10 +122,11 @@ const next = () => (current.value = (current.value + 1) % props.images.length);
                     class="shrink-0 overflow-hidden rounded-md border-2 bg-white transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     :class="
                         current === index
-                            ? 'border-[#4fb250] opacity-100'
+                            ? 'border-[#087f75] opacity-100'
                             : 'border-transparent opacity-50 hover:opacity-100'
                     "
                     :aria-label="`View image ${index + 1}`"
+                    :aria-pressed="current === index"
                     @click="current = index"
                 >
                     <img

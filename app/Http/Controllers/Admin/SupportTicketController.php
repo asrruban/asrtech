@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Notifications\ClientNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -110,6 +111,15 @@ class SupportTicketController extends Controller
             'status' => TicketStatus::Answered,
             'last_reply_at' => now(),
         ]);
+
+        if ($ticket->user !== null) {
+            $ticket->user->notify(new ClientNotification(
+                title: __('New reply on ticket #:number', ['number' => $ticket->id]),
+                message: __('Our support team replied to ":subject".', ['subject' => $ticket->subject]),
+                url: route('support.show', $ticket),
+                level: 'info',
+            ));
+        }
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Reply sent — ticket marked as answered.')]);
 

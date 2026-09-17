@@ -12,6 +12,7 @@ export type User = {
 export type Auth = {
     user: User;
     admin: Admin;
+    impersonating: boolean;
 };
 
 export type Admin = Pick<User, 'id' | 'name' | 'email' | 'avatar'>;

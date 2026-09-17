@@ -22,11 +22,11 @@ const props = defineProps<{
 
 const statusClass = (status: string) =>
     ({
-        open: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        open: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         customer_reply:
             'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
         answered:
-            'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+            'bg-blue-50 text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-emerald-200',
         in_progress:
             'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
         on_hold:
@@ -60,14 +60,14 @@ const formatDate = (date: string | null) =>
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-2.5">
-                <LifeBuoy class="size-5 text-[#4fb250]" />
+                <LifeBuoy class="size-5 text-[var(--client-accent)]" />
                 <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                     Your tickets
                 </h2>
             </div>
             <Link
                 href="/client-area/tickets/create"
-                class="inline-flex items-center gap-2 rounded-lg bg-[#4fb250] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#3f9f40]"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#087f75] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#06655e]"
             >
                 <Plus class="size-4" /> Open Ticket
             </Link>
@@ -85,7 +85,7 @@ const formatDate = (date: string | null) =>
                 v-for="ticket in props.tickets"
                 :key="ticket.id"
                 :href="`/client-area/ticket/${ticket.id}`"
-                class="block rounded-2xl border bg-card p-6 shadow-sm transition hover:border-[#4fb250]/50"
+                class="block rounded-2xl border bg-card p-6 shadow-sm transition hover:border-[#087f75]/50"
             >
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -96,7 +96,11 @@ const formatDate = (date: string | null) =>
                             {{ ticket.department ?? 'General' }} ·
                             {{ ticket.priority }} priority ·
                             {{ ticket.replies_count }}
-                            {{ ticket.replies_count === 1 ? 'message' : 'messages' }}
+                            {{
+                                ticket.replies_count === 1
+                                    ? 'message'
+                                    : 'messages'
+                            }}
                         </p>
                     </div>
                     <span

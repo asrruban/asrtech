@@ -74,7 +74,7 @@ const remove = (department: DepartmentRow) => {
                 <table v-else class="w-full text-sm">
                     <thead>
                         <tr
-                            class="border-b text-left text-xs uppercase tracking-wide text-muted-foreground"
+                            class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
                         >
                             <th class="px-4 py-3">Department</th>
                             <th class="hidden px-4 py-3 md:table-cell">

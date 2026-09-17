@@ -36,28 +36,32 @@ const moneyUsd = (currency: string, amount: string | number) =>
 </script>
 
 <template>
-    <div class="flex flex-col overflow-hidden rounded-xl bg-card shadow-lg">
+    <div
+        class="flex flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
+    >
         <div
-            class="bg-gradient-to-br from-[#45b6ee] to-[#2196d8] p-6 text-white"
+            class="bg-[var(--client-accent-soft)] p-6 text-[var(--client-ink)]"
         >
             <p
-                class="text-xs font-bold tracking-widest text-white/75 uppercase"
+                class="text-xs font-bold tracking-widest text-[var(--client-muted)] uppercase"
             >
                 Account
             </p>
             <div class="mt-2 flex items-start justify-between gap-4">
                 <div class="min-w-0">
-                    <p class="truncate text-2xl font-bold">
+                    <p class="text-2xl font-bold break-words">
                         {{ props.account.name }}
                     </p>
                     <p
                         v-for="line in props.account.address"
                         :key="line"
-                        class="mt-0.5 truncate text-sm text-white/85"
+                        class="mt-0.5 text-sm break-words text-[var(--client-muted)]"
                     >
                         {{ line }}
                     </p>
-                    <p class="mt-0.5 truncate text-sm text-white/85">
+                    <p
+                        class="mt-0.5 text-sm break-words text-[var(--client-muted)]"
+                    >
                         {{ props.account.email }}
                     </p>
                 </div>
@@ -65,26 +69,28 @@ const moneyUsd = (currency: string, amount: string | number) =>
                     v-if="user?.avatar"
                     :src="user.avatar"
                     alt=""
-                    class="size-16 shrink-0 rounded-full border-2 border-white/50 object-cover"
+                    class="size-16 shrink-0 rounded-full border-2 border-[var(--client-border)] object-cover"
                 />
                 <span
                     v-else
-                    class="flex size-16 shrink-0 items-center justify-center rounded-full border-2 border-white/50 bg-white/20 text-xl font-bold"
+                    class="flex size-16 shrink-0 items-center justify-center rounded-full border-2 border-[var(--client-border)] bg-[var(--client-surface)] text-xl font-bold"
                 >
                     {{ initials }}
                 </span>
             </div>
         </div>
-        <div class="flex bg-[#1f89c9] text-white">
+        <div
+            class="flex border-y bg-[var(--client-surface)] text-[var(--client-muted)]"
+        >
             <Link
                 href="/client-area/account-details"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold transition hover:bg-white/10"
+                class="inline-flex flex-1 items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold transition hover:bg-[var(--client-surface-soft)]"
             >
                 <Pencil class="size-3.5" /> Edit Details
             </Link>
             <button
                 type="button"
-                class="inline-flex flex-1 items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold transition hover:bg-white/10"
+                class="inline-flex flex-1 items-center justify-center gap-1.5 px-4 py-3 text-sm font-bold transition hover:bg-[var(--client-surface-soft)]"
                 @click="logout"
             >
                 <LogOut class="size-3.5" /> Log Out
@@ -101,18 +107,18 @@ const moneyUsd = (currency: string, amount: string | number) =>
                 :class="
                     Number(props.totalDue) > 0
                         ? 'text-red-500'
-                        : 'text-[#4fb250]'
+                        : 'text-[var(--client-accent)]'
                 "
             >
                 {{ moneyUsd(props.currency, props.totalDue) }}
             </p>
             <Link
                 href="/client-area/invoices"
-                class="mt-auto block rounded-md border px-4 py-2.5 text-center text-sm font-semibold text-muted-foreground transition hover:border-[#4fb250] hover:text-[#4fb250]"
+                class="mt-auto block rounded-md border px-4 py-2.5 text-center text-sm font-semibold text-muted-foreground transition hover:border-[#087f75] hover:text-[var(--client-accent)]"
             >
                 {{
                     Number(props.totalDue) > 0
-                        ? 'Pay All Invoices'
+                        ? 'View Invoices'
                         : 'View Invoices'
                 }}
             </Link>

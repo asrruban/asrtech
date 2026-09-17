@@ -128,6 +128,7 @@ class ClientAccountTest extends TestCase
                 ->where('service.product.name', 'Automation Toolkit')
                 ->where('service.order.order_number', $order->order_number));
 
+        $this->flushSession();
         $this->actingAs($stranger)
             ->get("/client-area/product/{$license->id}")
             ->assertNotFound();
@@ -168,6 +169,7 @@ class ClientAccountTest extends TestCase
                 ->where('invoice.total', '159.00')
                 ->where('billTo.name', $user->name));
 
+        $this->flushSession();
         $this->actingAs($stranger)
             ->get("/client-area/invoice/{$invoice->id}")
             ->assertNotFound();
@@ -184,6 +186,7 @@ class ClientAccountTest extends TestCase
             ->get("/client-area/invoice/{$invoice->id}/download")
             ->assertNotFound();
 
+        $this->flushSession();
         $this->actingAs($user)
             ->get("/client-area/invoice/{$invoice->id}/download")
             ->assertOk()

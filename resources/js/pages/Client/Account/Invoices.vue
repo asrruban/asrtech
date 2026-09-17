@@ -23,7 +23,7 @@ const props = defineProps<{
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="flex items-center gap-2.5">
-            <ReceiptText class="size-5 text-[#4fb250]" />
+            <ReceiptText class="size-5 text-[var(--client-accent)]" />
             <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                 Your invoices
             </h2>

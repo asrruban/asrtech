@@ -144,6 +144,7 @@ class ProductReleaseDownloadTest extends TestCase
             ->assertNotFound();
 
         $otherRelease = $this->release($this->product('other-product'), ['version' => '1.0.0']);
+        $this->flushSession();
         $this->actingAs($user)
             ->get("/client-area/product/{$license->id}/releases/{$otherRelease->id}/download")
             ->assertNotFound();

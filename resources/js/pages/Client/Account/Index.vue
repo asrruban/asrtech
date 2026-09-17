@@ -100,11 +100,11 @@ const cycleLabel = (cycle: string | null) =>
 
 const ticketStatusClass = (status: string) =>
     ({
-        open: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        open: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         customer_reply:
             'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
         answered:
-            'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+            'bg-blue-50 text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-emerald-200',
         in_progress:
             'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
         on_hold:
@@ -113,7 +113,7 @@ const ticketStatusClass = (status: string) =>
 
 const orderStatusClass = (status: string) =>
     ({
-        paid: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        paid: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         pending:
             'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
         failed: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
@@ -163,7 +163,7 @@ const formatDate = (date: string | null) =>
 
             <!-- Support tickets card (Active Projects slot in WHMCS) -->
             <div
-                class="flex min-h-[420px] flex-col overflow-hidden rounded-xl bg-card shadow-lg"
+                class="flex min-h-[420px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
             >
                 <div class="border-b px-6 py-4">
                     <h2 class="font-bold tracking-tight">Support Tickets</h2>
@@ -182,7 +182,7 @@ const formatDate = (date: string | null) =>
                     </p>
                     <Link
                         href="/client-area/tickets/create"
-                        class="rounded-md bg-[#5cb85c] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c]"
+                        class="rounded-md bg-[#087f75] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e]"
                     >
                         Open New Ticket
                     </Link>
@@ -215,7 +215,7 @@ const formatDate = (date: string | null) =>
                     <div class="border-t px-6 py-3 text-center">
                         <Link
                             href="/client-area/tickets"
-                            class="text-sm font-bold text-[#4fb250] hover:underline"
+                            class="text-sm font-bold text-[var(--client-accent)] hover:underline"
                         >
                             View all tickets
                         </Link>
@@ -225,7 +225,7 @@ const formatDate = (date: string | null) =>
 
             <!-- Active products card -->
             <div
-                class="flex min-h-[420px] flex-col overflow-hidden rounded-xl bg-card shadow-lg"
+                class="flex min-h-[420px] flex-col overflow-hidden rounded-xl border bg-card shadow-sm"
             >
                 <div
                     class="flex items-center justify-between gap-3 border-b px-6 py-4"
@@ -233,7 +233,7 @@ const formatDate = (date: string | null) =>
                     <h2 class="font-bold tracking-tight">Active Products</h2>
                     <Link
                         href="/products"
-                        class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-[#4fb250]"
+                        class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-[var(--client-accent)]"
                     >
                         <ShoppingCart class="size-3.5" /> Order New Product
                     </Link>
@@ -252,7 +252,7 @@ const formatDate = (date: string | null) =>
                     </p>
                     <Link
                         href="/products"
-                        class="rounded-md bg-[#5cb85c] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c]"
+                        class="rounded-md bg-[#087f75] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e]"
                     >
                         Browse Products
                     </Link>
@@ -333,16 +333,16 @@ const formatDate = (date: string | null) =>
         </div>
 
         <!-- Due invoices -->
-        <div class="mt-8 overflow-hidden rounded-xl bg-card shadow-lg">
+        <div class="mt-8 overflow-hidden rounded-xl border bg-card shadow-sm">
             <div
                 class="flex items-center justify-between gap-3 border-b px-6 py-4"
             >
                 <h2 class="font-bold tracking-tight">Due Invoices</h2>
                 <Link
                     href="/client-area/invoices"
-                    class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-[#4fb250]"
+                    class="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-[var(--client-accent)]"
                 >
-                    <ReceiptText class="size-3.5" /> Pay All Invoices
+                    <ReceiptText class="size-3.5" /> View Invoices
                 </Link>
             </div>
             <div
@@ -385,7 +385,7 @@ const formatDate = (date: string | null) =>
 
         <!-- Order history -->
         <div class="mt-10 flex items-center gap-2.5">
-            <ReceiptText class="size-5 text-[#4fb250]" />
+            <ReceiptText class="size-5 text-[var(--client-accent)]" />
             <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                 Order history
             </h2>
@@ -393,7 +393,7 @@ const formatDate = (date: string | null) =>
 
         <div
             v-if="props.orders.length"
-            class="mt-5 overflow-x-auto rounded-xl bg-card shadow-lg"
+            class="mt-5 overflow-x-auto rounded-xl border bg-card shadow-sm"
         >
             <table class="w-full min-w-[720px] text-left text-sm">
                 <thead>
@@ -420,7 +420,7 @@ const formatDate = (date: string | null) =>
                         <td class="px-5 py-4 font-medium">
                             <Link
                                 :href="order.product.url"
-                                class="hover:text-[#4fb250]"
+                                class="hover:text-[var(--client-accent)]"
                             >
                                 {{ order.product.name }}
                             </Link>

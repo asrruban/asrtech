@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { BadgeCheck, Check, Copy, Globe, RefreshCw, Settings2 } from '@lucide/vue';
+import {
+    BadgeCheck,
+    Check,
+    Copy,
+    Globe,
+    RefreshCw,
+    Settings2,
+} from '@lucide/vue';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 
 export interface ServiceItem {
     id: number;
@@ -28,9 +36,15 @@ const props = defineProps<{
 const copied = ref(false);
 
 const copyKey = async () => {
-    await navigator.clipboard.writeText(props.service.license_key);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 2000);
+    try {
+        await navigator.clipboard.writeText(props.service.license_key);
+        copied.value = true;
+        setTimeout(() => (copied.value = false), 2000);
+    } catch {
+        toast.error(
+            'Unable to copy. Please select and copy the license key manually.',
+        );
+    }
 };
 
 const reissuing = ref(false);
@@ -63,11 +77,10 @@ const label = (value: string) =>
 
 const statusClass = (status: string) =>
     ({
-        active: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        active: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         suspended:
             'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
-        expired:
-            'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
+        expired: 'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
         terminated:
             'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-300',
     })[status] ?? 'bg-slate-100 text-slate-600';
@@ -86,7 +99,7 @@ const formatDate = (date: string) =>
             <div>
                 <Link
                     :href="`/client-area/product/${props.service.id}`"
-                    class="font-bold tracking-tight hover:text-[#4fb250]"
+                    class="font-bold tracking-tight hover:text-[var(--client-accent)]"
                 >
                     {{ props.service.product.name }}
                 </Link>
@@ -112,11 +125,12 @@ const formatDate = (date: string) =>
             </code>
             <button
                 type="button"
-                class="inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#4fb250] hover:text-[#4fb250] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4fb250]"
+                class="inline-flex shrink-0 items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#087f75] hover:text-[var(--client-accent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#087f75]"
                 @click="copyKey"
             >
                 <template v-if="copied">
-                    <Check class="size-3.5 text-[#4fb250]" /> Copied
+                    <Check class="size-3.5 text-[var(--client-accent)]" />
+                    Copied
                 </template>
                 <template v-else><Copy class="size-3.5" /> Copy</template>
             </button>
@@ -143,7 +157,7 @@ const formatDate = (date: string) =>
                 <button
                     v-if="props.service.status !== 'terminated'"
                     type="button"
-                    class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#4fb250] hover:text-[#4fb250] disabled:opacity-60"
+                    class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#087f75] hover:text-[var(--client-accent)] disabled:opacity-60"
                     :disabled="reissuing"
                     @click="reissue"
                 >
@@ -152,7 +166,7 @@ const formatDate = (date: string) =>
                 </button>
                 <Link
                     :href="`/client-area/product/${props.service.id}`"
-                    class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#4fb250] hover:text-[#4fb250]"
+                    class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#087f75] hover:text-[var(--client-accent)]"
                 >
                     <Settings2 class="size-3.5" /> Manage
                 </Link>

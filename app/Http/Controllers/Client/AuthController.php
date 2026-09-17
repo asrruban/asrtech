@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\TrackAffiliateReferral;
 use App\Models\User;
+use App\Services\AffiliateService;
 use App\Services\EmailOtpService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,11 +31,25 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+        if (! Auth::validate($credentials)) {
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
+
+        /** @var User|null $user */
+        $user = Auth::getLastAttempted();
+
+        if ($user instanceof User && $user->hasTwoFactorEnabled()) {
+            $request->session()->regenerate();
+            $request->session()->put('client.two_factor.id', $user->id);
+            $request->session()->put('client.two_factor.remember', $request->boolean('remember'));
+            $request->session()->put('client.two_factor.credentials', hash('sha256', (string) $user->getAuthPassword()));
+
+            return redirect()->route('client.two-factor.challenge');
+        }
+
+        Auth::login($user, $request->boolean('remember'));
 
         $request->session()->regenerate();
 
@@ -67,6 +83,11 @@ class AuthController extends Controller
             'email' => $data['email'],
             'password' => $data['password'],
         ]);
+
+        app(AffiliateService::class)->attribute(
+            $user,
+            TrackAffiliateReferral::affiliateFromRequest($request, $user->id),
+        );
 
         Auth::login($user);
 

@@ -32,7 +32,10 @@ const selectedDepartment = () =>
 </script>
 
 <template>
-    <SeoHead title="Open a ticket" description="Contact our support team." />
+    <SeoHead
+        title="Open a ticket"
+        description="Get help with your ASR Tech product or account."
+    />
 
     <ClientAreaHero title="Open a Ticket" />
 
@@ -48,7 +51,13 @@ const selectedDepartment = () =>
             v-if="props.departments.length === 0"
             class="mt-6 rounded-2xl border bg-card p-10 text-center text-sm text-muted-foreground"
         >
-            Support is not available right now — please email us instead.
+            No ticket departments are currently available.
+            <Link
+                href="/contact"
+                class="font-semibold text-[var(--client-accent)] underline"
+                >Contact ASR Tech</Link
+            >
+            to discuss your request.
         </div>
 
         <form
@@ -63,6 +72,12 @@ const selectedDepartment = () =>
                 <select
                     id="department"
                     v-model="form.ticket_department_id"
+                    :aria-invalid="Boolean(form.errors.ticket_department_id)"
+                    :aria-describedby="
+                        form.errors.ticket_department_id
+                            ? 'form-ticket_department_id-error'
+                            : undefined
+                    "
                     class="h-10 w-full rounded-lg border bg-transparent px-3 text-sm"
                 >
                     <option
@@ -79,7 +94,10 @@ const selectedDepartment = () =>
                 >
                     {{ selectedDepartment()?.description }}
                 </p>
-                <InputError :message="form.errors.ticket_department_id" />
+                <InputError
+                    id="form-ticket_department_id-error"
+                    :message="form.errors.ticket_department_id"
+                />
             </div>
 
             <div class="grid gap-5 sm:grid-cols-[minmax(0,1fr)_160px]">
@@ -90,11 +108,20 @@ const selectedDepartment = () =>
                     <input
                         id="subject"
                         v-model="form.subject"
+                        :aria-invalid="Boolean(form.errors.subject)"
+                        :aria-describedby="
+                            form.errors.subject
+                                ? 'form-subject-error'
+                                : undefined
+                        "
                         type="text"
                         required
                         class="h-10 w-full rounded-lg border bg-transparent px-3 text-sm"
                     />
-                    <InputError :message="form.errors.subject" />
+                    <InputError
+                        id="form-subject-error"
+                        :message="form.errors.subject"
+                    />
                 </div>
                 <div class="space-y-2">
                     <label class="text-sm font-semibold" for="priority">
@@ -103,6 +130,12 @@ const selectedDepartment = () =>
                     <select
                         id="priority"
                         v-model="form.priority"
+                        :aria-invalid="Boolean(form.errors.priority)"
+                        :aria-describedby="
+                            form.errors.priority
+                                ? 'form-priority-error'
+                                : undefined
+                        "
                         class="h-10 w-full rounded-lg border bg-transparent px-3 text-sm"
                     >
                         <option
@@ -113,7 +146,10 @@ const selectedDepartment = () =>
                             {{ label }}
                         </option>
                     </select>
-                    <InputError :message="form.errors.priority" />
+                    <InputError
+                        id="form-priority-error"
+                        :message="form.errors.priority"
+                    />
                 </div>
             </div>
 
@@ -124,20 +160,28 @@ const selectedDepartment = () =>
                 <textarea
                     id="message"
                     v-model="form.message"
+                    :aria-invalid="Boolean(form.errors.message)"
+                    :aria-describedby="
+                        form.errors.message ? 'form-message-error' : undefined
+                    "
                     rows="8"
                     required
                     placeholder="Describe your issue in as much detail as possible…"
                     class="w-full rounded-lg border bg-transparent px-3 py-2 text-sm"
                 ></textarea>
-                <InputError :message="form.errors.message" />
+                <InputError
+                    id="form-message-error"
+                    :message="form.errors.message"
+                />
             </div>
 
             <button
                 type="submit"
                 :disabled="form.processing"
-                class="inline-flex items-center gap-2 rounded-lg bg-[#4fb250] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#3f9f40] disabled:opacity-60"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#087f75] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#06655e] disabled:opacity-60"
             >
-                <Send class="size-4" /> Submit Ticket
+                <Send class="size-4" />
+                {{ form.processing ? 'Submitting…' : 'Submit ticket' }}
             </button>
         </form>
     </section>

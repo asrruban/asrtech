@@ -45,8 +45,8 @@ class RefundRequestWorkflowTest extends TestCase
         $this->assertSame(RefundRequestStatus::Pending, $refundRequest->status);
         $this->assertSame('40.00', $refundRequest->amount);
         $this->assertStringStartsWith('RR-', $refundRequest->request_number);
-        Mail::assertSent(RefundRequestReceivedMail::class, 1);
-        Mail::assertSent(RefundRequestSubmittedAdminMail::class, fn ($mail) => $mail->hasTo($admin->email));
+        Mail::assertQueued(RefundRequestReceivedMail::class, 1);
+        Mail::assertQueued(RefundRequestSubmittedAdminMail::class, fn ($mail) => $mail->hasTo($admin->email));
 
         $this->actingAs($customer)
             ->get("/client-area/invoice/{$invoice->id}")
@@ -71,6 +71,7 @@ class RefundRequestWorkflowTest extends TestCase
             ->assertNotFound();
 
         $invoice->order->update(['paid_at' => now()->subDays(31)]);
+        $this->flushSession();
         $this->actingAs($customer)
             ->post("/client-area/invoice/{$invoice->id}/refund-requests", $payload)
             ->assertSessionHasErrors('refund_request');
@@ -112,7 +113,7 @@ class RefundRequestWorkflowTest extends TestCase
         $this->assertSame(RefundStatus::Succeeded, $refundRequest->refund->status);
         $this->assertNotNull($refundRequest->refund->creditNote);
         $this->assertSame('60.00', $refundRequest->refund->amount);
-        Mail::assertSent(RefundRequestDecisionMail::class, fn ($mail) => $mail->hasTo($customer->email));
+        Mail::assertQueued(RefundRequestDecisionMail::class, fn ($mail) => $mail->hasTo($customer->email));
 
         $this->actingAs($admin, 'admin')
             ->get("/admin/refund-requests/{$refundRequest->id}")
@@ -140,7 +141,7 @@ class RefundRequestWorkflowTest extends TestCase
 
         $this->assertSame(RefundRequestStatus::Rejected, $second->fresh()->status);
         $this->assertSame(0, $invoice->refunds()->count());
-        Mail::assertSent(RefundRequestDecisionMail::class, 2);
+        Mail::assertQueued(RefundRequestDecisionMail::class, 2);
     }
 
     private function submit(Invoice $invoice, User $customer, float $amount): void

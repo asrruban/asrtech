@@ -17,6 +17,13 @@ declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {
             name: string;
+            business: {
+                name: string;
+                owner: string;
+                address: string;
+                website: string;
+                facebook: string;
+            };
             auth: Auth;
             cartState: {
                 count: number;
@@ -24,8 +31,17 @@ declare module '@inertiajs/core' {
             adminBadges: {
                 unansweredTickets: number;
                 pendingRefundRequests: number;
+                pendingProductReviews: number;
+            } | null;
+            clientBadges: {
+                products: number;
+                subscriptions: number;
+                tickets: number;
+                unreadNotifications: number;
+                unpaidInvoices: number;
             } | null;
             site: {
+                localPreview: boolean;
                 companyName: string;
                 tagline: string;
                 supportEmail: string | null;

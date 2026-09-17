@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Admin\AffiliateController;
 use App\Http\Controllers\Admin\AiProductContentController;
 use App\Http\Controllers\Admin\AiProductIconController;
 use App\Http\Controllers\Admin\AiSeoController;
+use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\ApiTokenController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\BrandingController;
+use App\Http\Controllers\Admin\BulkActionController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CreditNoteController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -14,6 +18,7 @@ use App\Http\Controllers\Admin\GatewaySettingController;
 use App\Http\Controllers\Admin\GeneralSettingController;
 use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Admin\ImpersonationController;
+use App\Http\Controllers\Admin\InquiryController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\LicenseController;
 use App\Http\Controllers\Admin\PageController;
@@ -23,7 +28,10 @@ use App\Http\Controllers\Admin\ProductReleaseController;
 use App\Http\Controllers\Admin\ProductReviewController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\PromotionCodeController;
+use App\Http\Controllers\Admin\QuoteController;
 use App\Http\Controllers\Admin\RefundRequestController;
+use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\SearchController;
 use App\Http\Controllers\Admin\SecurityController;
 use App\Http\Controllers\Admin\SeoSettingController;
 use App\Http\Controllers\Admin\StorageSettingController;
@@ -35,6 +43,7 @@ use App\Http\Controllers\Admin\TicketDepartmentFieldController;
 use App\Http\Controllers\Admin\TwoFactorChallengeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\UserOrderController;
+use App\Http\Controllers\Admin\WebhookEndpointController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->name('admin.')->group(function () {
@@ -50,7 +59,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('two-factor.challenge.store');
 
     Route::middleware(['auth:admin', 'admin.audit'])->group(function () {
+        require __DIR__.'/project-workspace-admin.php';
+        require __DIR__.'/inquiry-notifications.php';
+        require __DIR__.'/maintenance-admin.php';
         Route::get('dashboard', DashboardController::class)->name('dashboard');
+        Route::get('inquiries', [InquiryController::class, 'index'])
+            ->middleware('admin.permission:support.manage')->name('inquiries.index');
+        Route::patch('inquiries/{inquiry}', [InquiryController::class, 'update'])
+            ->middleware('admin.permission:support.manage')->name('inquiries.update');
+        Route::get('search', SearchController::class)
+            ->middleware('throttle:60,1')
+            ->name('search');
+        Route::get('reports', [ReportController::class, 'index'])
+            ->middleware('admin.permission:reports.view')
+            ->name('reports.index');
+        Route::get('reports/export/{dataset}', [ReportController::class, 'export'])
+            ->middleware('admin.permission:reports.view')
+            ->name('reports.export');
         Route::get('docs', DocumentationController::class)->name('docs.index');
         Route::get('security', [SecurityController::class, 'index'])->name('security.index');
         Route::post('security/two-factor/setup', [SecurityController::class, 'setup'])->name('security.two-factor.setup');
@@ -106,7 +131,55 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('pages', PageController::class)
             ->except(['show'])
             ->middleware('admin.permission:content.manage');
+        Route::resource('announcements', AnnouncementController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('admin.permission:content.manage');
         Route::get('users', [UserController::class, 'index'])->middleware('admin.permission:users.view')->name('users.index');
+        Route::post('users/bulk-delete', [BulkActionController::class, 'destroyUsers'])
+            ->middleware('admin.permission:users.manage')
+            ->name('users.bulk-delete');
+        Route::post('invoices/bulk-remind', [BulkActionController::class, 'remindInvoices'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('invoices.bulk-remind');
+        Route::resource('quotes', QuoteController::class)
+            ->only(['index', 'store', 'update', 'destroy'])
+            ->middleware('admin.permission:billing.manage');
+        Route::post('quotes/{quote}/send', [QuoteController::class, 'send'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('quotes.send');
+        Route::get('affiliates', [AffiliateController::class, 'index'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('affiliates.index');
+        Route::patch('affiliates/{affiliate}/toggle', [AffiliateController::class, 'toggle'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('affiliates.toggle');
+        Route::post('referrals/{referral}/approve', [AffiliateController::class, 'approve'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('referrals.approve');
+        Route::post('referrals/{referral}/pay', [AffiliateController::class, 'pay'])
+            ->middleware('admin.permission:billing.manage')
+            ->name('referrals.pay');
+        Route::get('settings/api-tokens', [ApiTokenController::class, 'index'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('api-tokens.index');
+        Route::post('settings/api-tokens', [ApiTokenController::class, 'store'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('api-tokens.store');
+        Route::delete('settings/api-tokens/{apiToken}', [ApiTokenController::class, 'destroy'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('api-tokens.destroy');
+        Route::get('settings/webhooks', [WebhookEndpointController::class, 'index'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('webhooks.index');
+        Route::post('settings/webhooks', [WebhookEndpointController::class, 'store'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('webhooks.store');
+        Route::patch('settings/webhooks/{webhook}', [WebhookEndpointController::class, 'update'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('webhooks.update');
+        Route::delete('settings/webhooks/{webhook}', [WebhookEndpointController::class, 'destroy'])
+            ->middleware('admin.permission:settings.manage')
+            ->name('webhooks.destroy');
         Route::post('users', [UserController::class, 'store'])->middleware('admin.permission:users.manage')->name('users.store');
         Route::get('users/{user}/invoice/{invoice}', [InvoiceController::class, 'manage'])->middleware('admin.permission:billing.manage')->name('users.invoice');
         Route::get('users/{user}/{tab?}', [UserController::class, 'show'])

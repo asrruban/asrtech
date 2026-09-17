@@ -3,7 +3,6 @@ import { Link, usePage } from '@inertiajs/vue3';
 import {
     ArrowLeft,
     ArrowRight,
-    Clock3,
     Handshake,
     LifeBuoy,
     MessageSquare,
@@ -34,154 +33,98 @@ const departmentIcons = [MessageSquare, PackageOpen, Handshake, Sparkles];
 
 <template>
     <SeoHead
-        title="Choose a Support Department"
-        description="Choose the ASRTech support department best suited to your request."
+        title="Choose a support department"
+        description="Choose a department for your ASR Tech support request."
         :seo="seo"
     />
-
-    <section
-        class="relative overflow-hidden bg-[radial-gradient(circle_at_75%_28%,rgba(84,200,255,0.26),transparent_28%),linear-gradient(135deg,#073b8f,#0876d9)] pb-48 text-white"
-    >
-        <div
-            class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:48px_48px] opacity-[0.055]"
-        ></div>
-        <div class="relative mx-auto max-w-6xl px-4 pt-16 sm:px-6 lg:px-8">
+    <section class="border-b bg-[var(--client-surface-soft)] py-12 sm:py-16">
+        <div class="site-container">
             <Link
                 href="/support"
-                class="inline-flex items-center gap-2 text-sm font-bold text-blue-100 transition hover:text-white"
+                class="inline-flex items-center gap-2 text-sm text-[var(--client-muted)]"
+                ><ArrowLeft class="size-4" /> Support center</Link
             >
-                <ArrowLeft class="size-4" /> Support center
-            </Link>
-            <div class="mt-12 max-w-2xl">
-                <p
-                    class="text-xs font-extrabold tracking-[0.2em] text-cyan-200 uppercase"
-                >
-                    Open a new ticket
-                </p>
-                <h1
-                    class="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl"
-                >
-                    Choose a department
-                </h1>
-                <p class="mt-5 text-base leading-7 text-blue-100/85">
-                    Pick the team that best matches your question. We will keep
-                    the selected department ready when you open the ticket form.
-                </p>
-            </div>
+            <p class="section-kicker mt-8">Open a ticket</p>
+            <h1 class="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
+                How can we help?
+            </h1>
+            <p class="body-copy mt-5 max-w-2xl">
+                Choose the department that best fits your request. You can
+                review the details before submitting your ticket.
+            </p>
         </div>
     </section>
-
-    <section class="relative z-10 -mt-36 px-4 pb-24 sm:px-6 lg:px-8">
-        <div
-            class="mx-auto max-w-6xl rounded-3xl border bg-white p-5 shadow-2xl shadow-blue-950/15 sm:p-8 dark:bg-slate-900"
-        >
-            <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
-                <div>
-                    <p class="text-sm font-extrabold text-blue-600">
-                        Support routing
-                    </p>
-                    <h2 class="mt-1 text-2xl font-extrabold">
-                        How can we help?
-                    </h2>
-                </div>
-                <p class="text-sm text-muted-foreground">
-                    {{
-                        user
-                            ? 'Signed in and ready to submit'
-                            : 'Sign in is required to submit'
-                    }}
-                </p>
-            </div>
-
-            <div v-if="departments.length" class="grid gap-4 md:grid-cols-2">
-                <Link
-                    v-for="(department, index) in departments"
-                    :key="department.id"
-                    :href="`/client-area/tickets/create?department=${department.id}`"
-                    class="group flex min-h-44 items-start gap-5 rounded-2xl border border-slate-200 p-5 transition duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-950/10 dark:border-white/10 dark:hover:border-blue-500/50"
-                >
-                    <span
-                        class="flex size-16 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500 transition group-hover:bg-emerald-500 group-hover:text-white dark:bg-emerald-500/10"
-                    >
-                        <component
-                            :is="
-                                departmentIcons[index % departmentIcons.length]
-                            "
-                            class="size-8 stroke-[1.6]"
-                        />
-                    </span>
-                    <span class="min-w-0 flex-1">
-                        <span class="flex items-center justify-between gap-3">
-                            <span class="text-lg font-extrabold">{{
-                                department.name
-                            }}</span>
-                            <ArrowRight
-                                class="size-4 shrink-0 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
-                            />
-                        </span>
-                        <span
-                            class="mt-2 block text-sm leading-6 text-muted-foreground"
-                        >
-                            {{
-                                department.description ||
-                                'Send your request to this support team and we will follow up through the client area.'
-                            }}
-                        </span>
-                        <span
-                            v-if="department.clients_only"
-                            class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-blue-600"
-                        >
-                            <ShieldCheck class="size-3.5" /> Existing clients
-                        </span>
-                    </span>
-                </Link>
-            </div>
-
-            <div
-                v-else
-                class="rounded-2xl bg-slate-50 px-6 py-14 text-center dark:bg-white/[0.03]"
-            >
-                <LifeBuoy class="mx-auto size-10 text-slate-400" />
-                <h2 class="mt-4 text-lg font-extrabold">
-                    No public departments are available
-                </h2>
-                <p class="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-                    Please contact us by email while the support desk is being
-                    configured.
-                </p>
-                <a
-                    v-if="site.supportEmail"
-                    :href="`mailto:${site.supportEmail}`"
-                    class="mt-5 inline-flex font-bold text-blue-600 hover:underline"
-                >
-                    {{ site.supportEmail }}
-                </a>
-            </div>
+    <section class="site-container py-12 sm:py-16">
+        <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+            <h2 class="text-xl font-semibold">Support departments</h2>
+            <p class="text-sm text-[var(--client-muted)]">
+                {{
+                    user
+                        ? 'Your conversations are saved in your client area.'
+                        : 'Sign in to submit and track your request.'
+                }}
+            </p>
         </div>
-
-        <div class="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-3">
-            <div
-                class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-white/[0.03]"
+        <div v-if="departments.length" class="grid gap-5 md:grid-cols-2">
+            <Link
+                v-for="(department, index) in departments"
+                :key="department.id"
+                :href="`/client-area/tickets/create?department=${department.id}`"
+                class="group flex items-start gap-5 rounded-2xl border bg-[var(--client-surface)] p-6 transition hover:border-[#087f75] sm:p-8"
             >
-                <ShieldCheck class="size-5 text-emerald-500" />
-                <span class="text-sm font-semibold"
-                    >Private ticket history</span
-                >
-            </div>
-            <div
-                class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-white/[0.03]"
+                <span
+                    class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-[var(--client-accent-soft)] text-[var(--client-accent)]"
+                    ><component
+                        :is="departmentIcons[index % departmentIcons.length]"
+                        aria-hidden="true"
+                        class="size-6"
+                /></span>
+                <div class="min-w-0 flex-1">
+                    <h3
+                        class="flex items-start justify-between gap-3 text-lg font-semibold"
+                    >
+                        {{ department.name
+                        }}<ArrowRight
+                            class="mt-1 size-4 shrink-0 text-[var(--client-accent)]"
+                        />
+                    </h3>
+                    <p
+                        class="mt-3 text-sm leading-7 text-[var(--client-muted)]"
+                    >
+                        {{
+                            department.description ||
+                            'Describe your request and follow the conversation in your client area.'
+                        }}
+                    </p>
+                    <span
+                        v-if="department.clients_only"
+                        class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--client-accent-dark)]"
+                        ><ShieldCheck class="size-3.5" /> Existing clients</span
+                    >
+                </div>
+            </Link>
+        </div>
+        <div
+            v-else
+            class="rounded-2xl border bg-[var(--client-surface)] px-6 py-14 text-center"
+        >
+            <LifeBuoy class="mx-auto size-10 text-[var(--client-accent)]" />
+            <h2 class="mt-5 text-xl font-semibold">
+                No departments are available yet
+            </h2>
+            <p
+                class="mx-auto mt-3 max-w-md text-sm leading-7 text-[var(--client-muted)]"
             >
-                <Clock3 class="size-5 text-blue-500" />
-                <span class="text-sm font-semibold"
-                    >Clear response tracking</span
-                >
-            </div>
-            <div
-                class="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 dark:bg-white/[0.03]"
+                Use our contact form to tell us what you need help with.
+            </p>
+            <Link href="/contact" class="button-primary mt-6"
+                >Contact ASR Tech</Link
+            ><a
+                v-if="site.supportEmail"
+                :href="`mailto:${site.supportEmail}`"
+                class="mt-4 block text-sm text-[var(--client-accent)]"
+                >{{ site.supportEmail }}</a
             >
-                <LifeBuoy class="size-5 text-violet-500" />
-                <span class="text-sm font-semibold">Specialist routing</span>
-            </div>
         </div>
     </section>
 </template>

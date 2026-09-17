@@ -57,15 +57,11 @@ const remove = () => {
     }
 };
 
-const uid = (name: string) =>
-    `field-${props.field?.id ?? 'new'}-${name}`;
+const uid = (name: string) => `field-${props.field?.id ?? 'new'}-${name}`;
 </script>
 
 <template>
-    <form
-        class="space-y-4 rounded-lg border p-4"
-        @submit.prevent="submit"
-    >
+    <form class="space-y-4 rounded-lg border p-4" @submit.prevent="submit">
         <div class="grid gap-4 md:grid-cols-3">
             <div class="space-y-2">
                 <Label :for="uid('name')">Field Name</Label>

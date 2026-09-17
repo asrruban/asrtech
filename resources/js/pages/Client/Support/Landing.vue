@@ -49,16 +49,15 @@ const actions = computed(() => [
     {
         title: 'Product guides',
         description:
-            'Installation and configuration guidance for ASRTech products.',
+            'Installation and configuration guidance for ASR Tech products.',
         href: '#documentation',
         icon: BookOpen,
-        color: 'from-sky-400 to-blue-600',
+        color: 'from-sky-400 to-[#087f75]',
     },
     {
-        title: 'Software project help',
-        description:
-            'Talk through integrations, automation, or a custom platform.',
-        href: '/software-development',
+        title: 'Project inquiries',
+        description: 'Discuss a website, application, or custom integration.',
+        href: '/services',
         icon: Sparkles,
         color: 'from-violet-400 to-purple-600',
     },
@@ -82,12 +81,12 @@ const questions = [
         answer: 'Include the product version, WHMCS and PHP versions, the steps that reproduce the issue, and any relevant error message. Never include passwords or secret keys.',
     },
     {
-        question: 'Can ASRTech install or configure a product for me?',
-        answer: 'Yes. Choose the sales or general support department and describe your environment so we can recommend the appropriate installation service.',
+        question: 'Can ASR Tech install or configure a product for me?',
+        answer: 'Describe your product and environment in a support ticket. We can review the work needed and discuss a suitable scope.',
     },
     {
         question: 'How do I request custom software development?',
-        answer: 'Open the software development page, review our capabilities, and submit a ticket with your workflow, integration targets, and expected outcome.',
+        answer: 'Visit Services to explore our capabilities, then use the contact form to share your workflow, integrations, and expected outcome.',
     },
 ];
 
@@ -110,212 +109,190 @@ const filteredDocumentation = computed(() =>
 
 <template>
     <SeoHead
-        title="Support Center"
-        description="Find product documentation, answers, and the right ASRTech support department."
+        title="Support"
+        description="Product guides, technical help, and support conversations with ASR Tech."
         :seo="seo"
     />
-
-    <section
-        class="relative overflow-hidden bg-[radial-gradient(circle_at_75%_18%,rgba(78,184,255,0.3),transparent_30%),linear-gradient(135deg,#083b8a_0%,#075fc4_52%,#0792df_100%)] text-white"
-    >
+    <section class="border-b bg-[var(--client-surface-soft)] py-14 sm:py-20">
         <div
-            class="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] bg-[size:46px_46px] opacity-[0.06]"
-        ></div>
-        <div
-            class="relative mx-auto max-w-6xl px-4 pt-20 pb-44 sm:px-6 lg:px-8"
+            class="site-container grid items-end gap-8 lg:grid-cols-[1.1fr_1fr]"
         >
-            <div class="mx-auto max-w-3xl text-center">
-                <p
-                    class="text-xs font-extrabold tracking-[0.22em] text-cyan-200 uppercase"
-                >
-                    Help when you need it
-                </p>
+            <div>
+                <p class="section-kicker">Support &amp; resources</p>
                 <h1
-                    class="mt-4 text-4xl font-extrabold tracking-tight sm:text-6xl"
+                    class="mt-4 text-4xl font-semibold tracking-tight text-[var(--client-ink)] sm:text-5xl"
                 >
-                    Support <span class="font-light">Center</span>
+                    Keep moving forward.
                 </h1>
-                <p
-                    class="mx-auto mt-5 max-w-2xl text-base leading-7 text-blue-100/85"
-                >
-                    Search common questions, open product documentation, or
-                    connect with the team best equipped to help.
+                <p class="body-copy mt-5 max-w-xl">
+                    Find product guidance, review a support conversation, or
+                    tell us what needs attention.
                 </p>
+            </div>
+            <div>
                 <label
-                    class="mx-auto mt-9 flex max-w-2xl items-center gap-3 rounded-xl bg-white px-5 py-4 text-slate-900 shadow-2xl ring-1 shadow-blue-950/25 ring-white/30"
+                    for="support-search"
+                    class="mb-2 block text-sm font-semibold"
+                    >Search questions and product guides</label
                 >
-                    <Search class="size-5 text-blue-600" />
+                <div
+                    class="flex items-center gap-3 rounded-xl border bg-[var(--client-surface)] px-4 py-4 focus-within:ring-2 focus-within:ring-[#087f75]"
+                >
+                    <Search
+                        aria-hidden="true"
+                        class="size-5 text-[var(--client-accent)]"
+                    />
                     <input
+                        id="support-search"
                         v-model="query"
                         type="search"
-                        placeholder="Search for an answer or product guide..."
-                        class="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                        placeholder="Try installation, downloads, or a product…"
+                        class="min-w-0 flex-1 bg-transparent text-sm outline-none"
                     />
-                    <span
-                        class="hidden text-xs font-semibold text-slate-400 sm:inline"
-                    >
-                        Search support
-                    </span>
-                </label>
+                </div>
             </div>
         </div>
     </section>
-
-    <section class="relative z-10 -mt-32 px-4 sm:px-6 lg:px-8">
-        <div class="mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section class="site-container py-10 sm:py-14">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <component
                 :is="action.href.startsWith('#') ? 'a' : Link"
                 v-for="action in actions"
                 :key="action.title"
                 :href="action.href"
-                class="group relative min-h-64 overflow-hidden rounded-2xl bg-gradient-to-br p-6 text-white shadow-xl transition duration-300 hover:-translate-y-2 hover:shadow-2xl"
-                :class="action.color"
+                class="group rounded-2xl border bg-[var(--client-surface)] p-6 transition hover:border-[#087f75]"
             >
-                <div
-                    class="absolute -top-12 -right-10 size-44 rounded-full border-[28px] border-white/10"
-                ></div>
                 <component
                     :is="action.icon"
-                    class="relative size-10 stroke-[1.6]"
+                    aria-hidden="true"
+                    class="size-6 text-[var(--client-accent)]"
                 />
-                <h2 class="relative mt-12 text-xl font-extrabold">
-                    {{ action.title }}
+                <h2
+                    class="mt-6 flex items-center justify-between gap-2 text-base font-semibold"
+                >
+                    {{ action.title }} <ArrowRight class="size-4 shrink-0" />
                 </h2>
-                <p class="relative mt-3 text-sm leading-6 text-white/80">
+                <p class="mt-2 text-sm leading-6 text-[var(--client-muted)]">
                     {{ action.description }}
                 </p>
-                <ArrowRight
-                    class="absolute right-6 bottom-6 size-5 transition-transform group-hover:translate-x-1"
-                />
             </component>
         </div>
-    </section>
-
-    <section
-        class="bg-slate-50 px-4 pt-18 pb-24 sm:px-6 lg:px-8 dark:bg-slate-950"
-    >
-        <div class="mx-auto grid max-w-6xl gap-6 lg:grid-cols-2">
-            <div
-                class="overflow-hidden rounded-2xl border bg-white shadow-sm dark:bg-slate-900"
-            >
-                <div class="flex items-center gap-3 border-b px-6 py-5">
-                    <span
-                        class="rounded-xl bg-blue-50 p-2.5 text-blue-600 dark:bg-blue-500/10"
-                    >
-                        <CircleHelp class="size-5" />
-                    </span>
-                    <div>
-                        <h2 class="font-extrabold">Common questions</h2>
-                        <p class="text-xs text-muted-foreground">
-                            Quick answers from our team
-                        </p>
-                    </div>
+        <div class="mt-14 grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
+            <div>
+                <div class="mb-5 flex items-center gap-3">
+                    <CircleHelp class="size-5 text-[var(--client-accent)]" />
+                    <h2 class="text-2xl font-semibold tracking-tight">
+                        Common questions
+                    </h2>
                 </div>
-                <div class="divide-y">
+                <div
+                    class="divide-y rounded-2xl border bg-[var(--client-surface)] px-6"
+                >
                     <details
                         v-for="item in filteredQuestions"
                         :key="item.question"
-                        class="group px-6 py-4"
+                        class="group py-5"
                     >
                         <summary
-                            class="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-bold"
+                            class="flex cursor-pointer list-none items-center justify-between gap-5 text-sm font-semibold"
                         >
-                            {{ item.question }}
-                            <span
-                                class="flex size-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-lg text-slate-500 transition group-open:rotate-45 dark:bg-white/5"
+                            {{ item.question
+                            }}<span
+                                aria-hidden="true"
+                                class="text-xl font-normal text-[var(--client-accent)] group-open:rotate-45"
                                 >+</span
                             >
                         </summary>
                         <p
-                            class="mt-3 pr-8 text-sm leading-6 text-muted-foreground"
+                            class="mt-3 pr-4 text-sm leading-7 text-[var(--client-muted)]"
                         >
                             {{ item.answer }}
                         </p>
                     </details>
                     <p
-                        v-if="filteredQuestions.length === 0"
-                        class="px-6 py-10 text-center text-sm text-muted-foreground"
+                        v-if="!filteredQuestions.length"
+                        role="status"
+                        class="py-10 text-sm text-[var(--client-muted)]"
                     >
-                        No common questions match your search.
+                        No questions match “{{ query }}”. Try another search or
+                        open a ticket.
                     </p>
                 </div>
             </div>
-
-            <div
-                id="documentation"
-                class="overflow-hidden rounded-2xl border bg-white shadow-sm dark:bg-slate-900"
-            >
-                <div class="flex items-center gap-3 border-b px-6 py-5">
-                    <span
-                        class="rounded-xl bg-cyan-50 p-2.5 text-cyan-600 dark:bg-cyan-500/10"
-                    >
-                        <BookOpen class="size-5" />
-                    </span>
-                    <div>
-                        <h2 class="font-extrabold">Product documentation</h2>
-                        <p class="text-xs text-muted-foreground">
-                            Installation and usage guides
-                        </p>
-                    </div>
+            <div id="documentation" class="scroll-mt-24">
+                <div class="mb-5 flex items-center gap-3">
+                    <BookOpen class="size-5 text-[var(--client-accent)]" />
+                    <h2 class="text-2xl font-semibold tracking-tight">
+                        Product documentation
+                    </h2>
                 </div>
-                <div class="divide-y">
+                <div
+                    class="divide-y rounded-2xl border bg-[var(--client-surface)]"
+                >
                     <Link
                         v-for="product in filteredDocumentation"
                         :key="product.slug"
                         :href="product.documentation_path"
-                        class="group flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-slate-50 dark:hover:bg-white/[0.03]"
+                        class="flex items-center justify-between gap-4 p-6 transition hover:bg-[var(--client-surface-soft)]"
                     >
                         <div>
-                            <p class="text-sm font-bold">{{ product.name }}</p>
-                            <p class="mt-1 text-xs text-muted-foreground">
+                            <h3 class="text-sm font-semibold">
+                                {{ product.name }}
+                            </h3>
+                            <p class="mt-1 text-sm text-[var(--client-muted)]">
                                 {{
                                     product.documentation_title ||
-                                    'Product guide'
+                                    'Installation and usage guide'
                                 }}
                             </p>
                         </div>
                         <ArrowRight
-                            class="size-4 text-slate-400 transition group-hover:translate-x-1 group-hover:text-blue-600"
+                            class="size-4 shrink-0 text-[var(--client-accent)]"
                         />
                     </Link>
                     <p
-                        v-if="filteredDocumentation.length === 0"
-                        class="px-6 py-10 text-center text-sm text-muted-foreground"
+                        v-if="!filteredDocumentation.length"
+                        role="status"
+                        class="p-6 text-sm leading-7 text-[var(--client-muted)]"
                     >
-                        No product guides match your search.
+                        {{
+                            query
+                                ? 'No guides match your search. Try another product name.'
+                                : 'Published guides will appear here. Open a support ticket for help with a product.'
+                        }}
                     </p>
                 </div>
             </div>
         </div>
-
         <div
-            class="mx-auto mt-16 flex max-w-6xl flex-col items-start justify-between gap-6 rounded-3xl bg-slate-950 px-7 py-9 text-white sm:flex-row sm:items-center sm:px-10"
+            class="mt-16 flex flex-col items-start justify-between gap-6 rounded-2xl bg-[var(--client-accent-soft)] p-7 sm:flex-row sm:items-center sm:p-10"
         >
             <div class="flex items-start gap-4">
-                <span class="rounded-2xl bg-white/10 p-3 text-cyan-300">
-                    <Headphones class="size-7" />
-                </span>
+                <Headphones
+                    class="mt-1 size-7 shrink-0 text-[var(--client-accent)]"
+                />
                 <div>
-                    <p class="text-sm font-bold text-cyan-300">
-                        Still need help?
-                    </p>
-                    <h2 class="mt-1 text-2xl font-extrabold">
-                        Choose the right support team.
+                    <h2 class="text-2xl font-semibold tracking-tight">
+                        Let’s work through it.
                     </h2>
-                    <p class="mt-2 text-sm text-slate-400">
-                        {{ departments.length }} public department{{
-                            departments.length === 1 ? '' : 's'
-                        }}
-                        available.
+                    <p
+                        class="mt-2 text-sm leading-6 text-[var(--client-muted)]"
+                    >
+                        Describe the issue and include the details needed to
+                        reproduce it.
                     </p>
                 </div>
             </div>
             <Link
-                href="/support/ticket"
-                class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-extrabold transition hover:bg-blue-500"
-            >
-                View departments <ArrowRight class="size-4" />
-            </Link>
+                :href="departments.length ? '/support/ticket' : '/contact'"
+                class="button-primary shrink-0"
+                >{{
+                    departments.length
+                        ? 'Open a support ticket'
+                        : 'Contact ASR Tech'
+                }}
+                <ArrowRight class="size-4"
+            /></Link>
         </div>
     </section>
 </template>

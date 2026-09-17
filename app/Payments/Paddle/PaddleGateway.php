@@ -50,6 +50,6 @@ class PaddleGateway extends Gateway
             'order_id' => $order->id,
         ]);
 
-        return PaymentResult::redirect('paddle', $url, 'paddle_mock_' . uniqid());
+        return PaymentResult::redirect('paddle', $url, 'paddle_mock_'.uniqid());
     }
 }

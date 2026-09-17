@@ -28,8 +28,12 @@ class AdminEmailTemplateTest extends TestCase
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page
                 ->component('Admin/Configuration/Settings/EmailTemplates/Index')
-                ->has('templates', 9)
+                ->has('templates', 10)
                 ->has('categories'));
+
+        $this->assertTrue(
+            EmailTemplate::query()->where('slug', 'subscription-dunning-reminder')->where('is_system', true)->exists(),
+        );
 
         $this->assertTrue(
             EmailTemplate::query()->where('slug', 'email-otp')->where('is_system', true)->exists(),

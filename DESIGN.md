@@ -1,133 +1,33 @@
-# DESIGN.md: ModulesGarden-Inspired Product Detail
+# ASR Tech design system
 
-## Source
+## Identity and content
 
-- URL: https://www.modulesgarden.com/products/whmcs/sms-center
-- Capture date: 2026-07-20
-- Target stack: Laravel 13, Inertia 3, Vue 3, TypeScript, Tailwind CSS 4
-- Evidence: Firecrawl branding and image extraction, page markdown, viewport screenshot, and full-page screenshot
+The site uses a typographic ASR Tech wordmark when an administrator has not supplied a logo. Public business identity comes from `config/asrtech.php` through the shared `business` prop: ASR Tech, Al Amin (Owner and Founder), the Purbadhala address, asrtech.bd, and the supplied Facebook page. No business history, sales metrics, client logos, or testimonials are invented.
 
-## Reference Screenshot
+The light surface, charcoal, and teal palette is a design assumption for this redesign. It is not a claimed historical brand standard. Existing theme preferences remain available.
 
-The local full-page reference capture is intentionally excluded from version
-control. Use the source URL above as the visual reference for hierarchy,
-density, and page rhythm. The third-party logo, images, promotional creative,
-and copy are reference-only and must not be reused in ASRTech.
+## Visual language
 
-## Design Summary
+- Primary/action: `#087f75`; hover: `#06645d`.
+- Ink: `#172c2c`; muted copy: `#5c6e6d`.
+- White surfaces; pale green canvas: `#f4f7f5`; borders: `#dce5e1`.
+- Footer and conceptual code illustration: deep charcoal green.
+- Existing locally bundled Instrument Sans typography; no additional font dependency.
+- Content width: 1240px, with responsive 16px/24px gutters.
+- Editorial headings with restrained letter spacing; readable body copy and clear form labels.
+- Shared `.site-container`, `.page-intro`, `.section-kicker`, `.display-title`, `.section-title`, `.body-copy`, `.surface-card`, `.button-primary`, and `.button-secondary` classes.
+- `.page-intro` sets the surface and border. Its content container controls vertical padding.
 
-A compact B2B software marketplace page with a dark navy product-summary area, a strong green purchase action, a sticky white section rail, and dense white content panels over a cool gray canvas. The implementation should feel established and technical while remaining easier to scan than the source. ASRTech content, assets, and identity remain unchanged.
+## Composition
 
-## Design Tokens
+The homepage combines a light split hero, a code-native illustration of connected services, four service panels, real catalog payloads, a three-step engagement explanation, founder/location introduction, native disclosure FAQs, and a shared contact footer. The illustration is explicitly conceptual, not a screenshot or portfolio claim.
 
-### Colors
+Services separate development, platform extensions, and ongoing management. Product pages retain data-driven media, plans, requirements, documentation, reviews, and purchase controls. Missing media uses abstract technical artwork rather than a fabricated screenshot. Customer and administrative screens use shared navigation and form/table patterns with the same colors and typography.
 
-- Hero and footer navy: `#26364d` (observed/inferred from screenshot)
-- Deep navy: `#1a2333` (inferred for high-contrast panels)
-- Primary green: `#4fb250` (observed)
-- Green hover: `#439c45` (inferred)
-- Page canvas: `#e9edf2` (observed)
-- White surface: `#ffffff`
-- Primary ink: `#2e3442` (observed)
-- Muted copy: `#737980` (observed)
-- Border: `#d7dadb` (observed)
-- Informational blue: `#4aa7d9` (inferred from product/category accents)
+## Interaction and accessibility
 
-### Typography
+Keyboard focus is visible. Mobile navigation is an in-flow disclosure, so closed links are not focusable. Dialogs use the existing Reka primitives. Forms use labels, native controls, associated error descriptions, and loading states. Contact success requires database persistence. Motion respects reduced-motion preferences. Public decorative artwork is clipped within its section to prevent page overflow.
 
-- Reference family: Raleway for body and headings (observed).
-- ASRTech implementation: retain Instrument Sans to preserve existing brand and avoid importing third-party typography.
-- Product title: 36–48px desktop, 30–36px mobile, 700 weight, tight line height.
-- Section title: 26–32px, 700 weight.
-- Body: 14–16px, 1.65–1.8 line height.
-- Labels and tabs: 12–14px, 600–700 weight.
+## Content boundaries
 
-### Spacing And Layout
-
-- Maximum content width: 1280px.
-- Desktop hero: three columns for media, description, and purchase card.
-- Section rhythm: 40–64px vertical padding.
-- Content panel padding: 24px mobile, 32–40px desktop.
-- Corners: 4px in the reference; use 10–16px selectively for the established ASRTech component language.
-- Shadows: restrained surface shadow; stronger shadow only for the purchase card and mobile CTA.
-- Borders: light gray, one pixel.
-
-## Components
-
-### Product Hero
-
-- Cool-gray breadcrumb strip above a dark navy summary.
-- Product media on the left, product name and technical metadata in the center, purchase card on the right.
-- Compact chips for product type, version, compatibility, and release information.
-- On mobile, stack media, content, and purchase card in that order.
-
-### Purchase Card
-
-- White elevated surface against the dark hero.
-- Plan selector when multiple prices exist.
-- Large effective price with the original price struck through when discounted.
-- Green primary CTA and quiet secondary demo/trial action.
-- Surface trust cues: support, updates, secure ordering, and setup fee when applicable.
-
-### Sticky Section Rail
-
-- White bar with subtle shadow beneath the hero.
-- Green active state and underline.
-- Horizontally scrollable on mobile; no wrapped labels.
-- Sections: Overview, Features, Screenshots, Changelog, Reviews, Documentation.
-
-### Content Panels
-
-- White panels on `#e9edf2` canvas.
-- Overview uses a wide article and a compact technical-information sidebar.
-- Feature groups use bordered disclosure rows with plus/chevron affordance and green checks.
-- Changelog uses version cards or a timeline.
-- Reviews use a responsive card grid.
-- Screenshots use a responsive gallery with 16:10 media.
-
-### Mobile Purchase Bar
-
-- Fixed near the bottom edge below `lg`.
-- Shows selected price and a green order button.
-- Respects safe-area inset and leaves page padding so content is not obscured.
-
-## Page Patterns
-
-1. Breadcrumb
-2. Navy product summary with three-column desktop layout
-3. Sticky section tabs
-4. Pale-gray content canvas with one active white panel
-5. Dark conversion footer
-6. Mobile-only persistent purchase bar
-
-Responsive behavior:
-
-- Under 1024px: hero becomes one column; purchase card stays full width.
-- Under 768px: metadata becomes a two-column grid where possible; tabs scroll horizontally.
-- Under 640px: media thumbnails and screenshot grid scroll or stack; content padding reduces; CTAs become full width.
-
-## Content Style
-
-- Professional and direct, aimed at WHMCS operators and technical buyers.
-- Lead with the operational result, then list compatibility and implementation detail.
-- CTA language is short: “Order now”, “Choose plan”, “View demo”, “Open docs”.
-- Avoid reusing ModulesGarden copy, trademarks, promotional artwork, or screenshots.
-
-## Agent Build Instructions
-
-- Adapt the existing ASRTech `Product` payload; do not hardcode the reference product.
-- Retain SEO, gallery, price, feature group, requirements, changelog, review, and documentation support.
-- Pick a featured price first, otherwise the first enabled price.
-- Keep every action keyboard reachable with visible focus styles.
-- Use semantic headings, buttons, links, `details`, and lists.
-- Prevent horizontal page overflow at 320px; only the tab and thumbnail rails may scroll.
-- Preserve dark-mode legibility even though the reference is light-first.
-
-## Rerun Inputs
-
-```text
-workflow: firecrawl-website-design-clone
-source_url: https://www.modulesgarden.com/products/whmcs/sms-center
-target_stack: Laravel 13 + Inertia 3 + Vue 3 + TypeScript + Tailwind CSS 4
-output: DESIGN.md + implementation
-```
+The existing local database includes DemoCatalogSeeder records, including example prices, compatibility information, and screenshots. A local preview notice identifies sample catalog content. Those records and existing commerce integrations are preserved; they require business review before any production release. Legacy unverified testimonials are not rendered. Existing managed legal content is retained and requires owner review; the redesign does not create new legal promises.

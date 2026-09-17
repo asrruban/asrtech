@@ -63,8 +63,7 @@ const countries = computed(() =>
     })).sort((a, b) => a.name.localeCompare(b.name)),
 );
 
-const inputClass =
-    'h-11 w-full rounded-md border bg-transparent px-3 text-sm';
+const inputClass = 'h-11 w-full rounded-md border bg-transparent px-3 text-sm';
 const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
 </script>
 
@@ -77,7 +76,9 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
     <ClientAreaHero title="My Account" overlap />
 
     <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
-        <div class="-mt-24 grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <div
+            class="-mt-24 grid items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]"
+        >
             <AccountCard
                 :account="props.account"
                 :total-due="props.totalDue"
@@ -88,7 +89,7 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                 <AccountSettingsTabs />
 
                 <form
-                    class="rounded-xl bg-card p-6 shadow-lg sm:p-8"
+                    class="rounded-xl border bg-card p-6 shadow-sm sm:p-8"
                     @submit.prevent="submit"
                 >
                     <h2 class="font-bold tracking-tight">Billing Details</h2>
@@ -101,10 +102,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="first-name"
                                 v-model="form.first_name"
+                                :aria-invalid="Boolean(form.errors.first_name)"
+                                :aria-describedby="
+                                    form.errors.first_name
+                                        ? 'form-first_name-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.first_name" />
+                            <InputError
+                                id="form-first_name-error"
+                                :message="form.errors.first_name"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="last-name">
@@ -113,10 +123,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="last-name"
                                 v-model="form.last_name"
+                                :aria-invalid="Boolean(form.errors.last_name)"
+                                :aria-describedby="
+                                    form.errors.last_name
+                                        ? 'form-last_name-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.last_name" />
+                            <InputError
+                                id="form-last_name-error"
+                                :message="form.errors.last_name"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="company">
@@ -125,10 +144,21 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="company"
                                 v-model="form.company_name"
+                                :aria-invalid="
+                                    Boolean(form.errors.company_name)
+                                "
+                                :aria-describedby="
+                                    form.errors.company_name
+                                        ? 'form-company_name-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.company_name" />
+                            <InputError
+                                id="form-company_name-error"
+                                :message="form.errors.company_name"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="address">
@@ -137,10 +167,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="address"
                                 v-model="form.address_1"
+                                :aria-invalid="Boolean(form.errors.address_1)"
+                                :aria-describedby="
+                                    form.errors.address_1
+                                        ? 'form-address_1-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.address_1" />
+                            <InputError
+                                id="form-address_1-error"
+                                :message="form.errors.address_1"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="city">
@@ -149,10 +188,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="city"
                                 v-model="form.city"
+                                :aria-invalid="Boolean(form.errors.city)"
+                                :aria-describedby="
+                                    form.errors.city
+                                        ? 'form-city-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.city" />
+                            <InputError
+                                id="form-city-error"
+                                :message="form.errors.city"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="country">
@@ -161,6 +209,12 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <select
                                 id="country"
                                 v-model="form.country"
+                                :aria-invalid="Boolean(form.errors.country)"
+                                :aria-describedby="
+                                    form.errors.country
+                                        ? 'form-country-error'
+                                        : undefined
+                                "
                                 :class="inputClass"
                             >
                                 <option
@@ -171,7 +225,10 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                                     {{ country.name }}
                                 </option>
                             </select>
-                            <InputError :message="form.errors.country" />
+                            <InputError
+                                id="form-country-error"
+                                :message="form.errors.country"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="state">
@@ -180,10 +237,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="state"
                                 v-model="form.state"
+                                :aria-invalid="Boolean(form.errors.state)"
+                                :aria-describedby="
+                                    form.errors.state
+                                        ? 'form-state-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.state" />
+                            <InputError
+                                id="form-state-error"
+                                :message="form.errors.state"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="postcode">
@@ -192,10 +258,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="postcode"
                                 v-model="form.postcode"
+                                :aria-invalid="Boolean(form.errors.postcode)"
+                                :aria-describedby="
+                                    form.errors.postcode
+                                        ? 'form-postcode-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.postcode" />
+                            <InputError
+                                id="form-postcode-error"
+                                :message="form.errors.postcode"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="phone">
@@ -204,10 +279,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="phone"
                                 v-model="form.phone"
+                                :aria-invalid="Boolean(form.errors.phone)"
+                                :aria-describedby="
+                                    form.errors.phone
+                                        ? 'form-phone-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.phone" />
+                            <InputError
+                                id="form-phone-error"
+                                :message="form.errors.phone"
+                            />
                         </div>
                     </div>
 
@@ -223,10 +307,19 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="email"
                                 v-model="form.email"
+                                :aria-invalid="Boolean(form.errors.email)"
+                                :aria-describedby="
+                                    form.errors.email
+                                        ? 'form-email-error'
+                                        : undefined
+                                "
                                 type="email"
                                 :class="inputClass"
                             />
-                            <InputError :message="form.errors.email" />
+                            <InputError
+                                id="form-email-error"
+                                :message="form.errors.email"
+                            />
                         </div>
                         <div>
                             <label :class="labelClass" for="account-id">
@@ -247,13 +340,22 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                             <input
                                 id="vat"
                                 v-model="form.vat_number"
+                                :aria-invalid="Boolean(form.errors.vat_number)"
+                                :aria-describedby="
+                                    form.errors.vat_number
+                                        ? 'form-vat_number-error'
+                                        : undefined
+                                "
                                 type="text"
                                 :class="inputClass"
                             />
                             <p class="mt-1 text-xs text-muted-foreground">
                                 (EU customers only)
                             </p>
-                            <InputError :message="form.errors.vat_number" />
+                            <InputError
+                                id="form-vat_number-error"
+                                :message="form.errors.vat_number"
+                            />
                         </div>
                     </div>
 
@@ -268,18 +370,27 @@ const labelClass = 'mb-1.5 block text-[13px] font-medium text-muted-foreground';
                         <input
                             id="newsletter"
                             v-model="form.newsletter"
+                            :aria-invalid="Boolean(form.errors.newsletter)"
+                            :aria-describedby="
+                                form.errors.newsletter
+                                    ? 'form-newsletter-error'
+                                    : undefined
+                            "
                             type="checkbox"
-                            class="mt-0.5 size-4 rounded accent-[#4fb250]"
+                            class="mt-0.5 size-4 rounded accent-[#087f75]"
                         />
                         Subscribe to receive the most important news about our
                         promotions, products and services.
                     </label>
-                    <InputError :message="form.errors.newsletter" />
+                    <InputError
+                        id="form-newsletter-error"
+                        :message="form.errors.newsletter"
+                    />
 
                     <button
                         type="submit"
                         :disabled="form.processing"
-                        class="mt-8 w-full rounded-md bg-[#5cb85c] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c] disabled:opacity-60"
+                        class="mt-8 w-full rounded-md bg-[#087f75] px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e] disabled:opacity-60"
                     >
                         {{ form.processing ? 'Saving…' : 'Save Changes' }}
                     </button>

@@ -4,11 +4,13 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\BillingCycle;
 use App\Models\Product;
+use App\Models\ProductCompatibility;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class SaveProductRequest extends FormRequest
 {
@@ -50,6 +52,13 @@ class SaveProductRequest extends FormRequest
             'release_date' => ['nullable', 'date'],
             'compatibility' => ['nullable', 'string', 'max:255'],
             'php_compatibility' => ['nullable', 'string', 'max:255'],
+            'compatibility_ranges_present' => ['sometimes', 'boolean'],
+            'compatibility_ranges' => ['sometimes', 'array', 'max:30'],
+            'compatibility_ranges.*' => ['array:platform,minimum_version,maximum_version,published'],
+            'compatibility_ranges.*.platform' => ['required', Rule::in(array_keys(ProductCompatibility::PLATFORMS))],
+            'compatibility_ranges.*.minimum_version' => ['required', 'string', 'regex:'.ProductCompatibility::VERSION_PATTERN],
+            'compatibility_ranges.*.maximum_version' => ['required', 'string', 'regex:'.ProductCompatibility::VERSION_PATTERN],
+            'compatibility_ranges.*.published' => ['required', 'boolean'],
             'short_description' => ['nullable', 'string', 'max:500'],
             'description' => ['nullable', 'string', 'max:20000'],
             'featured_image' => ['nullable', 'string', 'max:2000', 'regex:/^(https?:\/\/|\/)/i'],
@@ -141,6 +150,44 @@ class SaveProductRequest extends FormRequest
         ];
     }
 
+    /** @return list<callable> */
+    public function after(): array
+    {
+        return [function (Validator $validator): void {
+            $ranges = $this->input('compatibility_ranges', []);
+
+            if (! is_array($ranges)) {
+                return;
+            }
+
+            foreach ($ranges as $index => $range) {
+                if (! is_array($range)) {
+                    continue;
+                }
+
+                $minimum = $range['minimum_version'] ?? null;
+                $maximum = $range['maximum_version'] ?? null;
+
+                if (is_string($minimum) && is_string($maximum)
+                    && preg_match(ProductCompatibility::VERSION_PATTERN, $minimum) === 1
+                    && preg_match(ProductCompatibility::VERSION_PATTERN, $maximum) === 1
+                    && version_compare(ProductCompatibility::normalizeVersion($minimum), ProductCompatibility::normalizeVersion($maximum), '>')) {
+                    $validator->errors()->add("compatibility_ranges.{$index}.maximum_version", 'The maximum version must be equal to or greater than the minimum version.');
+                }
+            }
+        }];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return [
+            'compatibility_ranges.*.minimum_version.regex' => 'Enter a stable version such as 8.2 or 8.2.1. Wildcards and prerelease versions are not supported.',
+            'compatibility_ranges.*.maximum_version.regex' => 'Enter a stable version such as 8.2 or 8.2.1. Wildcards and prerelease versions are not supported.',
+            'compatibility_ranges.*.platform.in' => 'Choose WHMCS, WordPress, or PHP.',
+        ];
+    }
+
     /** @return array<string, mixed> */
     public function productData(): array
     {
@@ -174,6 +221,10 @@ class SaveProductRequest extends FormRequest
             'featured',
             'has_free_trial',
         ]);
+
+        if ($this->has('compatibility_ranges') || $this->boolean('compatibility_ranges_present')) {
+            $data['compatibility_ranges'] = $this->rows('compatibility_ranges');
+        }
 
         $data['gallery'] = $this->rows('gallery');
         $data['documentation_robots'] ??= 'index,follow';

@@ -32,6 +32,10 @@ use Illuminate\Support\Carbon;
  * @property string|null $social_provider
  * @property string|null $social_provider_id
  * @property string|null $remember_token
+ * @property string|null $two_factor_secret
+ * @property list<string>|null $two_factor_recovery_codes
+ * @property Carbon|null $two_factor_confirmed_at
+ * @property int|null $two_factor_last_counter
  * @property string|null $avatar
  * @property string|null $admin_notes
  * @property Carbon|null $created_at
@@ -56,7 +60,7 @@ use Illuminate\Support\Carbon;
     'social_provider_id',
     'admin_notes',
 ])]
-#[Hidden(['password', 'remember_token'])]
+#[Hidden(['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
@@ -73,7 +77,16 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'newsletter' => 'boolean',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_last_counter' => 'integer',
         ];
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return filled($this->two_factor_secret) && $this->two_factor_confirmed_at !== null;
     }
 
     /** @return HasMany<Order, $this> */
@@ -133,5 +146,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tickets(): HasMany
     {
         return $this->hasMany(Ticket::class);
+    }
+
+    /** @return HasMany<Quote, $this> */
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
     }
 }

@@ -5,13 +5,14 @@ namespace App\Mail;
 use App\Models\Subscription;
 use App\Services\EmailTemplateService;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Str;
 
-class SubscriptionPaymentFailedMail extends Mailable
+class SubscriptionPaymentFailedMail extends Mailable implements ShouldQueue
 {
     use Concerns\BccFromConfiguration, Queueable, SerializesModels;
 

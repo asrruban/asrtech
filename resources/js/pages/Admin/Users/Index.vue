@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, Link, router, useForm } from '@inertiajs/vue3';
 import { BadgeCheck, Search, UserRound, UserRoundPlus } from '@lucide/vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +21,44 @@ const props = defineProps(['filters', 'users']);
 
 const search = ref(props.filters.search ?? '');
 const createOpen = ref(false);
+const selected = ref<number[]>([]);
+
+const allSelected = computed(
+    () =>
+        props.users.data.length > 0 &&
+        props.users.data.every((user: { id: number }) =>
+            selected.value.includes(user.id),
+        ),
+);
+
+const toggleAll = () => {
+    selected.value = allSelected.value
+        ? []
+        : props.users.data.map((user: { id: number }) => user.id);
+};
+
+const toggle = (id: number) => {
+    selected.value = selected.value.includes(id)
+        ? selected.value.filter((value) => value !== id)
+        : [...selected.value, id];
+};
+
+const bulkForm = useForm({ ids: [] as number[] });
+
+const bulkDelete = () => {
+    if (
+        !confirm(
+            `Delete ${selected.value.length} selected user(s)? Users with order history are skipped.`,
+        )
+    ) {
+        return;
+    }
+
+    bulkForm.ids = selected.value;
+    bulkForm.post('/admin/users/bulk-delete', {
+        onSuccess: () => (selected.value = []),
+    });
+};
 
 const createForm = useForm({
     name: '',
@@ -68,7 +106,10 @@ const paginationLabel = (value: string) =>
         </div>
 
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <form class="flex max-w-md flex-1 gap-3" @submit.prevent="applyFilters">
+            <form
+                class="flex max-w-md flex-1 gap-3"
+                @submit.prevent="applyFilters"
+            >
                 <Input v-model="search" placeholder="Search by name or email" />
                 <Button type="submit" variant="outline">
                     <Search class="size-4" /> Search
@@ -116,9 +157,7 @@ const paginationLabel = (value: string) =>
                                 autocomplete="new-password"
                                 required
                             />
-                            <InputError
-                                :message="createForm.errors.password"
-                            />
+                            <InputError :message="createForm.errors.password" />
                         </div>
                         <label class="flex items-center gap-2 text-sm">
                             <input
@@ -149,6 +188,22 @@ const paginationLabel = (value: string) =>
         <Card>
             <CardContent class="p-0">
                 <div
+                    v-if="selected.length > 0"
+                    class="flex items-center justify-between border-b bg-muted/40 px-5 py-3"
+                >
+                    <p class="text-sm font-medium">
+                        {{ selected.length }} selected
+                    </p>
+                    <Button
+                        size="sm"
+                        variant="destructive"
+                        :disabled="bulkForm.processing"
+                        @click="bulkDelete"
+                    >
+                        Delete selected
+                    </Button>
+                </div>
+                <div
                     v-if="users.data.length === 0"
                     class="p-10 text-center text-sm text-muted-foreground"
                 >
@@ -160,6 +215,15 @@ const paginationLabel = (value: string) =>
                             <tr
                                 class="border-b text-xs font-semibold tracking-wide text-muted-foreground uppercase"
                             >
+                                <th class="w-10 px-5 py-3.5">
+                                    <input
+                                        type="checkbox"
+                                        class="size-4 rounded"
+                                        :checked="allSelected"
+                                        aria-label="Select all users"
+                                        @change="toggleAll"
+                                    />
+                                </th>
                                 <th class="px-5 py-3.5">Customer</th>
                                 <th class="px-5 py-3.5">Verified</th>
                                 <th class="px-5 py-3.5">Sign in</th>
@@ -175,6 +239,15 @@ const paginationLabel = (value: string) =>
                                 :key="user.id"
                                 class="border-b last:border-b-0 hover:bg-muted/40"
                             >
+                                <td class="px-5 py-4">
+                                    <input
+                                        type="checkbox"
+                                        class="size-4 rounded"
+                                        :checked="selected.includes(user.id)"
+                                        :aria-label="`Select ${user.name}`"
+                                        @change="toggle(user.id)"
+                                    />
+                                </td>
                                 <td class="px-5 py-4">
                                     <p class="font-semibold">{{ user.name }}</p>
                                     <p class="text-xs text-muted-foreground">
@@ -205,7 +278,11 @@ const paginationLabel = (value: string) =>
                                     {{ formatDate(user.created_at) }}
                                 </td>
                                 <td class="px-5 py-4 text-right">
-                                    <Button as-child size="sm" variant="outline">
+                                    <Button
+                                        as-child
+                                        size="sm"
+                                        variant="outline"
+                                    >
                                         <Link :href="`/admin/users/${user.id}`">
                                             <UserRound class="size-4" /> Manage
                                         </Link>

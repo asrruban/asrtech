@@ -33,10 +33,12 @@ const statusClasses: Record<string, string> = {
     open: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
     customer_reply:
         'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300',
-    answered: 'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+    answered:
+        'bg-blue-100 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
     in_progress:
         'bg-violet-100 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
-    on_hold: 'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
+    on_hold:
+        'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
     closed: 'bg-muted text-muted-foreground',
 };
 
@@ -103,7 +105,7 @@ const formatDate = (date: string | null) =>
                 <table v-else class="w-full text-sm">
                     <thead>
                         <tr
-                            class="border-b text-left text-xs uppercase tracking-wide text-muted-foreground"
+                            class="border-b text-left text-xs tracking-wide text-muted-foreground uppercase"
                         >
                             <th class="px-4 py-3">Ticket</th>
                             <th class="hidden px-4 py-3 md:table-cell">

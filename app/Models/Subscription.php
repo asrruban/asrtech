@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonInterface|null $last_payment_at
  * @property array<string, mixed>|null $metadata
  * @property int $failed_payments_count
+ * @property int $dunning_reminders_sent
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
@@ -56,6 +57,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'ended_at',
     'last_payment_at',
     'metadata',
+    'dunning_reminders_sent',
 ])]
 class Subscription extends Model
 {

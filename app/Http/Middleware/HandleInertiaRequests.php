@@ -47,7 +47,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'business' => config('asrtech.business'),
             'site' => [
+                'localPreview' => app()->environment('local'),
                 'companyName' => config('asrtech.company_name'),
                 'tagline' => config('asrtech.tagline'),
                 'supportEmail' => config('asrtech.support_email'),
@@ -66,6 +68,9 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
                 'admin' => $request->user('admin'),
+                'impersonating' => $request->user('admin') instanceof Admin
+                    && $request->user('web') instanceof User
+                    && $request->session()->get('impersonating_user_id') === $request->user('web')->getAuthIdentifier(),
             ],
             'adminPermissions' => fn () => $request->user('admin') instanceof Admin
                 ? $request->user('admin')->role->permissions()
@@ -91,6 +96,7 @@ class HandleInertiaRequests extends Middleware
                     'products' => $user->licenses()->count(),
                     'subscriptions' => $user->subscriptions()->count(),
                     'tickets' => $user->tickets()->count(),
+                    'unreadNotifications' => $user->unreadNotifications()->count(),
                     'unpaidInvoices' => Invoice::query()
                         ->where('status', InvoiceStatus::Issued)
                         ->whereHas('order', fn ($query) => $query->where('user_id', $user->id))

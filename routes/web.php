@@ -4,33 +4,49 @@ use App\Http\Controllers\Admin\ImpersonationController;
 use App\Http\Controllers\Api\LicenseVerifyController;
 use App\Http\Controllers\Client\AccountController;
 use App\Http\Controllers\Client\AccountDetailsController;
+use App\Http\Controllers\Client\AffiliateController;
+use App\Http\Controllers\Client\AnnouncementController;
 use App\Http\Controllers\Client\AuthController;
+use App\Http\Controllers\Client\BusinessPageController;
 use App\Http\Controllers\Client\CartCheckoutController;
 use App\Http\Controllers\Client\CartController;
 use App\Http\Controllers\Client\CartPromotionController;
 use App\Http\Controllers\Client\CheckoutController;
 use App\Http\Controllers\Client\CreditNoteController;
+use App\Http\Controllers\Client\DataExportController;
 use App\Http\Controllers\Client\EmailVerificationController;
 use App\Http\Controllers\Client\GatewayCallbackController;
 use App\Http\Controllers\Client\HomeController;
+use App\Http\Controllers\Client\InquiryController;
 use App\Http\Controllers\Client\LicenseReissueController;
+use App\Http\Controllers\Client\NotificationController;
 use App\Http\Controllers\Client\ProductDocumentationController;
 use App\Http\Controllers\Client\ProductReleaseDownloadController;
 use App\Http\Controllers\Client\ProductReviewController;
 use App\Http\Controllers\Client\PublicPageController;
 use App\Http\Controllers\Client\PublicSupportController;
+use App\Http\Controllers\Client\QuoteController;
 use App\Http\Controllers\Client\RefundRequestController;
 use App\Http\Controllers\Client\SocialAuthController;
 use App\Http\Controllers\Client\SoftwareDevelopmentController;
 use App\Http\Controllers\Client\StorefrontProductController;
 use App\Http\Controllers\Client\SubscriptionController;
 use App\Http\Controllers\Client\SupportTicketController;
+use App\Http\Controllers\Client\TwoFactorChallengeController;
+use App\Http\Controllers\Client\TwoFactorController;
 use App\Models\Order;
 use App\Payments\GatewayRegistry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('services', [BusinessPageController::class, 'services'])->name('services.index');
+Route::get('services/{service}', [BusinessPageController::class, 'service'])->name('services.show');
+Route::get('about', [BusinessPageController::class, 'about'])->name('about');
+Route::get('contact', [BusinessPageController::class, 'contact'])->name('contact');
+Route::post('contact', [InquiryController::class, 'store'])
+    ->middleware('throttle:5,10')
+    ->name('contact.store');
 Route::get('products', [StorefrontProductController::class, 'index'])->name('products.index');
 Route::get('categories/{category:slug}', [StorefrontProductController::class, 'category'])
     ->name('categories.show');
@@ -58,6 +74,8 @@ Route::delete('cart/promotion', [CartPromotionController::class, 'destroy'])->na
 Route::get('support', [PublicSupportController::class, 'index'])->name('support.center');
 Route::get('support/ticket', [PublicSupportController::class, 'ticket'])->name('support.departments');
 Route::get('software-development', SoftwareDevelopmentController::class)->name('software-development');
+Route::get('announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+Route::get('announcements/{announcement:slug}', [AnnouncementController::class, 'show'])->name('announcements.show');
 Route::get('pages/{page:slug}', PublicPageController::class)->name('pages.show');
 Route::get('{legalPage}', [PublicPageController::class, 'legal'])
     ->whereIn('legalPage', ['terms-of-service', 'privacy-policy', 'refund-policy'])
@@ -113,7 +131,7 @@ Route::get('gateways/mock-checkout/{gateway}', function (Request $request, strin
 <body class="bg-slate-50 flex items-center justify-center min-h-screen">
     <div class="max-w-md w-full mx-4 bg-white rounded-2xl shadow-xl border border-slate-100 p-8 text-center">
         <div class="flex justify-center mb-6">
-            <div class="size-16 rounded-2xl bg-blue-600/10 flex items-center justify-center text-blue-600 font-extrabold text-2xl uppercase">
+            <div class="size-16 rounded-2xl bg-[#e5484d]/10 flex items-center justify-center text-[#e5484d] font-extrabold text-2xl uppercase">
                 {$gatewayInitials}
             </div>
         </div>
@@ -132,12 +150,12 @@ Route::get('gateways/mock-checkout/{gateway}', function (Request $request, strin
             </div>
             <div class="border-t border-slate-200/60 pt-3 flex justify-between">
                 <span class="font-bold text-slate-800">Total Amount</span>
-                <span class="font-extrabold text-lg text-blue-600">\${$amount}</span>
+                <span class="font-extrabold text-lg text-[#d13b40]">\${$amount}</span>
             </div>
         </div>
         
         <div class="space-y-3">
-            <a href="{$successUrl}" class="w-full inline-flex h-12 items-center justify-center rounded-xl bg-[#5cb85c] text-white font-bold hover:bg-[#4cae4c] transition shadow-lg shadow-[#5cb85c]/25">
+            <a href="{$successUrl}" class="w-full inline-flex h-12 items-center justify-center rounded-xl bg-[#0f8a5f] text-white font-bold hover:bg-[#0d8557] transition shadow-lg shadow-[#0f8a5f]/25">
                 Simulate Successful Payment
             </a>
             <a href="{$cancelUrl}" class="w-full inline-flex h-12 items-center justify-center rounded-xl border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition">
@@ -167,6 +185,12 @@ Route::middleware('guest')->group(function () {
     Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
 });
 
+Route::get('two-factor-challenge', [TwoFactorChallengeController::class, 'create'])
+    ->name('client.two-factor.challenge');
+Route::post('two-factor-challenge', [TwoFactorChallengeController::class, 'store'])
+    ->middleware('throttle:auth-login')
+    ->name('client.two-factor.verify');
+
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', [EmailVerificationController::class, 'show'])->name('verification.notice');
     Route::post('verify-email', [EmailVerificationController::class, 'verify'])
@@ -182,7 +206,7 @@ Route::redirect('account', '/client-area');
 Route::redirect('settings', '/client-area/account-details');
 Route::redirect('settings/profile', '/client-area/account-details');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'auth.session', 'verified'])->group(function () {
     Route::inertia('dashboard', 'Dashboard')->name('dashboard');
     // WHMCS-style client area.
     Route::get('client-area', [AccountController::class, 'index'])->name('account.index');
@@ -201,6 +225,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('throttle:20,1')
         ->name('account.releases.download');
     Route::get('client-area/invoices', [AccountController::class, 'invoices'])->name('account.invoices');
+    Route::get('client-area/quotes', [QuoteController::class, 'index'])->name('account.quotes.index');
+    Route::get('client-area/quotes/{quote}', [QuoteController::class, 'show'])->name('account.quotes.show');
+    Route::post('client-area/quotes/{quote}/accept', [QuoteController::class, 'accept'])->name('account.quotes.accept');
+    Route::post('client-area/quotes/{quote}/decline', [QuoteController::class, 'decline'])->name('account.quotes.decline');
+    Route::get('client-area/affiliate', [AffiliateController::class, 'index'])->name('account.affiliate');
+    Route::post('client-area/affiliate/join', [AffiliateController::class, 'store'])->name('account.affiliate.join');
     Route::get('client-area/invoice/{invoice}', [AccountController::class, 'invoice'])->name('account.invoice');
     Route::get('client-area/invoice/{invoice}/download', [AccountController::class, 'downloadInvoice'])->name('account.invoices.download');
     Route::post('client-area/invoice/{invoice}/refund-requests', [RefundRequestController::class, 'store'])
@@ -234,6 +264,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('client-area/account-details', [AccountDetailsController::class, 'update'])->name('profile.update');
     Route::get('client-area/change-password', [AccountDetailsController::class, 'editPassword'])->name('password.edit');
     Route::patch('client-area/change-password', [AccountDetailsController::class, 'updatePassword'])->name('password.update');
+    Route::get('client-area/security', [TwoFactorController::class, 'index'])->name('account.security');
+    Route::post('client-area/security/two-factor/setup', [TwoFactorController::class, 'setup'])->name('account.security.setup');
+    Route::post('client-area/security/two-factor/confirm', [TwoFactorController::class, 'confirm'])->name('account.security.confirm');
+    Route::delete('client-area/security/two-factor', [TwoFactorController::class, 'disable'])->name('account.security.disable');
+    Route::post('client-area/security/two-factor/recovery-codes', [TwoFactorController::class, 'regenerateRecoveryCodes'])->name('account.security.recovery-codes');
+    Route::get('client-area/notifications', [NotificationController::class, 'index'])->name('account.notifications');
+    Route::post('client-area/notifications/read-all', [NotificationController::class, 'readAll'])->name('account.notifications.read-all');
+    Route::post('client-area/notifications/{notification}/read', [NotificationController::class, 'read'])->name('account.notifications.read');
+    Route::get('client-area/data-export', DataExportController::class)
+        ->middleware('throttle:10,1')
+        ->name('account.data-export');
     Route::delete('client-area/account', [AccountDetailsController::class, 'destroy'])->name('profile.destroy');
     Route::inertia('settings/appearance', 'settings/Appearance')->name('appearance.edit');
 });
@@ -246,4 +287,7 @@ Route::post('impersonation/leave', [ImpersonationController::class, 'destroy'])
     ->middleware('auth')
     ->name('impersonation.leave');
 
+require __DIR__.'/account-recovery.php';
+require __DIR__.'/project-workspace-client.php';
+require __DIR__.'/maintenance.php';
 require __DIR__.'/admin.php';

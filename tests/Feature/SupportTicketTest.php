@@ -82,6 +82,7 @@ class SupportTicketTest extends TestCase
                 ->where('ticket.ticket_number', $ticket->ticket_number)
                 ->has('replies', 1));
 
+        $this->flushSession();
         $this->actingAs($other)
             ->get("/client-area/ticket/{$ticket->id}")
             ->assertNotFound();

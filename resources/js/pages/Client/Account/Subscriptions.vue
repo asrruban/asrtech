@@ -108,7 +108,7 @@ const updatePaymentMethod = (subscription: SubscriptionItem) =>
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="flex items-center gap-2.5">
-            <RefreshCw class="size-5 text-[#4fb250]" />
+            <RefreshCw class="size-5 text-[var(--client-accent)]" />
             <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                 Recurring services
             </h2>
@@ -118,7 +118,7 @@ const updatePaymentMethod = (subscription: SubscriptionItem) =>
             <article
                 v-for="subscription in props.subscriptions"
                 :key="subscription.id"
-                class="overflow-hidden rounded-2xl bg-card shadow-lg"
+                class="overflow-hidden rounded-2xl border bg-card shadow-sm"
             >
                 <div
                     class="flex flex-col justify-between gap-6 p-6 sm:flex-row sm:items-start sm:p-8"
@@ -198,7 +198,7 @@ const updatePaymentMethod = (subscription: SubscriptionItem) =>
                         <button
                             v-if="subscription.can_resume"
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-md bg-[#5cb85c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4cae4c]"
+                            class="inline-flex items-center gap-2 rounded-md bg-[#087f75] px-4 py-2 text-sm font-semibold text-white hover:bg-[#06655e]"
                             @click="resume(subscription)"
                         >
                             <RefreshCw class="size-4" /> Resume renewal

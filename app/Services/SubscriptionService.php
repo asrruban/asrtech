@@ -22,6 +22,7 @@ class SubscriptionService
     public function __construct(
         private readonly StripeGateway $stripe,
         private readonly SubscriptionNotificationService $notifications,
+        private readonly WebhookDispatcher $webhooks,
     ) {}
 
     /** Create local subscription records after an initial recurring order is paid. */
@@ -182,6 +183,7 @@ class SubscriptionService
                 'current_period_end' => $periodEnd,
                 'last_payment_at' => now(),
                 'ended_at' => null,
+                'dunning_reminders_sent' => 0,
             ]);
 
             $locked->license->update([
@@ -240,6 +242,14 @@ class SubscriptionService
 
         if ($recorded) {
             $this->notifications->paymentFailed($subscription->fresh(), $reference);
+            $this->webhooks->dispatch('subscription.payment_failed', [
+                'subscription_id' => $subscription->id,
+                'gateway' => $subscription->gateway,
+                'reference' => $reference,
+                'amount' => (float) $subscription->amount,
+                'currency' => $subscription->currency,
+                'customer_email' => $subscription->user?->email,
+            ]);
         }
     }
 
@@ -281,6 +291,7 @@ class SubscriptionService
                 'cancel_at_period_end' => $cancelAtPeriodEnd,
                 'canceled_at' => $canceledAt,
                 'ended_at' => $endedAt,
+                ...($status->providesAccess() ? ['dunning_reminders_sent' => 0] : []),
             ]);
 
             $effectivePeriodEnd = $periodEnd ?? $subscription->current_period_end;
@@ -323,6 +334,12 @@ class SubscriptionService
         $this->recordSystemEvent($subscription, 'subscription.cancellation_scheduled');
 
         $this->notifications->cancellationScheduled($subscription->fresh());
+        $this->webhooks->dispatch('subscription.cancellation_scheduled', [
+            'subscription_id' => $subscription->id,
+            'gateway' => $subscription->gateway,
+            'current_period_end' => $subscription->current_period_end?->toIso8601String(),
+            'customer_email' => $subscription->user?->email,
+        ]);
     }
 
     public function resume(Subscription $subscription): void

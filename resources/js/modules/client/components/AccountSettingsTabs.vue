@@ -1,34 +1,31 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-
 const page = usePage();
-
 const tabs = [
-    { label: 'Edit Account Details', href: '/client-area/account-details' },
-    { label: 'Change Password', href: '/client-area/change-password' },
+    { label: 'Account details', href: '/client-area/account-details' },
+    { label: 'Password', href: '/client-area/change-password' },
+    { label: 'Security', href: '/client-area/security' },
 ];
-
-const isActive = (href: string) => page.url === href;
 </script>
-
 <template>
-    <div class="flex gap-7 px-1">
+    <nav
+        aria-label="Account settings"
+        class="mb-4 flex flex-wrap gap-1 rounded-xl border bg-[var(--client-surface)] p-1.5"
+    >
         <Link
             v-for="tab in tabs"
             :key="tab.href"
             :href="tab.href"
-            class="relative pb-4 text-sm font-bold tracking-wide whitespace-nowrap transition"
-            :class="
-                isActive(tab.href)
-                    ? 'text-white'
-                    : 'text-white/70 hover:text-white'
+            :aria-current="
+                page.url.split('?')[0] === tab.href ? 'page' : undefined
             "
+            class="flex-1 rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition"
+            :class="
+                page.url.split('?')[0] === tab.href
+                    ? 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)]'
+                    : 'text-[var(--client-muted)] hover:bg-[var(--client-surface-soft)]'
+            "
+            >{{ tab.label }}</Link
         >
-            {{ tab.label }}
-            <span
-                v-if="isActive(tab.href)"
-                class="absolute bottom-0 left-1/2 -ml-2 size-0 border-x-8 border-b-8 border-x-transparent border-b-card"
-            ></span>
-        </Link>
-    </div>
+    </nav>
 </template>

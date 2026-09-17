@@ -1,33 +1,33 @@
 <script setup lang="ts">
-import { Wrench } from '@lucide/vue';
+import { RefreshCw, Wrench } from '@lucide/vue';
 import SeoHead from '@/modules/client/components/SeoHead.vue';
-
 defineProps<{ message?: string | null }>();
 </script>
-
 <template>
-    <SeoHead title="Maintenance" />
-
+    <SeoHead
+        title="Site maintenance"
+        description="ASR Tech is temporarily unavailable for maintenance."
+        :seo="{ robots: 'noindex,nofollow' }"
+    />
     <section
-        class="flex min-h-[70vh] items-center justify-center bg-muted/40 px-4 py-16"
+        class="flex min-h-[65vh] items-center justify-center bg-muted/40 px-4 py-20"
     >
-        <div class="w-full max-w-md text-center">
-            <div class="mb-6 flex justify-center">
-                <div
-                    class="flex size-14 items-center justify-center rounded-2xl bg-[#26364d] text-white shadow-sm"
-                >
-                    <Wrench class="size-7" />
-                </div>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
-                We'll be right back
-            </h1>
-            <p class="mt-3 leading-7 text-muted-foreground">
+        <div class="w-full max-w-lg text-center">
+            <span
+                class="mx-auto flex size-16 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary"
+                ><Wrench class="size-7"
+            /></span>
+            <p class="section-kicker mt-8">A little technical care</p>
+            <h1 class="section-title mt-4">We'll be back.</h1>
+            <p class="body-copy mt-5">
                 {{
                     message ||
-                    'The site is undergoing scheduled maintenance. Please check back shortly.'
+                    'ASR Tech is temporarily unavailable while maintenance is in progress. Please try again later.'
                 }}
             </p>
+            <a href="/" class="button-secondary mt-8"
+                ><RefreshCw class="size-4" /> Try again</a
+            >
         </div>
     </section>
 </template>

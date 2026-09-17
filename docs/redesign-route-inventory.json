@@ -1,0 +1,4696 @@
+[
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/api/inbound-email",
+    "name": "api.inbound-email",
+    "action": "App\\Http\\Controllers\\Api\\InboundEmailController",
+    "middleware": [
+      "api",
+      "throttle:30,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/products",
+    "name": "api.v1.products",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@products",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/orders",
+    "name": "api.v1.orders",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@orders",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/orders/{orderNumber}",
+    "name": "api.v1.orders.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@order",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/licenses/{key}",
+    "name": "api.v1.licenses.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@license",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/invoices/{number}",
+    "name": "api.v1.invoices.show",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@invoice",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/api/v1/subscriptions",
+    "name": "api.v1.subscriptions",
+    "action": "App\\Http\\Controllers\\Api\\V1\\ResourceController@subscriptions",
+    "middleware": [
+      "api",
+      "api.token",
+      "throttle:120,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/up",
+    "name": null,
+    "action": "Closure",
+    "middleware": [],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/",
+    "name": "home",
+    "action": "App\\Http\\Controllers\\Client\\HomeController",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Home"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/services",
+    "name": "services.index",
+    "action": "App\\Http\\Controllers\\Client\\BusinessPageController@services",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Services/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/services/{service}",
+    "name": "services.show",
+    "action": "App\\Http\\Controllers\\Client\\BusinessPageController@service",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Services/Show"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/about",
+    "name": "about",
+    "action": "App\\Http\\Controllers\\Client\\BusinessPageController@about",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/About"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/contact",
+    "name": "contact",
+    "action": "App\\Http\\Controllers\\Client\\BusinessPageController@contact",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Contact"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/contact",
+    "name": "contact.store",
+    "action": "App\\Http\\Controllers\\Client\\InquiryController@store",
+    "middleware": [
+      "web",
+      "throttle:5,10"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/products",
+    "name": "products.index",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@index",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Products/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/categories/{category}",
+    "name": "categories.show",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@category",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Products/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/categories/{category}/{group}",
+    "name": "subcategories.show",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@subcategory",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Products/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/products/{productType}/{product}/documentation",
+    "name": "products.documentation",
+    "action": "App\\Http\\Controllers\\Client\\ProductDocumentationController",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Products/Documentation"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/products/{product}/documentation",
+    "name": "products.documentation.legacy",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@legacyDocumentation",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/products/{productType}/{product}",
+    "name": "products.show",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@show",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Products/Show"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/products/{product}",
+    "name": "products.show.legacy",
+    "action": "App\\Http\\Controllers\\Client\\StorefrontProductController@legacyShow",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/cart",
+    "name": "cart.index",
+    "action": "App\\Http\\Controllers\\Client\\CartController@index",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Cart/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/cart/{product}/prices/{price}",
+    "name": "cart.store",
+    "action": "App\\Http\\Controllers\\Client\\CartController@store",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/cart/items/{price}",
+    "name": "cart.destroy",
+    "action": "App\\Http\\Controllers\\Client\\CartController@destroy",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/cart",
+    "name": "cart.clear",
+    "action": "App\\Http\\Controllers\\Client\\CartController@clear",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/cart/promotion",
+    "name": "cart.promotion.store",
+    "action": "App\\Http\\Controllers\\Client\\CartPromotionController@store",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/cart/promotion",
+    "name": "cart.promotion.destroy",
+    "action": "App\\Http\\Controllers\\Client\\CartPromotionController@destroy",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/support",
+    "name": "support.center",
+    "action": "App\\Http\\Controllers\\Client\\PublicSupportController@index",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Support/Landing"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/support/ticket",
+    "name": "support.departments",
+    "action": "App\\Http\\Controllers\\Client\\PublicSupportController@ticket",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Support/Departments"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/software-development",
+    "name": "software-development",
+    "action": "App\\Http\\Controllers\\Client\\SoftwareDevelopmentController",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/SoftwareDevelopment"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/announcements",
+    "name": "announcements.index",
+    "action": "App\\Http\\Controllers\\Client\\AnnouncementController@index",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Announcements/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/announcements/{announcement}",
+    "name": "announcements.show",
+    "action": "App\\Http\\Controllers\\Client\\AnnouncementController@show",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Announcements/Show"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/pages/{page}",
+    "name": "pages.show",
+    "action": "App\\Http\\Controllers\\Client\\PublicPageController",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Pages/Show"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/{legalPage}",
+    "name": "legal.show",
+    "action": "App\\Http\\Controllers\\Client\\PublicPageController@legal",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Pages/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/api/license/verify",
+    "name": "license.verify",
+    "action": "App\\Http\\Controllers\\Api\\LicenseVerifyController",
+    "middleware": [
+      "web",
+      "throttle:60,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/gateways/callback/{gateway}",
+    "name": "gateways.webhook",
+    "action": "App\\Http\\Controllers\\Client\\GatewayCallbackController@webhook",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/gateways/return/{gateway}",
+    "name": "gateways.return",
+    "action": "App\\Http\\Controllers\\Client\\GatewayCallbackController@return",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/gateways/mock-checkout/{gateway}",
+    "name": "gateways.mock-checkout",
+    "action": "Closure",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/login",
+    "name": "login",
+    "action": "App\\Http\\Controllers\\Client\\AuthController@create",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": [
+      "Client/Auth/Login"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/login",
+    "name": "login.store",
+    "action": "App\\Http\\Controllers\\Client\\AuthController@store",
+    "middleware": [
+      "web",
+      "guest",
+      "throttle:auth-login"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/register",
+    "name": "register",
+    "action": "App\\Http\\Controllers\\Client\\AuthController@createRegister",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": [
+      "Client/Auth/Register"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/register",
+    "name": "register.store",
+    "action": "App\\Http\\Controllers\\Client\\AuthController@storeRegister",
+    "middleware": [
+      "web",
+      "guest",
+      "throttle:auth-login"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/auth/{provider}/redirect",
+    "name": "social.redirect",
+    "action": "App\\Http\\Controllers\\Client\\SocialAuthController@redirect",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/auth/{provider}/callback",
+    "name": "social.callback",
+    "action": "App\\Http\\Controllers\\Client\\SocialAuthController@callback",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/two-factor-challenge",
+    "name": "client.two-factor.challenge",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorChallengeController@create",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/Auth/TwoFactorChallenge"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/two-factor-challenge",
+    "name": "client.two-factor.verify",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorChallengeController@store",
+    "middleware": [
+      "web",
+      "throttle:auth-login"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/verify-email",
+    "name": "verification.notice",
+    "action": "App\\Http\\Controllers\\Client\\EmailVerificationController@show",
+    "middleware": [
+      "web",
+      "auth"
+    ],
+    "pages": [
+      "Client/Auth/VerifyEmail"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/verify-email",
+    "name": "verification.verify",
+    "action": "App\\Http\\Controllers\\Client\\EmailVerificationController@verify",
+    "middleware": [
+      "web",
+      "auth",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/verify-email/resend",
+    "name": "verification.resend",
+    "action": "App\\Http\\Controllers\\Client\\EmailVerificationController@resend",
+    "middleware": [
+      "web",
+      "auth",
+      "throttle:3,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "uri": "/account",
+    "name": null,
+    "action": "\\Illuminate\\Routing\\RedirectController",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "uri": "/settings",
+    "name": null,
+    "action": "\\Illuminate\\Routing\\RedirectController",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "uri": "/settings/profile",
+    "name": null,
+    "action": "\\Illuminate\\Routing\\RedirectController",
+    "middleware": [
+      "web"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/dashboard",
+    "name": "dashboard",
+    "action": "\\Inertia\\Controller",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Dashboard"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area",
+    "name": "account.index",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/products",
+    "name": "account.products",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@products",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Products"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/subscriptions",
+    "name": "account.subscriptions",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Subscriptions"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}",
+    "name": "account.subscriptions.show",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@show",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Subscription"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}/cancel",
+    "name": "account.subscriptions.cancel",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@cancel",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}/resume",
+    "name": "account.subscriptions.resume",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@resume",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}/extend",
+    "name": "account.subscriptions.extend.show",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@showExtend",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/ExtendSubscription"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}/extend",
+    "name": "account.subscriptions.extend.store",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@extend",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/subscriptions/{subscription}/billing-portal",
+    "name": "account.subscriptions.billing-portal",
+    "action": "App\\Http\\Controllers\\Client\\SubscriptionController@billingPortal",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/product/{license}",
+    "name": "account.product",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@product",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Product"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/product/{license}/releases/{release}/download",
+    "name": "account.releases.download",
+    "action": "App\\Http\\Controllers\\Client\\ProductReleaseDownloadController",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:20,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/invoices",
+    "name": "account.invoices",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@invoices",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Invoices"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/quotes",
+    "name": "account.quotes.index",
+    "action": "App\\Http\\Controllers\\Client\\QuoteController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Quotes"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/quotes/{quote}",
+    "name": "account.quotes.show",
+    "action": "App\\Http\\Controllers\\Client\\QuoteController@show",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Quote"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/quotes/{quote}/accept",
+    "name": "account.quotes.accept",
+    "action": "App\\Http\\Controllers\\Client\\QuoteController@accept",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/quotes/{quote}/decline",
+    "name": "account.quotes.decline",
+    "action": "App\\Http\\Controllers\\Client\\QuoteController@decline",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/affiliate",
+    "name": "account.affiliate",
+    "action": "App\\Http\\Controllers\\Client\\AffiliateController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Affiliate"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/affiliate/join",
+    "name": "account.affiliate.join",
+    "action": "App\\Http\\Controllers\\Client\\AffiliateController@store",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/invoice/{invoice}",
+    "name": "account.invoice",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@invoice",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Invoice"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/invoice/{invoice}/download",
+    "name": "account.invoices.download",
+    "action": "App\\Http\\Controllers\\Client\\AccountController@downloadInvoice",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/invoice/{invoice}/refund-requests",
+    "name": "account.refund-requests.store",
+    "action": "App\\Http\\Controllers\\Client\\RefundRequestController@store",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:5,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/client-area/refund-requests/{refundRequest}",
+    "name": "account.refund-requests.destroy",
+    "action": "App\\Http\\Controllers\\Client\\RefundRequestController@destroy",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/credit-notes/{creditNote}",
+    "name": "account.credit-notes.show",
+    "action": "App\\Http\\Controllers\\Client\\CreditNoteController@show",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/CreditNote"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/credit-notes/{creditNote}/download",
+    "name": "account.credit-notes.download",
+    "action": "App\\Http\\Controllers\\Client\\CreditNoteController@download",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/licenses/{license}/reissue",
+    "name": "account.licenses.reissue",
+    "action": "App\\Http\\Controllers\\Client\\LicenseReissueController",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/checkout/{product}/prices/{price}",
+    "name": "checkout.store",
+    "action": "App\\Http\\Controllers\\Client\\CheckoutController",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/products/{productType}/{product}/reviews",
+    "name": "products.reviews.store",
+    "action": "App\\Http\\Controllers\\Client\\ProductReviewController",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/checkout",
+    "name": "checkout.create",
+    "action": "App\\Http\\Controllers\\Client\\CartCheckoutController@create",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Checkout/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/checkout",
+    "name": "checkout.cart.store",
+    "action": "App\\Http\\Controllers\\Client\\CartCheckoutController@store",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/tickets",
+    "name": "support.index",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Support/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/tickets/create",
+    "name": "support.create",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@create",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Support/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/tickets",
+    "name": "support.store",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@store",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/ticket/{ticket}",
+    "name": "support.show",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@show",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Support/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/ticket/{ticket}/reply",
+    "name": "support.reply",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@reply",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/ticket/{ticket}/close",
+    "name": "support.close",
+    "action": "App\\Http\\Controllers\\Client\\SupportTicketController@close",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/account-details",
+    "name": "profile.edit",
+    "action": "App\\Http\\Controllers\\Client\\AccountDetailsController@edit",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Details"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/client-area/account-details",
+    "name": "profile.update",
+    "action": "App\\Http\\Controllers\\Client\\AccountDetailsController@update",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/change-password",
+    "name": "password.edit",
+    "action": "App\\Http\\Controllers\\Client\\AccountDetailsController@editPassword",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/ChangePassword"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/client-area/change-password",
+    "name": "password.update",
+    "action": "App\\Http\\Controllers\\Client\\AccountDetailsController@updatePassword",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/security",
+    "name": "account.security",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Security"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/security/two-factor/setup",
+    "name": "account.security.setup",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorController@setup",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/security/two-factor/confirm",
+    "name": "account.security.confirm",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorController@confirm",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/client-area/security/two-factor",
+    "name": "account.security.disable",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorController@disable",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/security/two-factor/recovery-codes",
+    "name": "account.security.recovery-codes",
+    "action": "App\\Http\\Controllers\\Client\\TwoFactorController@regenerateRecoveryCodes",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/notifications",
+    "name": "account.notifications",
+    "action": "App\\Http\\Controllers\\Client\\NotificationController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Notifications"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/notifications/read-all",
+    "name": "account.notifications.read-all",
+    "action": "App\\Http\\Controllers\\Client\\NotificationController@readAll",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/notifications/{notification}/read",
+    "name": "account.notifications.read",
+    "action": "App\\Http\\Controllers\\Client\\NotificationController@read",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/data-export",
+    "name": "account.data-export",
+    "action": "App\\Http\\Controllers\\Client\\DataExportController",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/client-area/account",
+    "name": "profile.destroy",
+    "action": "App\\Http\\Controllers\\Client\\AccountDetailsController@destroy",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/settings/appearance",
+    "name": "appearance.edit",
+    "action": "\\Inertia\\Controller",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "settings/Appearance"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/logout",
+    "name": "logout",
+    "action": "App\\Http\\Controllers\\Client\\AuthController@destroy",
+    "middleware": [
+      "web",
+      "auth"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/impersonation/leave",
+    "name": "impersonation.leave",
+    "action": "App\\Http\\Controllers\\Admin\\ImpersonationController@destroy",
+    "middleware": [
+      "web",
+      "auth"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/forgot-password",
+    "name": "password.request",
+    "action": "App\\Http\\Controllers\\Client\\PasswordRecoveryController@create",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": [
+      "Client/Auth/ForgotPassword"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/forgot-password",
+    "name": "password.email",
+    "action": "App\\Http\\Controllers\\Client\\PasswordRecoveryController@store",
+    "middleware": [
+      "web",
+      "guest",
+      "throttle:5,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/reset-password/{token}",
+    "name": "password.reset",
+    "action": "App\\Http\\Controllers\\Client\\PasswordRecoveryController@edit",
+    "middleware": [
+      "web",
+      "guest"
+    ],
+    "pages": [
+      "Client/Auth/ResetPassword"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/reset-password",
+    "name": "password.reset.store",
+    "action": "App\\Http\\Controllers\\Client\\PasswordRecoveryController@update",
+    "middleware": [
+      "web",
+      "guest",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/projects",
+    "name": "client.projects.index",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@index",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Projects/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/projects/{project}",
+    "name": "client.projects.show",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@show",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Projects/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/projects/{project}/updates",
+    "name": "client.projects.updates.store",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@postUpdate",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:30,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/projects/{project}/files",
+    "name": "client.projects.files.store",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@upload",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:20,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/projects/{project}/files/{file}",
+    "name": "client.projects.files.download",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@download",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/projects/{project}/approvals/{approval}",
+    "name": "client.projects.approvals.decide",
+    "action": "App\\Http\\Controllers\\Client\\ProjectController@decide",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/maintenance",
+    "name": "maintenance.index",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@index",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/MaintenancePlans/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/maintenance/{plan}",
+    "name": "maintenance.show",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@show",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Client/MaintenancePlans/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/maintenance/{plan}/request",
+    "name": "maintenance.request",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@store",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:10,10"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/maintenance",
+    "name": "account.maintenance.index",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@requests",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Maintenance/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/maintenance/{maintenanceRequest}",
+    "name": "account.maintenance.show",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@details",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Account/Maintenance/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/maintenance/{maintenanceRequest}/checkout",
+    "name": "account.maintenance.checkout",
+    "action": "App\\Http\\Controllers\\Client\\MaintenanceCheckoutController@start",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/client-area/maintenance/{maintenanceRequest}/checkout",
+    "name": "account.maintenance.checkout.review",
+    "action": "App\\Http\\Controllers\\Client\\MaintenanceCheckoutController@review",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": [
+      "Client/Checkout/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/maintenance/{maintenanceRequest}/checkout/pay",
+    "name": "account.maintenance.checkout.pay",
+    "action": "App\\Http\\Controllers\\Client\\MaintenanceCheckoutController@pay",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified",
+      "throttle:10,10"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/client-area/maintenance/{maintenanceRequest}/withdraw",
+    "name": "account.maintenance.withdraw",
+    "action": "App\\Http\\Controllers\\Client\\MaintenancePlanController@withdraw",
+    "middleware": [
+      "web",
+      "auth",
+      "auth.session",
+      "verified"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/login",
+    "name": "admin.login",
+    "action": "App\\Http\\Controllers\\Admin\\AuthController@create",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Admin/Auth/Login"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/login",
+    "name": "admin.login.store",
+    "action": "App\\Http\\Controllers\\Admin\\AuthController@store",
+    "middleware": [
+      "web",
+      "throttle:auth-login"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/two-factor-challenge",
+    "name": "admin.two-factor.challenge",
+    "action": "App\\Http\\Controllers\\Admin\\TwoFactorChallengeController@create",
+    "middleware": [
+      "web"
+    ],
+    "pages": [
+      "Admin/Auth/TwoFactorChallenge"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/two-factor-challenge",
+    "name": "admin.two-factor.challenge.store",
+    "action": "App\\Http\\Controllers\\Admin\\TwoFactorChallengeController@store",
+    "middleware": [
+      "web",
+      "throttle:5,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/inquiries/{inquiry}",
+    "name": "admin.inquiries.show",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Inquiries/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/inquiries/{inquiry}/quote",
+    "name": "admin.inquiries.quote",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryController@quote",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/projects",
+    "name": "admin.projects.index",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Projects/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/projects",
+    "name": "admin.projects.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/projects/{project}",
+    "name": "admin.projects.show",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Projects/Show"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/projects/{project}",
+    "name": "admin.projects.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/projects/{project}/milestones",
+    "name": "admin.projects.milestones.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@milestone",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/projects/{project}/milestones/{milestone}",
+    "name": "admin.projects.milestones.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@updateMilestone",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/projects/{project}/updates",
+    "name": "admin.projects.updates.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@postUpdate",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/projects/{project}/files",
+    "name": "admin.projects.files.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@upload",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage",
+      "throttle:20,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/projects/{project}/files/{file}",
+    "name": "admin.projects.files.download",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@download",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/projects/{project}/approvals",
+    "name": "admin.projects.approvals.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@approval",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/projects/{project}/approvals/{approval}",
+    "name": "admin.projects.approvals.cancel",
+    "action": "App\\Http\\Controllers\\Admin\\ProjectController@cancelApproval",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/inquiry-notifications",
+    "name": "admin.settings.inquiry-notifications.edit",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryNotificationController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/InquiryNotifications"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/inquiry-notifications",
+    "name": "admin.settings.inquiry-notifications.update",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryNotificationController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/inquiry-notifications/{delivery}/retry",
+    "name": "admin.settings.inquiry-notifications.retry",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryNotificationController@retry",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/maintenance/plans",
+    "name": "admin.maintenance.plans.index",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenancePlanController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Maintenance/Plans"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/maintenance/plans",
+    "name": "admin.maintenance.plans.store",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenancePlanController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/maintenance/plans/{plan}",
+    "name": "admin.maintenance.plans.update",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenancePlanController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/maintenance/requests",
+    "name": "admin.maintenance.requests.index",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenanceRequestController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Maintenance/Requests"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/maintenance/requests/{maintenanceRequest}",
+    "name": "admin.maintenance.requests.show",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenanceRequestController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Maintenance/Request"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/maintenance/requests/{maintenanceRequest}",
+    "name": "admin.maintenance.requests.update",
+    "action": "App\\Http\\Controllers\\Admin\\MaintenanceRequestController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/dashboard",
+    "name": "admin.dashboard",
+    "action": "App\\Http\\Controllers\\Admin\\DashboardController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": [
+      "Admin/Dashboard"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/inquiries",
+    "name": "admin.inquiries.index",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Inquiries/Index"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/inquiries/{inquiry}",
+    "name": "admin.inquiries.update",
+    "action": "App\\Http\\Controllers\\Admin\\InquiryController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/search",
+    "name": "admin.search",
+    "action": "App\\Http\\Controllers\\Admin\\SearchController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "throttle:60,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/reports",
+    "name": "admin.reports.index",
+    "action": "App\\Http\\Controllers\\Admin\\ReportController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:reports.view"
+    ],
+    "pages": [
+      "Admin/Reports/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/reports/export/{dataset}",
+    "name": "admin.reports.export",
+    "action": "App\\Http\\Controllers\\Admin\\ReportController@export",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:reports.view"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/docs",
+    "name": "admin.docs.index",
+    "action": "App\\Http\\Controllers\\Admin\\DocumentationController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": [
+      "Admin/Docs/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/security",
+    "name": "admin.security.index",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": [
+      "Admin/Security/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/security/two-factor/setup",
+    "name": "admin.security.two-factor.setup",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@setup",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/security/two-factor/confirm",
+    "name": "admin.security.two-factor.confirm",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@confirm",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/security/two-factor",
+    "name": "admin.security.two-factor.disable",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@disable",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/security/two-factor/recovery-codes",
+    "name": "admin.security.two-factor.recovery-codes",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@regenerateRecoveryCodes",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/security/admins/{admin}/role",
+    "name": "admin.security.admins.role",
+    "action": "App\\Http\\Controllers\\Admin\\SecurityController@updateRole",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:admins.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/categories",
+    "name": "admin.categories.index",
+    "action": "App\\Http\\Controllers\\Admin\\CategoryController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Categories/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/categories",
+    "name": "admin.categories.store",
+    "action": "App\\Http\\Controllers\\Admin\\CategoryController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/categories/{category}",
+    "name": "admin.categories.update",
+    "action": "App\\Http\\Controllers\\Admin\\CategoryController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/categories/{category}",
+    "name": "admin.categories.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\CategoryController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/subcategories",
+    "name": "admin.subcategories.index",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Groups/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/subcategories",
+    "name": "admin.subcategories.store",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/subcategories/{group}",
+    "name": "admin.subcategories.update",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/subcategories/{group}",
+    "name": "admin.subcategories.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/groups",
+    "name": "admin.groups.index",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Groups/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/groups",
+    "name": "admin.groups.store",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/groups/{group}",
+    "name": "admin.groups.update",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/groups/{group}",
+    "name": "admin.groups.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\GroupController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/seo/generate",
+    "name": "admin.seo.generate",
+    "action": "App\\Http\\Controllers\\Admin\\AiSeoController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/products/ai/content",
+    "name": "admin.products.ai.content",
+    "action": "App\\Http\\Controllers\\Admin\\AiProductContentController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage",
+      "throttle:10,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/products/ai/icon",
+    "name": "admin.products.ai.icon",
+    "action": "App\\Http\\Controllers\\Admin\\AiProductIconController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage",
+      "throttle:5,1"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/products",
+    "name": "admin.products.index",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Products/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/products/create",
+    "name": "admin.products.create",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@create",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Products/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/products",
+    "name": "admin.products.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/products/{product}/edit",
+    "name": "admin.products.edit",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/Products/Edit"
+    ]
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/products/{product}",
+    "name": "admin.products.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/products/{product}",
+    "name": "admin.products.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\ProductController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/products/{product}/releases",
+    "name": "admin.products.releases.index",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReleaseController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/ProductReleases/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/products/{product}/releases",
+    "name": "admin.products.releases.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReleaseController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/products/{product}/releases/{release}",
+    "name": "admin.products.releases.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReleaseController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/products/{product}/releases/{release}",
+    "name": "admin.products.releases.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReleaseController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/product-reviews",
+    "name": "admin.product-reviews.index",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReviewController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/ProductReviews/Index"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/product-reviews/{review}",
+    "name": "admin.product-reviews.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProductReviewController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/product-types",
+    "name": "admin.product-types.index",
+    "action": "App\\Http\\Controllers\\Admin\\ProductTypeController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": [
+      "Admin/Catalog/ProductTypes/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/product-types",
+    "name": "admin.product-types.store",
+    "action": "App\\Http\\Controllers\\Admin\\ProductTypeController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/product-types/{product_type}",
+    "name": "admin.product-types.update",
+    "action": "App\\Http\\Controllers\\Admin\\ProductTypeController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/product-types/{product_type}",
+    "name": "admin.product-types.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\ProductTypeController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:catalog.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/pages",
+    "name": "admin.pages.index",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": [
+      "Admin/Content/Pages/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/pages/create",
+    "name": "admin.pages.create",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@create",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": [
+      "Admin/Content/Pages/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/pages",
+    "name": "admin.pages.store",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/pages/{page}/edit",
+    "name": "admin.pages.edit",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": [
+      "Admin/Content/Pages/Edit"
+    ]
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/pages/{page}",
+    "name": "admin.pages.update",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/pages/{page}",
+    "name": "admin.pages.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\PageController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/announcements",
+    "name": "admin.announcements.index",
+    "action": "App\\Http\\Controllers\\Admin\\AnnouncementController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": [
+      "Admin/Content/Announcements"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/announcements",
+    "name": "admin.announcements.store",
+    "action": "App\\Http\\Controllers\\Admin\\AnnouncementController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/announcements/{announcement}",
+    "name": "admin.announcements.update",
+    "action": "App\\Http\\Controllers\\Admin\\AnnouncementController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/announcements/{announcement}",
+    "name": "admin.announcements.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\AnnouncementController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:content.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/users",
+    "name": "admin.users.index",
+    "action": "App\\Http\\Controllers\\Admin\\UserController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.view"
+    ],
+    "pages": [
+      "Admin/Users/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/users/bulk-delete",
+    "name": "admin.users.bulk-delete",
+    "action": "App\\Http\\Controllers\\Admin\\BulkActionController@destroyUsers",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/bulk-remind",
+    "name": "admin.invoices.bulk-remind",
+    "action": "App\\Http\\Controllers\\Admin\\BulkActionController@remindInvoices",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/quotes",
+    "name": "admin.quotes.index",
+    "action": "App\\Http\\Controllers\\Admin\\QuoteController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Commerce/Quotes/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/quotes",
+    "name": "admin.quotes.store",
+    "action": "App\\Http\\Controllers\\Admin\\QuoteController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/quotes/{quote}",
+    "name": "admin.quotes.update",
+    "action": "App\\Http\\Controllers\\Admin\\QuoteController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/quotes/{quote}",
+    "name": "admin.quotes.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\QuoteController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/quotes/{quote}/send",
+    "name": "admin.quotes.send",
+    "action": "App\\Http\\Controllers\\Admin\\QuoteController@send",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/affiliates",
+    "name": "admin.affiliates.index",
+    "action": "App\\Http\\Controllers\\Admin\\AffiliateController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Commerce/Affiliates"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/affiliates/{affiliate}/toggle",
+    "name": "admin.affiliates.toggle",
+    "action": "App\\Http\\Controllers\\Admin\\AffiliateController@toggle",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/referrals/{referral}/approve",
+    "name": "admin.referrals.approve",
+    "action": "App\\Http\\Controllers\\Admin\\AffiliateController@approve",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/referrals/{referral}/pay",
+    "name": "admin.referrals.pay",
+    "action": "App\\Http\\Controllers\\Admin\\AffiliateController@pay",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/api-tokens",
+    "name": "admin.api-tokens.index",
+    "action": "App\\Http\\Controllers\\Admin\\ApiTokenController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/ApiTokens"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/api-tokens",
+    "name": "admin.api-tokens.store",
+    "action": "App\\Http\\Controllers\\Admin\\ApiTokenController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/settings/api-tokens/{apiToken}",
+    "name": "admin.api-tokens.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\ApiTokenController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/webhooks",
+    "name": "admin.webhooks.index",
+    "action": "App\\Http\\Controllers\\Admin\\WebhookEndpointController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Webhooks"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/webhooks",
+    "name": "admin.webhooks.store",
+    "action": "App\\Http\\Controllers\\Admin\\WebhookEndpointController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/settings/webhooks/{webhook}",
+    "name": "admin.webhooks.update",
+    "action": "App\\Http\\Controllers\\Admin\\WebhookEndpointController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/settings/webhooks/{webhook}",
+    "name": "admin.webhooks.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\WebhookEndpointController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/users",
+    "name": "admin.users.store",
+    "action": "App\\Http\\Controllers\\Admin\\UserController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/users/{user}/invoice/{invoice}",
+    "name": "admin.users.invoice",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@manage",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Invoices/Show"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/users/{user}/{tab?}",
+    "name": "admin.users.show",
+    "action": "App\\Http\\Controllers\\Admin\\UserController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.view"
+    ],
+    "pages": [
+      "Admin/Users/Show"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/users/{user}",
+    "name": "admin.users.update",
+    "action": "App\\Http\\Controllers\\Admin\\UserController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/users/{user}/notes",
+    "name": "admin.users.notes",
+    "action": "App\\Http\\Controllers\\Admin\\UserController@updateNotes",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:users.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/users/{user}/orders",
+    "name": "admin.users.orders.store",
+    "action": "App\\Http\\Controllers\\Admin\\UserOrderController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/users/{user}/impersonate",
+    "name": "admin.users.impersonate",
+    "action": "App\\Http\\Controllers\\Admin\\ImpersonationController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:admins.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/orders/{order}/invoice",
+    "name": "admin.orders.invoice.store",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/licenses/{license}",
+    "name": "admin.licenses.show",
+    "action": "App\\Http\\Controllers\\Admin\\LicenseController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:licenses.view"
+    ],
+    "pages": [
+      "Admin/Licenses/Show"
+    ]
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/licenses/{license}",
+    "name": "admin.licenses.update",
+    "action": "App\\Http\\Controllers\\Admin\\LicenseController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:licenses.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/invoices",
+    "name": "admin.invoices.index",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Invoices/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/refund-requests",
+    "name": "admin.refund-requests.index",
+    "action": "App\\Http\\Controllers\\Admin\\RefundRequestController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/RefundRequests/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/refund-requests/{refundRequest}",
+    "name": "admin.refund-requests.show",
+    "action": "App\\Http\\Controllers\\Admin\\RefundRequestController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/RefundRequests/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/refund-requests/{refundRequest}/approve",
+    "name": "admin.refund-requests.approve",
+    "action": "App\\Http\\Controllers\\Admin\\RefundRequestController@approve",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/refund-requests/{refundRequest}/reject",
+    "name": "admin.refund-requests.reject",
+    "action": "App\\Http\\Controllers\\Admin\\RefundRequestController@reject",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/payments",
+    "name": "admin.payments.index",
+    "action": "App\\Http\\Controllers\\Admin\\PaymentReliabilityController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Payments/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/payments/webhooks/{webhookEvent}",
+    "name": "admin.payments.webhooks.show",
+    "action": "App\\Http\\Controllers\\Admin\\PaymentReliabilityController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Payments/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/payments/webhooks/{webhookEvent}/replay",
+    "name": "admin.payments.webhooks.replay",
+    "action": "App\\Http\\Controllers\\Admin\\PaymentReliabilityController@replay",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/subscriptions",
+    "name": "admin.subscriptions.index",
+    "action": "App\\Http\\Controllers\\Admin\\SubscriptionController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Subscriptions/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/subscriptions/{subscription}",
+    "name": "admin.subscriptions.show",
+    "action": "App\\Http\\Controllers\\Admin\\SubscriptionController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Subscriptions/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/subscriptions/{subscription}/cancel",
+    "name": "admin.subscriptions.cancel",
+    "action": "App\\Http\\Controllers\\Admin\\SubscriptionController@cancel",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/subscriptions/{subscription}/resume",
+    "name": "admin.subscriptions.resume",
+    "action": "App\\Http\\Controllers\\Admin\\SubscriptionController@resume",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/promotions",
+    "name": "admin.promotions.index",
+    "action": "App\\Http\\Controllers\\Admin\\PromotionCodeController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Commerce/Promotions/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/promotions",
+    "name": "admin.promotions.store",
+    "action": "App\\Http\\Controllers\\Admin\\PromotionCodeController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/promotions/{promotion}",
+    "name": "admin.promotions.update",
+    "action": "App\\Http\\Controllers\\Admin\\PromotionCodeController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/promotions/{promotion}",
+    "name": "admin.promotions.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\PromotionCodeController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/tax-rates",
+    "name": "admin.tax-rates.index",
+    "action": "App\\Http\\Controllers\\Admin\\TaxRateController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Commerce/TaxRates/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/tax-rates",
+    "name": "admin.tax-rates.store",
+    "action": "App\\Http\\Controllers\\Admin\\TaxRateController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT",
+      "PATCH"
+    ],
+    "uri": "/admin/tax-rates/{tax_rate}",
+    "name": "admin.tax-rates.update",
+    "action": "App\\Http\\Controllers\\Admin\\TaxRateController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/tax-rates/{tax_rate}",
+    "name": "admin.tax-rates.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\TaxRateController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/invoices/{invoice}",
+    "name": "admin.invoices.show",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/invoices/{invoice}/download",
+    "name": "admin.invoices.download",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@download",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/credit-notes/{creditNote}/download",
+    "name": "admin.credit-notes.download",
+    "action": "App\\Http\\Controllers\\Admin\\CreditNoteController@download",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/{invoice}/mark-paid",
+    "name": "admin.invoices.pay",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@markPaid",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/{invoice}/void",
+    "name": "admin.invoices.void",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@void",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/{invoice}/add-payment",
+    "name": "admin.invoices.payment",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@addPayment",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/{invoice}/refund",
+    "name": "admin.invoices.refund",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@refund",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/invoices/{invoice}/notes",
+    "name": "admin.invoices.notes",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@updateNotes",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/invoices/{invoice}/send",
+    "name": "admin.invoices.send",
+    "action": "App\\Http\\Controllers\\Admin\\InvoiceController@sendEmail",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/support/tickets",
+    "name": "admin.support.tickets.index",
+    "action": "App\\Http\\Controllers\\Admin\\SupportTicketController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Tickets/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/support/tickets/{ticket}",
+    "name": "admin.support.tickets.show",
+    "action": "App\\Http\\Controllers\\Admin\\SupportTicketController@show",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Tickets/Show"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/support/tickets/{ticket}/reply",
+    "name": "admin.support.tickets.reply",
+    "action": "App\\Http\\Controllers\\Admin\\SupportTicketController@reply",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PATCH"
+    ],
+    "uri": "/admin/support/tickets/{ticket}/status",
+    "name": "admin.support.tickets.status",
+    "action": "App\\Http\\Controllers\\Admin\\SupportTicketController@updateStatus",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/support/tickets/{ticket}",
+    "name": "admin.support.tickets.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\SupportTicketController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/support/departments",
+    "name": "admin.support.departments.index",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Departments/Index"
+    ]
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/support/departments/create",
+    "name": "admin.support.departments.create",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@create",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Departments/Create"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/support/departments",
+    "name": "admin.support.departments.store",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/support/departments/test-mail",
+    "name": "admin.support.departments.test-mail",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@testMail",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/support/departments/{department}/edit",
+    "name": "admin.support.departments.edit",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": [
+      "Admin/Support/Departments/Edit"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/support/departments/{department}",
+    "name": "admin.support.departments.update",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/support/departments/{department}",
+    "name": "admin.support.departments.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/support/departments/{department}/move",
+    "name": "admin.support.departments.move",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentController@move",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/support/departments/{department}/fields",
+    "name": "admin.support.departments.fields.store",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentFieldController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/support/departments/{department}/fields/{field}",
+    "name": "admin.support.departments.fields.update",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentFieldController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/support/departments/{department}/fields/{field}",
+    "name": "admin.support.departments.fields.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\TicketDepartmentFieldController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:support.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ],
+    "uri": "/admin/settings",
+    "name": "admin.settings.edit",
+    "action": "\\Illuminate\\Routing\\RedirectController",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/general",
+    "name": "admin.settings.general.edit",
+    "action": "App\\Http\\Controllers\\Admin\\GeneralSettingController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/General"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/general",
+    "name": "admin.settings.general.update",
+    "action": "App\\Http\\Controllers\\Admin\\GeneralSettingController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/branding",
+    "name": "admin.settings.branding",
+    "action": "App\\Http\\Controllers\\Admin\\BrandingController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/gateways",
+    "name": "admin.settings.gateways.edit",
+    "action": "App\\Http\\Controllers\\Admin\\GatewaySettingController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/Gateways"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/gateways/{gateway}/activate",
+    "name": "admin.settings.gateways.activate",
+    "action": "App\\Http\\Controllers\\Admin\\GatewaySettingController@activate",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/settings/gateways/{gateway}",
+    "name": "admin.settings.gateways.deactivate",
+    "action": "App\\Http\\Controllers\\Admin\\GatewaySettingController@deactivate",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/gateways/{gateway}",
+    "name": "admin.settings.gateways.update",
+    "action": "App\\Http\\Controllers\\Admin\\GatewaySettingController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:billing.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/emailtemplates",
+    "name": "admin.settings.emailtemplates.index",
+    "action": "App\\Http\\Controllers\\Admin\\EmailTemplateController@index",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/EmailTemplates/Index"
+    ]
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/settings/emailtemplates",
+    "name": "admin.settings.emailtemplates.store",
+    "action": "App\\Http\\Controllers\\Admin\\EmailTemplateController@store",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/emailtemplates/{emailtemplate}",
+    "name": "admin.settings.emailtemplates.edit",
+    "action": "App\\Http\\Controllers\\Admin\\EmailTemplateController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/EmailTemplates/Edit"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/emailtemplates/{emailtemplate}",
+    "name": "admin.settings.emailtemplates.update",
+    "action": "App\\Http\\Controllers\\Admin\\EmailTemplateController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "DELETE"
+    ],
+    "uri": "/admin/settings/emailtemplates/{emailtemplate}",
+    "name": "admin.settings.emailtemplates.destroy",
+    "action": "App\\Http\\Controllers\\Admin\\EmailTemplateController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/storage",
+    "name": "admin.settings.storage.edit",
+    "action": "App\\Http\\Controllers\\Admin\\StorageSettingController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/Storage"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/storage",
+    "name": "admin.settings.storage.update",
+    "action": "App\\Http\\Controllers\\Admin\\StorageSettingController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/admin/settings/seo",
+    "name": "admin.settings.seo.edit",
+    "action": "App\\Http\\Controllers\\Admin\\SeoSettingController@edit",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": [
+      "Admin/Configuration/Settings/Seo"
+    ]
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/admin/settings/seo",
+    "name": "admin.settings.seo.update",
+    "action": "App\\Http\\Controllers\\Admin\\SeoSettingController@update",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit",
+      "admin.permission:settings.manage"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "POST"
+    ],
+    "uri": "/admin/logout",
+    "name": "admin.logout",
+    "action": "App\\Http\\Controllers\\Admin\\AuthController@destroy",
+    "middleware": [
+      "web",
+      "auth:admin",
+      "admin.audit"
+    ],
+    "pages": []
+  },
+  {
+    "methods": [
+      "GET",
+      "HEAD"
+    ],
+    "uri": "/storage/{path}",
+    "name": "storage.local",
+    "action": "Closure",
+    "middleware": [],
+    "pages": []
+  },
+  {
+    "methods": [
+      "PUT"
+    ],
+    "uri": "/storage/{path}",
+    "name": "storage.local.upload",
+    "action": "Closure",
+    "middleware": [],
+    "pages": []
+  }
+]

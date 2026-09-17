@@ -108,8 +108,7 @@ const statusClass = (status: string) =>
         active: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300',
         suspended:
             'bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
-        expired:
-            'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300',
+        expired: 'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300',
         terminated:
             'bg-red-100 text-red-700 dark:bg-red-500/10 dark:text-red-300',
     })[status] ?? 'bg-muted text-muted-foreground';
@@ -167,9 +166,7 @@ const statusClass = (status: string) =>
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <dl
-                            class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2"
-                        >
+                        <dl class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-2">
                             <div>
                                 <dt class="text-muted-foreground">Product</dt>
                                 <dd class="mt-0.5 font-semibold">
@@ -219,7 +216,9 @@ const statusClass = (status: string) =>
                             </div>
                             <div>
                                 <dt class="text-muted-foreground">Order</dt>
-                                <dd class="mt-0.5 font-mono text-xs font-semibold">
+                                <dd
+                                    class="mt-0.5 font-mono text-xs font-semibold"
+                                >
                                     {{ license.order.order_number }}
                                     <span
                                         class="ml-1 font-sans text-muted-foreground"
@@ -245,13 +244,10 @@ const statusClass = (status: string) =>
                                     >
                                         <FileText class="size-3.5" />
                                         {{
-                                            license.order.invoice
-                                                .invoice_number
+                                            license.order.invoice.invoice_number
                                         }}
                                     </Link>
-                                    <span
-                                        v-else
-                                        class="text-muted-foreground"
+                                    <span v-else class="text-muted-foreground"
                                         >—</span
                                     >
                                 </dd>
@@ -427,8 +423,8 @@ const statusClass = (status: string) =>
                     <CardHeader>
                         <CardTitle>Module commands</CardTitle>
                         <CardDescription>
-                            Status changes apply immediately to the
-                            customer's account and to verify API checks.
+                            Status changes apply immediately to the customer's
+                            account and to verify API checks.
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-3">
@@ -467,8 +463,9 @@ const statusClass = (status: string) =>
                                 "
                                 @click="licenseAction('reset_reissues')"
                             >
-                                <RefreshCw class="size-4" /> Reset reissues
-                                ({{ license.reissue_count }})
+                                <RefreshCw class="size-4" /> Reset reissues ({{
+                                    license.reissue_count
+                                }})
                             </Button>
                             <Button
                                 variant="destructive"
@@ -476,8 +473,7 @@ const statusClass = (status: string) =>
                                 :disabled="acting"
                                 @click="licenseAction('terminate')"
                             >
-                                <XCircle class="size-4" /> Terminate
-                                permanently
+                                <XCircle class="size-4" /> Terminate permanently
                             </Button>
                         </template>
                         <p
@@ -495,9 +491,9 @@ const statusClass = (status: string) =>
                         <BadgeCheck class="size-5 shrink-0 text-primary" />
                         <p class="text-xs leading-5 text-muted-foreground">
                             Suspended licenses fail product activation checks
-                            but keep their installation details. Reissuing
-                            keeps the status and clears the recorded website
-                            so the customer can activate elsewhere.
+                            but keep their installation details. Reissuing keeps
+                            the status and clears the recorded website so the
+                            customer can activate elsewhere.
                         </p>
                     </CardContent>
                 </Card>

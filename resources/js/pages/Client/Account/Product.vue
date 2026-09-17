@@ -2,6 +2,7 @@
 import { Link, router } from '@inertiajs/vue3';
 import { Check, Copy, Download, Package, RefreshCw, Wrench } from '@lucide/vue';
 import { ref } from 'vue';
+import { toast } from 'vue-sonner';
 import ClientAreaHero from '@/modules/client/components/ClientAreaHero.vue';
 import SeoHead from '@/modules/client/components/SeoHead.vue';
 
@@ -82,9 +83,15 @@ const activeTab = ref<'information' | 'downloads'>('information');
 
 const copied = ref(false);
 const copyKey = async () => {
-    await navigator.clipboard.writeText(props.service.license_key);
-    copied.value = true;
-    setTimeout(() => (copied.value = false), 2000);
+    try {
+        await navigator.clipboard.writeText(props.service.license_key);
+        copied.value = true;
+        setTimeout(() => (copied.value = false), 2000);
+    } catch {
+        toast.error(
+            'Unable to copy. Please select and copy the license key manually.',
+        );
+    }
 };
 
 const reissuing = ref(false);
@@ -125,7 +132,7 @@ const cycleLabel = (cycle: string) =>
 
 const statusClass = (status: string) =>
     ({
-        active: 'bg-[#5cb85c] text-white',
+        active: 'bg-[#087f75] text-white',
         suspended: 'bg-amber-500 text-white',
         expired: 'bg-red-500 text-white',
         terminated: 'bg-red-500 text-white',
@@ -170,24 +177,24 @@ const dtClass =
     />
 
     <ClientAreaHero>
-        <div class="mt-10 flex flex-col gap-6 sm:flex-row sm:items-start">
+        <div class="mt-3 flex flex-col gap-6 sm:flex-row sm:items-start">
             <img
                 v-if="props.service.product?.featured_image"
                 :src="props.service.product.featured_image"
                 alt=""
-                class="size-24 shrink-0 rounded-2xl border border-white/20 object-cover shadow-lg"
+                class="size-24 shrink-0 rounded-2xl border border-[var(--client-border)] object-cover shadow-lg"
             />
             <span
                 v-else
-                class="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#45b6ee] to-[#2196d8] shadow-lg"
+                class="flex size-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#087f75] to-[#06655e] shadow-lg"
             >
                 <Package class="size-11 text-white" />
             </span>
 
             <div class="min-w-0">
-                <p class="text-sm font-semibold text-white/75">
+                <p class="text-sm font-semibold text-[var(--client-muted)]">
                     {{ props.service.product?.category ?? 'Products' }}
-                    <span class="mx-1 text-white/40">/</span>
+                    <span class="mx-1 text-[var(--client-muted)]">/</span>
                     {{ label(props.service.product?.type ?? '') }}
                 </p>
                 <div class="mt-1 flex flex-wrap items-center gap-3">
@@ -202,7 +209,7 @@ const dtClass =
                     </span>
                 </div>
                 <p
-                    class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-white/85"
+                    class="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-[var(--client-muted)]"
                 >
                     <span>
                         Next Due Date:
@@ -231,19 +238,19 @@ const dtClass =
                     <Link
                         v-if="props.service.product"
                         :href="props.service.product.url"
-                        class="rounded-md bg-[#5cb85c] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c]"
+                        class="rounded-md bg-[#087f75] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e]"
                     >
                         View Product Page
                     </Link>
                     <Link
                         href="/client-area/tickets/create"
-                        class="rounded-md border border-white/40 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+                        class="rounded-lg border border-[var(--client-border)] bg-[var(--client-surface)] px-4 py-2.5 text-sm font-semibold text-[var(--client-ink)] transition hover:bg-[var(--client-surface-soft)]"
                     >
                         Get Support
                     </Link>
                     <Link
                         href="/client-area/tickets/create"
-                        class="rounded-md border border-white/40 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10"
+                        class="rounded-lg border border-[var(--client-border)] bg-[var(--client-surface)] px-4 py-2.5 text-sm font-semibold text-[var(--client-ink)] transition hover:bg-[var(--client-surface-soft)]"
                     >
                         Request Cancellation
                     </Link>
@@ -251,7 +258,11 @@ const dtClass =
             </div>
         </div>
 
-        <div class="mt-10 -mb-px flex gap-1">
+        <div
+            class="mt-8 -mb-px flex gap-1"
+            role="group"
+            aria-label="Product information"
+        >
             <button
                 v-for="tab in [
                     { key: 'information' as const, label: 'Information' },
@@ -259,11 +270,12 @@ const dtClass =
                 ]"
                 :key="tab.key"
                 type="button"
+                :aria-pressed="activeTab === tab.key"
                 class="border-b-[3px] px-4 py-3 text-sm font-bold tracking-wide transition"
                 :class="
                     activeTab === tab.key
-                        ? 'border-[#7ed957] text-white'
-                        : 'border-transparent text-white/70 hover:text-white'
+                        ? 'border-[#087f75] text-[var(--client-accent-dark)]'
+                        : 'border-transparent text-[var(--client-muted)] hover:text-[var(--client-ink)]'
                 "
                 @click="activeTab = tab.key"
             >
@@ -275,7 +287,7 @@ const dtClass =
     <section class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
         <div
             v-show="activeTab === 'information'"
-            class="mt-8 grid overflow-hidden rounded-xl bg-card shadow-lg lg:grid-cols-[minmax(0,1fr)_340px]"
+            class="mt-8 grid overflow-hidden rounded-xl border bg-card shadow-sm lg:grid-cols-[minmax(0,1fr)_340px]"
         >
             <div class="p-6 sm:p-8">
                 <h2 class="font-bold tracking-tight">License Information</h2>
@@ -303,11 +315,13 @@ const dtClass =
                             </span>
                             <button
                                 type="button"
-                                class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#4fb250] hover:text-[#4fb250]"
+                                class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#087f75] hover:text-[var(--client-accent)]"
                                 @click="copyKey"
                             >
                                 <template v-if="copied">
-                                    <Check class="size-3.5 text-[#4fb250]" />
+                                    <Check
+                                        class="size-3.5 text-[var(--client-accent)]"
+                                    />
                                     Copied
                                 </template>
                                 <template v-else>
@@ -319,7 +333,7 @@ const dtClass =
                             <button
                                 v-if="props.service.status !== 'terminated'"
                                 type="button"
-                                class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#4fb250] hover:text-[#4fb250] disabled:opacity-60"
+                                class="inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-semibold transition hover:border-[#087f75] hover:text-[var(--client-accent)] disabled:opacity-60"
                                 :disabled="reissuing"
                                 @click="reissue"
                             >
@@ -452,7 +466,7 @@ const dtClass =
                 <h2 class="font-bold tracking-tight">Latest Version</h2>
 
                 <p
-                    class="mt-6 text-5xl font-bold tracking-tight text-[#4fb250]"
+                    class="mt-6 text-5xl font-bold tracking-tight text-[var(--client-accent)]"
                 >
                     {{
                         props.service.product?.version
@@ -491,7 +505,7 @@ const dtClass =
                 <Link
                     v-if="props.service.product"
                     :href="props.service.product.url"
-                    class="mt-7 inline-flex items-center gap-2 rounded-md bg-[#5cb85c] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c]"
+                    class="mt-7 inline-flex items-center gap-2 rounded-md bg-[#087f75] px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e]"
                 >
                     <Download class="size-4" /> View Product Page
                 </Link>
@@ -508,7 +522,7 @@ const dtClass =
         </div>
 
         <div v-show="activeTab === 'downloads'" class="mt-8 space-y-5">
-            <div class="rounded-xl bg-card p-6 shadow-lg sm:p-8">
+            <div class="rounded-xl border bg-card p-6 shadow-sm sm:p-8">
                 <p class="text-sm font-semibold text-primary">
                     Secure product delivery
                 </p>
@@ -525,7 +539,7 @@ const dtClass =
             <article
                 v-for="release in props.releases"
                 :key="release.id"
-                class="overflow-hidden rounded-xl bg-card shadow-lg"
+                class="overflow-hidden rounded-xl border bg-card shadow-sm"
             >
                 <div
                     class="flex flex-col justify-between gap-5 border-b border-border p-6 sm:flex-row sm:items-start sm:p-8"
@@ -559,7 +573,7 @@ const dtClass =
                     <a
                         v-if="release.can_download"
                         :href="release.download_url"
-                        class="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#5cb85c] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#4cae4c]"
+                        class="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-[#087f75] px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-[#06655e]"
                     >
                         <Download class="size-4" /> Download package
                     </a>
@@ -627,7 +641,7 @@ const dtClass =
 
             <div
                 v-if="props.releases.length === 0"
-                class="rounded-xl bg-card p-10 text-center shadow-lg"
+                class="rounded-xl border bg-card p-10 text-center shadow-sm"
             >
                 <span
                     class="mx-auto flex size-20 items-center justify-center rounded-full border-2 border-muted text-muted-foreground/40"
@@ -652,7 +666,7 @@ const dtClass =
                     v-for="offering in props.services"
                     :key="offering.id"
                     :href="offering.url"
-                    class="flex items-stretch gap-0 overflow-hidden rounded-xl bg-card shadow-lg transition hover:shadow-xl"
+                    class="flex items-stretch gap-0 overflow-hidden rounded-xl border bg-card shadow-sm transition hover:shadow-xl"
                 >
                     <img
                         v-if="offering.featured_image"
@@ -662,7 +676,7 @@ const dtClass =
                     />
                     <span
                         v-else
-                        class="flex w-28 shrink-0 items-center justify-center bg-gradient-to-br from-[#8e6ee6] to-[#6a48c9] text-white"
+                        class="flex w-28 shrink-0 items-center justify-center bg-[var(--client-accent-soft)] text-[var(--client-accent)]"
                     >
                         <Wrench class="size-9" />
                     </span>

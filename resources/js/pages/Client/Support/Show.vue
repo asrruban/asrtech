@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link, router, useForm } from '@inertiajs/vue3';
-import { ArrowLeft, CircleCheck, Send, ShieldCheck, UserRound } from '@lucide/vue';
+import {
+    ArrowLeft,
+    CircleCheck,
+    Send,
+    ShieldCheck,
+    UserRound,
+} from '@lucide/vue';
 import InputError from '@/components/InputError.vue';
 import ClientAreaHero from '@/modules/client/components/ClientAreaHero.vue';
 import SeoHead from '@/modules/client/components/SeoHead.vue';
@@ -50,11 +56,11 @@ const closeTicket = () => {
 
 const statusClass = (status: string) =>
     ({
-        open: 'bg-[#eff9ef] text-[#357e37] dark:bg-[#4fb250]/10 dark:text-[#84d780]',
+        open: 'bg-[var(--client-accent-soft)] text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-[#84d780]',
         customer_reply:
             'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300',
         answered:
-            'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300',
+            'bg-blue-50 text-[var(--client-accent-dark)] dark:bg-[#087f75]/10 dark:text-emerald-200',
         in_progress:
             'bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-300',
         on_hold:
@@ -118,7 +124,7 @@ const formatDate = (date: string | null) =>
                 class="rounded-2xl border p-5 shadow-sm"
                 :class="
                     reply.is_staff
-                        ? 'border-[#4fb250]/40 bg-[#eff9ef]/40 dark:bg-[#4fb250]/5'
+                        ? 'border-[#087f75]/40 bg-[var(--client-accent-soft)]/40 dark:bg-[#087f75]/5'
                         : 'bg-card'
                 "
             >
@@ -128,7 +134,7 @@ const formatDate = (date: string | null) =>
                     <span class="flex items-center gap-2 font-bold">
                         <ShieldCheck
                             v-if="reply.is_staff"
-                            class="size-4 text-[#4fb250]"
+                            class="size-4 text-[var(--client-accent)]"
                         />
                         <UserRound
                             v-else
@@ -137,7 +143,7 @@ const formatDate = (date: string | null) =>
                         {{ reply.author }}
                         <span
                             v-if="reply.is_staff"
-                            class="rounded-full bg-[#4fb250]/10 px-2 py-0.5 text-xs font-bold text-[#357e37] dark:text-[#84d780]"
+                            class="rounded-full bg-[#087f75]/10 px-2 py-0.5 text-xs font-bold text-[var(--client-accent-dark)] dark:text-[#84d780]"
                         >
                             Staff
                         </span>
@@ -146,7 +152,7 @@ const formatDate = (date: string | null) =>
                         {{ formatDate(reply.created_at) }}
                     </span>
                 </div>
-                <p class="whitespace-pre-wrap text-sm leading-relaxed">
+                <p class="text-sm leading-relaxed whitespace-pre-wrap">
                     {{ reply.message }}
                 </p>
             </article>
@@ -166,17 +172,25 @@ const formatDate = (date: string | null) =>
             <textarea
                 id="reply-message"
                 v-model="form.message"
+                :aria-invalid="Boolean(form.errors.message)"
+                :aria-describedby="
+                    form.errors.message ? 'form-message-error' : undefined
+                "
                 rows="5"
                 required
                 class="w-full rounded-lg border bg-transparent px-3 py-2 text-sm"
             ></textarea>
-            <InputError :message="form.errors.message" />
+            <InputError
+                id="form-message-error"
+                :message="form.errors.message"
+            />
             <button
                 type="submit"
                 :disabled="form.processing"
-                class="inline-flex items-center gap-2 rounded-lg bg-[#4fb250] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#3f9f40] disabled:opacity-60"
+                class="inline-flex items-center gap-2 rounded-lg bg-[#087f75] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#06655e] disabled:opacity-60"
             >
-                <Send class="size-4" /> Send Reply
+                <Send class="size-4" />
+                {{ form.processing ? 'Sending…' : 'Send reply' }}
             </button>
         </form>
     </section>

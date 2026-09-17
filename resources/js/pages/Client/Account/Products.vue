@@ -24,13 +24,16 @@ const props = defineProps<{
 
     <section class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="flex items-center gap-2.5">
-            <KeyRound class="size-5 text-[#4fb250]" />
+            <KeyRound class="size-5 text-[var(--client-accent)]" />
             <h2 class="text-xl font-bold tracking-tight sm:text-2xl">
                 Your products & services
             </h2>
         </div>
 
-        <div v-if="props.services.length" class="mt-6 grid gap-5 lg:grid-cols-2">
+        <div
+            v-if="props.services.length"
+            class="mt-6 grid gap-5 lg:grid-cols-2"
+        >
             <ServiceCard
                 v-for="service in props.services"
                 :key="service.id"
@@ -48,7 +51,7 @@ const props = defineProps<{
             </p>
             <Link
                 href="/products"
-                class="mt-5 inline-flex items-center gap-2 rounded-md bg-[#4fb250] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#439c45]"
+                class="mt-5 inline-flex items-center gap-2 rounded-md bg-[#087f75] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#06655e]"
             >
                 Browse products <ArrowRight class="size-4" />
             </Link>

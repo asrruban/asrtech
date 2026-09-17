@@ -56,14 +56,67 @@ const tabs = computed(() => [
         count: badges.value.unpaidInvoices ?? 0,
         alert: (badges.value.unpaidInvoices ?? 0) > 0,
     },
+    {
+        label: 'Quotes',
+        href: '/client-area/quotes',
+        prefixes: ['/client-area/quotes'],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
+    {
+        label: 'Projects',
+        href: '/client-area/projects',
+        prefixes: ['/client-area/projects'],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
+    {
+        label: 'Maintenance',
+        href: '/client-area/maintenance',
+        prefixes: ['/client-area/maintenance'],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
+    {
+        label: 'Account',
+        href: '/client-area/account-details',
+        prefixes: [
+            '/client-area/account-details',
+            '/client-area/change-password',
+            '/client-area/security',
+        ],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
+    {
+        label: 'Notifications',
+        href: '/client-area/notifications',
+        prefixes: ['/client-area/notifications'],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
+    {
+        label: 'Affiliate',
+        href: '/client-area/affiliate',
+        prefixes: ['/client-area/affiliate'],
+        exact: false,
+        count: null as number | null,
+        alert: false,
+    },
 ]);
 
 const isActive = (tab: { prefixes: string[]; exact: boolean }) =>
     tab.exact
-        ? page.url === tab.prefixes[0]
+        ? page.url.split('?')[0] === tab.prefixes[0]
         : tab.prefixes.some(
               (prefix) =>
-                  page.url === prefix || page.url.startsWith(`${prefix}/`),
+                  page.url.split('?')[0] === prefix ||
+                  page.url.split('?')[0].startsWith(`${prefix}/`),
           );
 
 const logout = () => router.post('/logout');
@@ -71,17 +124,19 @@ const logout = () => router.post('/logout');
 
 <template>
     <nav
-        class="-mx-4 flex items-center gap-1 overflow-x-auto border-b border-white/15 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
+        aria-label="Account navigation"
+        class="-mx-4 flex items-center gap-1 overflow-x-auto border-b border-[var(--client-border)] px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8"
     >
         <Link
             v-for="tab in tabs"
             :key="tab.href"
             :href="tab.href"
-            class="inline-flex shrink-0 items-center gap-1.5 border-b-[3px] px-3 py-3.5 text-sm font-bold tracking-wide whitespace-nowrap transition sm:px-4"
+            :aria-current="isActive(tab) ? 'page' : undefined"
+            class="inline-flex shrink-0 items-center gap-1.5 border-b-[3px] px-3 py-3.5 text-sm font-semibold whitespace-nowrap transition sm:px-4"
             :class="
                 isActive(tab)
-                    ? 'border-[#7ed957] text-white'
-                    : 'border-transparent text-white/75 hover:text-white'
+                    ? 'border-[#087f75] text-[var(--client-accent-dark)]'
+                    : 'border-transparent text-[var(--client-muted)] hover:text-[var(--client-ink)]'
             "
         >
             {{ tab.label }}
@@ -91,7 +146,7 @@ const logout = () => router.post('/logout');
                 :class="
                     tab.alert
                         ? 'bg-orange-500 text-white'
-                        : 'bg-white/90 text-slate-700'
+                        : 'bg-[var(--client-surface)] text-[var(--client-muted)]'
                 "
             >
                 {{ tab.count }}
@@ -99,7 +154,7 @@ const logout = () => router.post('/logout');
         </Link>
         <button
             type="button"
-            class="ml-auto inline-flex shrink-0 items-center gap-1.5 px-3 py-3.5 text-sm font-bold whitespace-nowrap text-white/75 transition hover:text-white"
+            class="ml-auto inline-flex shrink-0 items-center gap-1.5 px-3 py-3.5 text-sm font-semibold whitespace-nowrap text-[var(--client-muted)] transition hover:text-[var(--client-ink)]"
             @click="logout"
         >
             <Power class="size-4" /> Log Out

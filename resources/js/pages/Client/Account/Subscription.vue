@@ -217,7 +217,7 @@ const updatePaymentMethod = () =>
                     <button
                         v-if="props.subscription.can_resume"
                         type="button"
-                        class="inline-flex items-center gap-2 rounded-md bg-[#5cb85c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#4cae4c]"
+                        class="inline-flex items-center gap-2 rounded-md bg-[#087f75] px-4 py-2 text-sm font-semibold text-white hover:bg-[#06655e]"
                         @click="resume"
                     >
                         <RefreshCw class="size-4" /> Resume renewal
@@ -225,7 +225,7 @@ const updatePaymentMethod = () =>
                     <Link
                         v-if="props.subscription.can_extend"
                         :href="`/client-area/subscriptions/${props.subscription.id}/extend`"
-                        class="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 shadow-sm"
+                        class="inline-flex items-center gap-2 rounded-md bg-[#087f75] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#087f75]"
                     >
                         <CreditCard class="size-4" /> Extend to Billing Cycle
                     </Link>
@@ -233,17 +233,25 @@ const updatePaymentMethod = () =>
             </div>
 
             <div
-                v-if="props.subscription.gateway === 'free_trial' && props.subscription.status === 'trialing'"
-                class="border-t border-blue-200 bg-blue-50 px-6 py-4 text-blue-950 sm:px-8"
+                v-if="
+                    props.subscription.gateway === 'free_trial' &&
+                    props.subscription.status === 'trialing'
+                "
+                class="border-t border-red-200 bg-blue-50 px-6 py-4 text-blue-950 sm:px-8"
             >
                 <div class="flex gap-3">
                     <CalendarClock
-                        class="mt-0.5 size-5 shrink-0 text-blue-600"
+                        class="mt-0.5 size-5 shrink-0 text-[var(--client-accent)]"
                     />
                     <div>
                         <p class="font-bold">7 Days Free Trial Active</p>
-                        <p class="mt-0.5 text-sm text-blue-800">
-                            This trial period ends on {{ date(props.subscription.current_period_end) }}. Extend to a regular billing cycle to continue access.
+                        <p
+                            class="mt-0.5 text-sm text-[var(--client-accent-dark)]"
+                        >
+                            This trial period ends on
+                            {{ date(props.subscription.current_period_end) }}.
+                            Extend to a regular billing cycle to continue
+                            access.
                         </p>
                     </div>
                 </div>
